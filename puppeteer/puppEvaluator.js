@@ -77,10 +77,12 @@ async function main() {
     return[names, pricesPadded, dates];
 
   });
+  console.log('ending evaluate')
   namesAll = dataExtract[0];
   //console.log('names are: ' + namesAll)
   pricesAll = dataExtract[1];
   //console.log('prices are: ' + pricesAll)
+
   return dataExtract;
 }
 

@@ -19,8 +19,8 @@ async function do_() {
   puppeteerIns.then(res => pLoader.loadPage(url))
   .then(res => pScroller.main())
   .then(res => pEvaluator.main())
-  .then(res => console.log(res));
-  //.then(res => pWriter.main(res[0],res[1]))
+  //.then(res => console.log(res));
+  .then(res => pWriter.main(res[0],res[1]))
   /*.then(res => {
     console.log(arr[0]);
     pWriter.main(arr[0], arr[1])

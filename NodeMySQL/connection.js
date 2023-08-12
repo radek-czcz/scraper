@@ -43,7 +43,10 @@ function doConnection() {
 }
 
 function insert(names, prices) {
-
+  let arrayOfData = []
+  let query1 = 'INSERT INTO mojeprodukty '
+  let dateNow = dates.dateToSqlFormat(new Date());
+  //CREATE DB CONNECTION
   const connection = mysql.createConnection({
     host:'localhost',
     port:3306,
@@ -52,21 +55,95 @@ function insert(names, prices) {
     password:'asd2%yhfA'
   })
 
-   const query1 = 'INSERT INTO mojeprodukty ' + getArrayOfColumnNamesToString('mojeprodukty');
-   // (prName, prSeller, extractDate) VALUES (?, ?)';
+  // GET ARRAY OF COLUMN NAMES FROM DB
+    let promiseArrayOfColNames = new Promise((reject, resolve) => {
+      console.log('getting array of columns')
+      let arr = getArrayOfColumnNamesToString('mojeprodukty');
+      resolve(arr);
+    }).catch(err => console.log('error by promiseArrayOfColNames'))
 
-   let dateNow = dates.dateToSqlFormat(new Date());
+    // CREATE DB'S QUERY TEXT
+    .then(res => {
+      console.log('array of columns ready ' + res)
+      let arrayOfData = [];
+      console.log('create querys text')
+      let query2 = query1 + res;
+      // (prName, prSeller, extractDate) VALUES (?, ?)';
+      console.log(query2);
+  // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
+  for (var nth = 0; nth < names.length; nth++) {
+    arrayOfData.push([names[nth], prices[nth], 'Media Expert', , dateNow]);
+   }
+   console.log(arrayOfData);
+  /*for (var nth = 0; nth < names.length; nth++) {
+    connection.query(query2, [names[nth], prices[nth], 'Media Expert', , dateNow]);
+  }*/
 
-   for (var nth = 0; nth < names.length; nth++) {
-     connection.query(query1, [names[nth], 'Media Expert', 22312234, dateNow]);
-    }
-}
+
+  }
+  )
+ }
+
 
 function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
 
   let resString = '(';
 
-  const connection = mysql.createConnection({
+  let connection = mysql.createConnection({
+    host:'localhost',
+    port:3306,
+    database:'store',
+    user:'root',
+    password:'asd2%yhfA'
+  })
+  console.log('start columns');
+  const query1 =   'SHOW COLUMNS FROM ' + inpName;
+  let queryRes;
+
+  let queryForColumnsNames = new Promise((reject, resolve) => {
+  console.log('start columns 1');
+  connection.query(query1,
+    (err, results, fields) => {
+      if (err) {console.log(err)}
+      console.log(results);
+      queryRes = results;
+    })
+    return;
+  }).catch(err => {if (err) {console.log('error by queryForColumnsNames '+ err)}})
+
+  .then(res => {
+    let returned = [];
+    console.log(queryRes);
+    for (let key = 0; key < queryRes.length; key++) {
+      returned.push(queryRes[key].Field);
+      console.log(queryRes[key].Field);
+    }
+    //console.log(returned);
+    console.log('quer = ' + returned);
+
+    resString = '(' + returned[0]
+
+    for (let nth=1; nth<returned.length; nth++ ) {
+      resString = resString + ', ' + returned[nth]
+    }
+
+    resString = resString + ') VALUES (?'
+    for (nth=1; nth < returned.length; nth++) {
+      resString = resString + ', ?'
+    }
+
+    resString = resString+')';
+    console.log ('resString = ' + resString);
+
+  console.log(resString);
+  return resString;
+})
+  return resString;
+}
+
+function test1(names, prices) {
+  console.log('start test1')
+  let connection = mysql.createConnection({
     host:'localhost',
     port:3306,
     database:'store',
@@ -74,34 +151,45 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
     password:'asd2%yhfA'
   })
 
-  'SHOW COLUMNS FROM sale_details';
-  const query1 =   'SHOW COLUMNS FROM ' + inpName;
-  let quer = connection.query(query1,
-    function (err, results, fields) {
-      let returned = [];
-      console.log(results);
-      for (var key of results) {
-        returned.push(key.Field);
-        console.log(key.Field);
-      }
-      //console.log(returned);
-      console.log('quer = ' + quer);
+let promQuery = new Promise ((resolve, reject) => {
+      console.log('prom query')
+      connection.query('SHOW COLUMNS FROM mojeprodukty'/*SELECT * FROM mojeprodukty'*/, (err, res, fields) => {
+        if (err) return reject(err)
+        else resolve(res);
+      })
+})
 
-      resString = '(' + returned[0]
+  console.log('before end')
+  promQuery.then(res => console.log(res))
 
-      for (let nth=1; nth<returned.length; nth++ ) {
-        resString = resString + ', ' + returned[nth]
-      }
-
-      resString = resString + ') VALUES (?'
-      for (nth=1; nth < returned.length; nth++) {
-        resString = resString + ', ?'
-      }
-
-      resString = resString+')';
-      console.log ('resString = ' + resString);
-    })
 }
 
+function testSub() {
+  console.log('testSub start')
+  let names = [
+    'Karta pamięci KIOXIA Exceria microSDXC 64GB',
+    'Karta pamięci KIOXIA Exceria SDHC 16GB',
+    'Karta pamięci KIOXIA Exceria microSDHC 32GB',
+    'Karta pamięci KIOXIA Exceria SDHC 32GB',
+    'Karta pamięci KIOXIA Exceria Plus microSDHC 32GB',
+    'Karta pamięci KIOXIA Exceria High Endurance microSDHC 32GB',
+    'Karta pamięci KIOXIA Exceria microSDHC 16GB'
+  ]
 
-module.exports = {doConnection, insert};
+  let prices =  [
+   '23', '26',
+   '29', '34',
+   '56', '56',
+   '19'
+ ]
+
+ return [names, prices]
+
+}
+
+function test2() {
+  var arr = testSub();
+  test1(arr[0], arr[1])
+}
+
+module.exports = {doConnection, insert, getArrayOfColumnNamesToString, test2};
