@@ -54,13 +54,15 @@ function insert(names, prices) {
     user:'root',
     password:'asd2%yhfA'
   })
+      console.log('getting array of columns')
 
   // GET ARRAY OF COLUMN NAMES FROM DB
-    let promiseArrayOfColNames = new Promise((reject, resolve) => {
-      console.log('getting array of columns')
-      let arr = getArrayOfColumnNamesToString('mojeprodukty');
-      resolve(arr);
-    }).catch(err => console.log('error by promiseArrayOfColNames'))
+
+    getArrayOfColumnNamesToString('mojeprodukty')
+
+    .catch(err => {console.log('error by promiseArrayOfColNames' + err)
+    return err;
+  })
 
     // CREATE DB'S QUERY TEXT
     .then(res => {
@@ -75,9 +77,9 @@ function insert(names, prices) {
     arrayOfData.push([names[nth], prices[nth], 'Media Expert', , dateNow]);
    }
    console.log(arrayOfData);
-  /*for (var nth = 0; nth < names.length; nth++) {
+  for (var nth = 0; nth < names.length; nth++) {
     connection.query(query2, [names[nth], prices[nth], 'Media Expert', , dateNow]);
-  }*/
+  }
 
 
   }
@@ -86,6 +88,8 @@ function insert(names, prices) {
 
 
 function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
+
+  return new Promise((reject, resolve) => {
 
   let resString = '(';
 
@@ -107,8 +111,9 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
       if (err) {console.log(err)}
       console.log(results);
       queryRes = results;
+      resolve();
     })
-    return;
+
   }).catch(err => {if (err) {console.log('error by queryForColumnsNames '+ err)}})
 
   .then(res => {
@@ -135,11 +140,10 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
     resString = resString+')';
     console.log ('resString = ' + resString);
 
-  console.log(resString);
-  return resString;
+    resolve(resString);
 })
-  return resString;
-}
+
+})}
 
 function test1(names, prices) {
   console.log('start test1')
