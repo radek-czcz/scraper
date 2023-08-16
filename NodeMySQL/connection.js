@@ -42,7 +42,8 @@ function doConnection() {
 
 }
 
-function insert(names, prices) {
+function insert(names, prices, seller) {
+  console.log('seller from insert ' + seller)
   let arrayOfData = []
   let query1 = 'INSERT INTO mojeprodukty '
   let dateNow = dates.dateToSqlFormat(new Date());
@@ -54,6 +55,16 @@ function insert(names, prices) {
     user:'root',
     password:'asd2%yhfA'
   })
+    //SELLER NAME PARSING FROM DB
+  function query3() {
+    return new Promise((reso, rej) => {
+    connection.query(`SELECT sellerName FROM store.sprzedawcy
+    WHERE sellerWebUrl = ` + `'` + seller + `'`  + ' LIMIT 1', (err, res, f) => {
+    reso(res[0].sellerName);
+          })}
+    )
+  }
+
       console.log('getting array of columns')
 
   // GET ARRAY OF COLUMN NAMES FROM DB
@@ -72,15 +83,18 @@ function insert(names, prices) {
       let query2 = query1 + res;
       // (prName, prSeller, extractDate) VALUES (?, ?)';
       console.log(query2);
+
   // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
+    query3().then(resu => {
   for (var nth = 0; nth < names.length; nth++) {
-    arrayOfData.push([names[nth], prices[nth], 'Media Expert', , dateNow]);
+    arrayOfData.push([names[nth], prices[nth], resu, , dateNow]);
    }
    console.log(arrayOfData);
   for (var nth = 0; nth < names.length; nth++) {
-    connection.query(query2, [names[nth], prices[nth], 'Media Expert', , dateNow]);
+    console.log(parseFloat(prices[nth]));
+    connection.query(query2, [names[nth], prices[nth], resu, , dateNow]);
   }
-
+})
 
   }
   )

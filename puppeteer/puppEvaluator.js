@@ -20,12 +20,14 @@ async function main() {
      'div.list-items',
      'div.offer-box',
      'a.is-animate.spark-link',
-     'div.main-price.is-big span.whole'
+     'div.main-price.is-big span.whole',
+     'div.price-with-code-emblem'
      ]
 
   //FILTERS' STRINGS
      var filterString = [
-        '.icon-box-bold'
+        '.icon-box-bold',
+        '.offer-unavailable'
      ]
 
 
@@ -34,7 +36,9 @@ async function main() {
   // FILTERED (MANUFACTURER) ALL PRODUCT FRAMES
         //.filter(inp => inp.textContent.toLowerCase().includes(filterString[0]))
   // FILTERED (ONLY AVALIBLE TO BUY) ALL PRODUCT FRAMES - falsy expr: !inp.querySelector('.icon-box-bold')
-        .filter(inp => !inp.querySelector(filterString[0]));
+        .filter(inp => !inp.querySelector(filterString[0]))
+        .filter(inp => !inp.querySelector(filterString[1]));
+
   // MAPPED (TO PRODUCTS NAMES UNTRIMMED)
      const namesUntrimmed = productBoxes.map(inp => inp.querySelector(str[2]));
   // UNTRIMMED PRODUCT'S NAMES
@@ -42,7 +46,7 @@ async function main() {
      namesAll = names;
   //PRICE EXTRACT
      const pricesSelection = productBoxes.map(function(inp) {
-        const promoPrice = inp.querySelector('div.price-with-code-emblem');
+        const promoPrice = inp.querySelector(str[4]);
         // CHECK IF PROMO-PRICE
         if (promoPrice) {
            return promoPrice.querySelector('span.whole');
@@ -60,7 +64,7 @@ async function main() {
         if (inp === null)
            return "----";
         else
-           return inp.textContent/*.padStart(4,' ')*/;
+           return inp.textContent.replace(/[^0-9^.]/g,'')/*.padStart(4,' ')*/;
      });
      pricesAll = pricesPadded;
 
