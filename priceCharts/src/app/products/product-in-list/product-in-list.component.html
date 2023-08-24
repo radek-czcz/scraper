@@ -1,0 +1,20 @@
+<h3> Lista produktów, których cena jest dzisiaj nie większa niż 110% ceny minimalnej z badanego okresu </h3>
+
+<mat-expansion-panel hideToggle>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+                <p>{{pr.prName}}</p>
+        <!--{title}-->
+      </mat-panel-title>
+      <mat-panel-description>
+
+
+        <!--
+        {seller}-->
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <p>Cena: {{pr.prPrice}}</p>
+    <p>Sprzedawca: {{pr.prSeller}}</p>
+    <p>Data: {{pr.extractDate}}</p>
+
+  </mat-expansion-panel>

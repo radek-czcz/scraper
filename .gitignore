@@ -1,2 +1,5 @@
 node_modules/
 .vs/
+priceCharts/.angular/
+priceCharts/node_modules
+priceCharts/.vscode

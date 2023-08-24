@@ -1,0 +1,9 @@
+h3 {
+  padding-left: 20px
+}
+
+mat-expansion-panel {
+  margin: 1%;
+  padding: 6px;
+  background-color: #ffddcc;
+}
