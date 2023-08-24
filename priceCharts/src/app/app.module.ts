@@ -6,11 +6,13 @@ import { ProductInListComponent } from './products/product-in-list/product-in-li
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import {MatExpansionModule} from '@angular/material/expansion';
+import { ComponentsListComponent } from './products/components-list/components-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ProductInListComponent
+    ProductInListComponent,
+    ComponentsListComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import {MatExpansionModule} from '@angular/material/expansion';
 import { ServAngService } from '../../serv-ang.service';
 import { Observable } from 'rxjs';
@@ -13,8 +13,9 @@ import { iProduct } from '../iProduct'
   //standalone: true,
   //imports: [MatExpansionModule]
 })
-export class ProductInListComponent implements OnInit {
+export class ProductInListComponent /*implements OnInit*/ {
 
+@Input()
   pr: iProduct = {
     prName: '',
     prPrice: 0,
@@ -23,17 +24,11 @@ export class ProductInListComponent implements OnInit {
     extractDate: '',
   };
 
-
-
-
-  constructor(private servPr: ServAngService) {
-
+  /*constructor(private servPr: ServAngService) {
   }
 
   ngOnInit(): void {
-
     this.servPr.getResponse().subscribe(results => this.pr = results[0])
-
-  }
+  }*/
 
 }

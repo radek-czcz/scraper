@@ -1,0 +1,4 @@
+<h3> Lista produktów, których cena jest dzisiaj nie większa niż 110% ceny minimalnej z badanego okresu </h3>
+<ng-container *ngFor="let prod of allProductsToShow">
+  <app-product-in-list [pr] ="prod"></app-product-in-list>
+</ng-container>

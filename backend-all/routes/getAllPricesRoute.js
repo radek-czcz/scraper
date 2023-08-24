@@ -5,7 +5,18 @@ export const getAllPricesRoute = {
   method: 'GET',
   path: '/api/all',
   handler: async (reg, h) => {
-    const results = await db.query('SELECT * FROM mojeprodukty');
+    const results = await db.query(
+
+      `
+    	SELECT prName, prSeller, prPrice, extractDate from mojeprodukty
+    	WHERE EXISTS (
+    		select prName from store.derived1
+    		where mojeprodukty.prPrice < 1.1*derived1.minP AND
+    		mojeprodukty.extractDate = DATE(NOW()) AND
+    		derived1.prName = mojeprodukty.prName
+    	);`
+
+    );
     return results;
   }
 }
