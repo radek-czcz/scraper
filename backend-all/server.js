@@ -4,32 +4,37 @@ import {db} from './databaseConnection'
 
 let server;
 
-const start = async () => {
-  server = Hapi.server({
-    port:8000,
-    host: 'localhost'
+// DEFINICJA I KONFIGURACJA SERWERA HAPI
+  const start = async () => {
+      server = Hapi.server({
+        port:8000,
+        host: 'localhost'
+      });
+
+// DEFINICJA ROUTE'ÓW
+      routes.forEach(route => server.route(route));
+
+      db.connect();
+
+      await server.start();
+      console.log(`server is listening on ${server.info.uri}`);
+  }
+
+// CATCHER BŁĘDÓW
+  process.on('unhandledRejection', err => {
+    console.log(err);
+    process.exit(1);
   });
 
-  routes.forEach(route => server.route(route));
+// DEFINCJA REAKCJI NA CTRL-C
+  process.on('SIGINT', async () => {
+      console.log('stopping server...');
 
-  db.connect();
+      await server.stop({timeout: 10000})
+      db.end()
+      console.log('server stopped');
+      process.exit(0);
+  })
 
-  await server.start();
-  console.log(`server is listening on ${server.info.uri}`);
-}
-
-process.on('unhandledRejection', err => {
-  console.log(err);
-  process.exit(1);
-});
-
-process.on('SIGINT', async () => {
-  console.log('stopping server...');
-
-  await server.stop({timeout: 10000})
-  db.end()
-  console.log('server stopped');
-  process.exit(0);
-})
-
-start();
+// WYSTARTOWANIE SERWERA
+  start();
