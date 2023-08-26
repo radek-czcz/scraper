@@ -32,7 +32,7 @@ export class ComponentsListComponent  implements OnInit {
         console.log(splitted);
         let dateMidForm =  new Date(Date.UTC(+splitted[0], +splitted[1]-1, +splitted[2]));
         console.log(dateMidForm);
-        let dateFormatted = dateMidForm.getFullYear().toString()+'-'+(dateMidForm.getMonth()+1) +'-'+ dateMidForm.getDate().toString();
+        let dateFormatted = dateMidForm.getFullYear().toString()+'-'+(dateMidForm.getMonth()+1) +'-'+ ((+dateMidForm.getDate()+1).toString());
         console.log(dateFormatted);
         prod.extractDate = dateFormatted;
         console.log(prod);

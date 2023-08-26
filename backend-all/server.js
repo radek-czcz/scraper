@@ -30,7 +30,7 @@ let server;
   process.on('SIGINT', async () => {
       console.log('stopping server...');
 
-      await server.stop({timeout: 10000})
+      await server.stop({timeout: 3000})
       db.end()
       console.log('server stopped');
       process.exit(0);
