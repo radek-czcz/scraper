@@ -4,6 +4,7 @@ import { ServAngService } from '../../serv-ang.service';
 import { Observable } from 'rxjs';
 import { OnInit } from '@angular/core'
 import { iProduct } from '../iProduct'
+import { DateFormatterService } from '../../services/date-formatter.service'
 
 @Component({
   selector: 'app-components-list',
@@ -14,29 +15,14 @@ export class ComponentsListComponent  implements OnInit {
 
     allProductsToShow: iProduct[] = [];
 
-    constructor(private servPr: ServAngService) {
+    constructor(private servPr: ServAngService, private dateFormatterService: DateFormatterService) {
     }
 
     ngOnInit(): void {
       this.servPr.getResponse().subscribe(results => {this.allProductsToShow = results
         console.log(this.allProductsToShow);
-        this.formatDate();
+        //this.formatDate();
+        //this.dateFormatterService.formatDate(this.allProductsToShow);
       })
     }
-
-    formatDate(): void {
-      this.allProductsToShow.forEach(prod => {
-        console.log(prod);
-        let date = prod.extractDate;
-        let splitted = date.split(/[- : T]/);
-        console.log(splitted);
-        let dateMidForm =  new Date(Date.UTC(+splitted[0], +splitted[1]-1, +splitted[2]));
-        console.log(dateMidForm);
-        let dateFormatted = dateMidForm.getFullYear().toString()+'-'+(dateMidForm.getMonth()+1) +'-'+ ((+dateMidForm.getDate()+1).toString());
-        console.log(dateFormatted);
-        prod.extractDate = dateFormatted;
-        console.log(prod);
-      })
-    }
-
   }

@@ -8,14 +8,11 @@ export const getAllPricesRoute = {
     const results = await db.query(
 
       `
-      CREATE TABLE iF NOT EXISTS derived1
-select prName, min(prPrice) as minP from mojeprodukty
-group by prName;
 
     	SELECT prName, prPrice, extractDate from mojeprodukty
     	WHERE EXISTS (
     		select prName from store.derived1
-    		where mojeprodukty.prPrice < 1.1*derived1.minP AND
+    		where mojeprodukty.prPrice < 1.0*derived1.minP AND
     		mojeprodukty.extractDate = DATE(NOW()) AND
     		derived1.prName = mojeprodukty.prName
     	);`
