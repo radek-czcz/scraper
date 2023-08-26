@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
 
 
@@ -7,13 +7,15 @@ import { Chart } from 'chart.js/auto';
   templateUrl: './price-chart.component.html',
   styleUrls: ['./price-chart.component.css']
 })
-export class PriceChartComponent implements OnInit {
+export class PriceChartComponent implements OnInit, AfterViewInit {
 
   chart: any = [];
 
-  ngOnInit() {
+  idname: string = 'canvas' + this.makeid(4)
 
-    this.chart = new Chart('canvas', {
+  ngAfterViewInit() {
+    let ctx = document.getElementById(this.idname);
+    this.chart = new Chart(this.idname, {
       type: 'bar',
       data: {
         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -34,4 +36,21 @@ export class PriceChartComponent implements OnInit {
       },
     });
   }
+
+  ngOnInit() {
+
+  }
+
+  makeid(length: number) {
+      let result = '';
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      const charactersLength = characters.length;
+      let counter = 0;
+      while (counter < length) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        counter += 1;
+      }
+      return result;
+  }
+
   }
