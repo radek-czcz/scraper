@@ -12,5 +12,5 @@
     <p>Cena: {{pr.prPrice}}</p>
     <p>Sprzedawca: {{pr.prSeller}}</p>
     <p>Data: {{pr.extractDate | date:'YYYY-MM-dd'}}</p>
-<app-price-chart></app-price-chart>
+<app-price-chart [productKey] = 'pr.prName'></app-price-chart>
   </mat-expansion-panel>

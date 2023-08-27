@@ -21,3 +21,5 @@ export const getAllPricesRoute = {
     return results;
   }
 }
+
+//DATE(NOW())

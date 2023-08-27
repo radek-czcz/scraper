@@ -4,7 +4,7 @@ import { ServAngService } from '../../serv-ang.service';
 import { Observable } from 'rxjs';
 import { OnInit } from '@angular/core'
 import { iProduct } from '../iProduct'
-import { DateFormatterService } from '../../services/date-formatter.service'
+import { DateFormatterService } from '../../services/date-formatter/date-formatter.service'
 
 @Component({
   selector: 'app-components-list',
@@ -19,7 +19,8 @@ export class ComponentsListComponent  implements OnInit {
     }
 
     ngOnInit(): void {
-      this.servPr.getResponse().subscribe(results => {this.allProductsToShow = results
+      this.servPr.getResponse().subscribe(results => {
+        this.allProductsToShow = results;
         console.log(this.allProductsToShow);
         //this.formatDate();
         //this.dateFormatterService.formatDate(this.allProductsToShow);

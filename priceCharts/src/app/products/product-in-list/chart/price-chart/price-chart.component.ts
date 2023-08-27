@@ -1,6 +1,6 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Input, Component, OnInit, AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
-
+import { ChartDataProviderService } from '../../../../services/chart-data-provider/chart-data-provider.service';
 
 @Component({
   selector: 'app-price-chart',
@@ -9,32 +9,62 @@ import { Chart } from 'chart.js/auto';
 })
 export class PriceChartComponent implements OnInit, AfterViewInit {
 
+  _productKey: string = '';
   chart: any = [];
 
   idname: string = 'canvas' + this.makeid(4)
 
+  constructor(private dataProvider: ChartDataProviderService) {}
+
+  @Input()
+  set productKey(inp: string) {
+    this._productKey = inp;
+  }
+
   ngAfterViewInit() {
-    let ctx = document.getElementById(this.idname);
-    this.chart = new Chart(this.idname, {
-      type: 'bar',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [
-          {
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
+    let chartData: {};
+
+    this.dataProvider.prName = this._productKey;
+
+
+    this.dataProvider.getChartData().subscribe(chartData => {
+      let dateLabels: Array<string> = [];
+      let prPrices: Array<number> = [];
+      console.log(chartData);
+      chartData.forEach(inp => {
+        dateLabels.push(inp.extractDate);
+        prPrices.push(inp.prPrice);
+      })
+
+      console.log(dateLabels);
+
+      let ctx = document.getElementById(this.idname);
+      this.chart = new Chart(this.idname, {
+        type: 'bar',
+        data: {
+          labels: dateLabels,
+          datasets: [
+            {
+              label: 'cena',
+              data: prPrices,
+              borderWidth: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
           },
         },
-      },
-    });
+      });
+
+    })
+
+
+
+
   }
 
   ngOnInit() {
