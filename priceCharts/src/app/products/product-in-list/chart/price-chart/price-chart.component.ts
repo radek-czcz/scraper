@@ -1,6 +1,7 @@
 import { Input, Component, OnInit, AfterViewInit } from '@angular/core';
 import { Chart } from 'chart.js/auto';
 import { ChartDataProviderService } from '../../../../services/chart-data-provider/chart-data-provider.service';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-price-chart',
@@ -32,11 +33,9 @@ export class PriceChartComponent implements OnInit, AfterViewInit {
       let prPrices: Array<number> = [];
       console.log(chartData);
       chartData.forEach(inp => {
-        dateLabels.push(inp.extractDate);
+        dateLabels.push(formatDate(inp.extractDate,'YYYY-MM-dd', 'pl-PL'));
         prPrices.push(inp.prPrice);
       })
-
-      console.log(dateLabels);
 
       let ctx = document.getElementById(this.idname);
       this.chart = new Chart(this.idname, {
