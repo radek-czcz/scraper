@@ -4,10 +4,10 @@ import mysql2 from 'mysql2';
 // UTWORZENIE POŁĄCZENIA Z BAZĄ DANYCH
 
   const connection = mysql2.createConnection({
-    host: 'localhost',
-    user: 'hapi-server',
-    password: 'asd2%yhfA',
-    database: 'store'
+    host: /*'localhost'*/ '188.210.222.87',
+    user: /*'hapi-server'*/ 'srv59554_mojeprodukty',
+    password: /*'asd2%yhfA'*/ '2!gTaC83GwseD',
+    database: /*'store'*/ 'srv59554_mojeprodukty'
   });
 
 
