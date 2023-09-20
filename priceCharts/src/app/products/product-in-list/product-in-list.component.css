@@ -7,3 +7,7 @@ mat-expansion-panel {
   padding: 6px;
   background-color: #ffddcc;
 }
+
+mat-panel-title {
+  flex-grow: 2.5;
+}

@@ -13,24 +13,22 @@ import mysql2 from 'mysql2';
 
 // OBIEKT db DO OBSŁUGI ZAPYTAŃ DO MYSQL
 
-  export const db = {
+export const db = {
+  connect: () => connection.connect(err => {
+      if (err) {
+      console.log(err);
+      }
+    }
+  ),
 
-    connect: () => connection.connect(
+  query: (queryString, escapedValues) =>
+    new Promise((resolve, rej) => {
+      connection.query(queryString, escapedValues, (err, res, fields) => {
+        if (err) rej(err);
+        resolve(res);
+      })
+    }),
 
-    err => {
-  if (err) {
-    console.log(err);
-  }
-}) ,
-
-    query: (queryString, escapedValues) =>
-      new Promise((resolve, rej) => {
-        connection.query(queryString, escapedValues, (err, res, fields) => {
-          if (err) rej(err);
-          resolve(res);
-        })
-      }),
-
-    end: () => connection.end()
+  end: () => connection.end()
 
   }

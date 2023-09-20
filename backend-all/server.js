@@ -6,29 +6,47 @@ let server;
 
 // DEFINICJA I KONFIGURACJA SERWERA HAPI
   const start = async () => {
-      server = Hapi.server({
-        port:8000,
-        host: '188.210.222.87',
-        routes: {
-          cors: {
-            origin: ["Access-Control-Allow-Origin", "http://srv59554.seohost.com.pl"],
-              headers: ["Accept", "Content-Type"],
-              additionalHeaders: ["X-Requested-With"]
+    server = Hapi.server({
+      port:8000,
+      host: '188.210.222.87',
+      routes: {
+        cors: {
+          origin: ["Access-Control-Allow-Origin", "http://srv59554.seohost.com.pl"],
+            headers: ["Accept", "Content-Type"],
+            additionalHeaders: ["X-Requested-With"]
         }
-    }
-  });
+      }
+    });
 
-// DEFINICJA ROUTE'ÓW
-      routes.forEach(route => server.route(route));
+  // DEFINICJA ROUTE'ÓW
 
-      db.connect();
+    server.route({
+        method: 'GET',
+        path: '/abc',
+        handler: (request, h) => {
+            return 'Hello World! abc';
+        }
+    });
 
-      await server.start();
-      console.log(`server is listening on ${server.info.uri}`);
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: (request, h) => {
+            return 'Hello World!';
+        }
+    });
+        
+    routes.forEach(route => server.route(route));
+
+    db.connect();
+
+    await server.start();
+    console.log(`server is listening on ${server.info.uri}`);
   }
 
 // CATCHER BŁĘDÓW
   process.on('unhandledRejection', err => {
+    console.log('that error');
     console.log(err);
     process.exit(1);
   });
