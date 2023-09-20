@@ -8,8 +8,15 @@ let server;
   const start = async () => {
       server = Hapi.server({
         port:8000,
-        host: 'localhost'
-      });
+        host: '188.210.222.87',
+        routes: {
+          cors: {
+            origin: ["Access-Control-Allow-Origin", "http://srv59554.seohost.com.pl"],
+              headers: ["Accept", "Content-Type"],
+              additionalHeaders: ["X-Requested-With"]
+        }
+    }
+  });
 
 // DEFINICJA ROUTE'ÓW
       routes.forEach(route => server.route(route));

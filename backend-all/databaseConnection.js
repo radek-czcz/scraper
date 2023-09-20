@@ -15,7 +15,13 @@ import mysql2 from 'mysql2';
 
   export const db = {
 
-    connect: () => connection.connect(),
+    connect: () => connection.connect(
+
+    err => {
+  if (err) {
+    console.log(err);
+  }
+}) ,
 
     query: (queryString, escapedValues) =>
       new Promise((resolve, rej) => {
