@@ -5,6 +5,7 @@ export const getAllPricesRoute = {
   method: 'GET',
   path: '/api/all2',
   handler: async (reg, h) => {
+    console.log('querying the db');
     const results = await db.query(
       `
       SELECT prName, prPrice, extractDate from mojeprodukty
@@ -19,6 +20,7 @@ export const getAllPricesRoute = {
               WHERE prPrice > "64.00";
               `*/
       );
+    console.log('ending querying');
     return results;
   }
 }
