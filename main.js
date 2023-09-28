@@ -36,4 +36,4 @@ async function do_(urlInp) {
 }
 
 //url.forEach(inp => do_(inp);
-do_(url[0]);
+do_(url[1]);

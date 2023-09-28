@@ -1,0 +1,9 @@
+{
+  "apps" : [{
+    "name"        : "servapp",
+    "script"      : "./server.js",
+    "watch"       : true,
+    "exec_interpreter" : "npx babel-node",
+    "exec_mode"        : "fork",
+  }]
+}

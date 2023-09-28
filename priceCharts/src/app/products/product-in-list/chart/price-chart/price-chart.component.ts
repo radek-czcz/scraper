@@ -39,7 +39,7 @@ export class PriceChartComponent implements OnInit, AfterViewInit {
 
       let ctx = document.getElementById(this.idname);
       this.chart = new Chart(this.idname, {
-        type: 'bar',
+        type: 'line',
         data: {
           labels: dateLabels,
           datasets: [

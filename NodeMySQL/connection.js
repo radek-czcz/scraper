@@ -2,14 +2,14 @@ const mysql = require('mysql2');
 const dates = require('../dates/date.js')
 
 
-function doConnection() {
+/*function doConnection() {
 
   const connection = mysql.createConnection({
-    host:'localhost',
+    host: '188.210.222.87',
     port:3306,
-    database:'store',
-    user:'root',
-    password:'asd2%yhfA'
+    database: 'srv59554_mojeprodukty',
+    user: 'srv59554_mojeprodukty',
+    password: 'XXX',
   })
 
   var dbConnStatus = '';
@@ -40,42 +40,51 @@ function doConnection() {
     )
   });
 
-}
+}*/
+
+let connection;
 
 function insert(names, prices, seller) {
-  console.log('seller from insert ' + seller)
-  let arrayOfData = []
-  let query1 = 'INSERT INTO mojeprodukty '
-  let dateNow = dates.dateToSqlFormat(new Date());
+    console.log('seller from insert ' + seller)
+    let arrayOfData = []
+    let query1 = 'INSERT INTO mojeprodukty '
+    let dateNow = dates.dateToSqlFormat(new Date());
   //CREATE DB CONNECTION
-  const connection = mysql.createConnection({
-    host:'localhost',
-    port:3306,
-    database:'store',
-    user:'root',
-    password:'asd2%yhfA'
-  })
-    //SELLER NAME PARSING FROM DB
-  function query3() {
-    return new Promise((reso, rej) => {
-    connection.query(`SELECT sellerName FROM store.sprzedawcy
-    WHERE sellerWebUrl = ` + `'` + seller + `'`  + ' LIMIT 1', (err, res, f) => {
-    reso(res[0].sellerName);
-          })}
-    )
-  }
+    connection = mysql.createConnection({
+      host: '188.210.222.87',
+      port:3306,
+      database: 'srv59554_mojeprodukty',
+      user: 'srv59554_mojeprodukty',
+      password: 'XXX',
+
+      /*
+      host:'localhost',
+      port:3306,
+      database:'store',
+      user:'root',
+      password:'XXX'
+      */
+    })
+
+  //SELLER NAME PARSING FROM DB
+    function query3() {
+      return new Promise((reso, rej) => {
+      connection.query(`SELECT sellerName FROM srv59554_mojeprodukty.sprzedawcy
+      WHERE sellerWebUrl = ` + `'` + seller + `'`  + ' LIMIT 1', (err, res, f) => {
+      reso(res[0].sellerName);
+            })}
+      )
+    }
 
       console.log('getting array of columns')
 
   // GET ARRAY OF COLUMN NAMES FROM DB
-
-    getArrayOfColumnNamesToString('mojeprodukty')
-
+    getArrayOfColumnNamesToString()
     .catch(err => {console.log('error by promiseArrayOfColNames' + err)
-    return err;
-  })
+      return err;
+    })
 
-    // CREATE DB'S QUERY TEXT
+  // CREATE DB'S QUERY TEXT
     .then(res => {
       console.log('array of columns ready ' + res)
       let arrayOfData = [];
@@ -84,21 +93,19 @@ function insert(names, prices, seller) {
       // (prName, prSeller, extractDate) VALUES (?, ?)';
       console.log(query2);
 
-  // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
-    query3().then(resu => {
-  for (var nth = 0; nth < names.length; nth++) {
-    arrayOfData.push([names[nth], prices[nth], resu, , dateNow]);
-   }
-   console.log(arrayOfData);
-  for (var nth = 0; nth < names.length; nth++) {
-    console.log(parseFloat(prices[nth]));
-    connection.query(query2, [names[nth], prices[nth], resu, , dateNow]);
-  }
-})
-
-  }
-  )
- }
+      // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
+      query3().then(resu => {
+        for (var nth = 0; nth < names.length; nth++) {
+          arrayOfData.push([names[nth], prices[nth], resu, dateNow /*, dateNow*/]);
+        }
+        console.log(arrayOfData);
+        for (var nth = 0; nth < names.length; nth++) {
+          console.log(parseFloat(prices[nth]));
+          connection.query(query2, [names[nth], prices[nth], resu, dateNow /*, dateNow*/]);
+        }
+      })
+    })
+}
 
 
 function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
@@ -107,13 +114,21 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
 
   let resString = '(';
 
-  let connection = mysql.createConnection({
+  /*let connection = mysql.createConnection({
+  
     host:'localhost',
     port:3306,
     database:'store',
     user:'root',
-    password:'asd2%yhfA'
-  })
+    password:'XXX'
+  
+    host: '188.210.222.87',
+    port:3306,
+    database: 'srv59554_mojeprodukty',
+    user: 'srv59554_mojeprodukty',
+    password: 'XXX',
+  })*/
+
   console.log('start columns');
   const query1 =   'SHOW COLUMNS FROM ' + inpName;
   let queryRes;
@@ -159,19 +174,19 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
 
 })}
 
-function test1(names, prices) {
+/*function test1(names, prices) {
   console.log('start test1')
   let connection = mysql.createConnection({
     host:'localhost',
     port:3306,
     database:'store',
     user:'root',
-    password:'asd2%yhfA'
+    password:'XXX'
   })
 
 let promQuery = new Promise ((resolve, reject) => {
       console.log('prom query')
-      connection.query('SHOW COLUMNS FROM mojeprodukty'/*SELECT * FROM mojeprodukty'*/, (err, res, fields) => {
+      connection.query('SHOW COLUMNS FROM mojeprodukty', (err, res, fields) => {
         if (err) return reject(err)
         else resolve(res);
       })
@@ -180,9 +195,9 @@ let promQuery = new Promise ((resolve, reject) => {
   console.log('before end')
   promQuery.then(res => console.log(res))
 
-}
+}*/
 
-function testSub() {
+/*function testSub() {
   console.log('testSub start')
   let names = [
     'Karta pamięci KIOXIA Exceria microSDXC 64GB',
@@ -208,6 +223,6 @@ function testSub() {
 function test2() {
   var arr = testSub();
   test1(arr[0], arr[1])
-}
+}*/
 
-module.exports = {doConnection, insert, getArrayOfColumnNamesToString, test2};
+module.exports = {insert, getArrayOfColumnNamesToString /*, test2, doConnection*/};

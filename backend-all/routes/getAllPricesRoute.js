@@ -11,8 +11,8 @@ export const getAllPricesRoute = {
       SELECT prName, prPrice, extractDate from mojeprodukty
       WHERE EXISTS (
       select prName from derived1
-      where mojeprodukty.prPrice < 1.1*derived1.minP AND
-      mojeprodukty.extractDate = DATE("2023-08-29") AND
+      where mojeprodukty.prPrice < 1.05*derived1.minP AND
+      mojeprodukty.extractDate = DATE("2023-09-28") AND
       derived1.prName = mojeprodukty.prName
       );`
               /* `

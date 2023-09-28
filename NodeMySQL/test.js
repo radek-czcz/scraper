@@ -13,7 +13,7 @@ let par =
     port:3306,
     database:'store',
     user:'root',
-    password:'asd2%yhfA'
+    password:'XXX'
   })
 
   /*connection.query('select 1', (err, res, f) => {

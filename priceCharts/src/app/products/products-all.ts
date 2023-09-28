@@ -14,7 +14,7 @@ class allProducts {
       port:3306,
       database:'store',
       user:'root',
-      password:'asd2%yhfA'
+      password:'XXX'
     });
 
     let queryString: string = 'SELECT * FROM ?';
