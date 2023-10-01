@@ -51,19 +51,19 @@ function insert(names, prices, seller) {
     let dateNow = dates.dateToSqlFormat(new Date());
   //CREATE DB CONNECTION
     connection = mysql.createConnection({
-      host: '188.210.222.87',
+      /*host: '188.210.222.87',
       port:3306,
       database: 'srv59554_mojeprodukty',
       user: 'srv59554_mojeprodukty',
-      password: 'XXX',
+      password: '2!gTaC83GwseD',*/
 
-      /*
+      
       host:'localhost',
       port:3306,
       database:'store',
       user:'root',
-      password:'XXX'
-      */
+      password:'asd2%yhfA'
+      
     })
 
   //SELLER NAME PARSING FROM DB

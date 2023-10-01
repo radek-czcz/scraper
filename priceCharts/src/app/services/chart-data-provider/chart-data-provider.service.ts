@@ -16,7 +16,7 @@ export class ChartDataProviderService {
 
 // CHECK IF ID COULD NOT BE PASSED ANOTHER WAY
   public getChartData(): Observable<iProduct[]> {
-    return this.http.get<iProduct[]>('http://188.210.222.87:8000/api/prices/' + this._prName);
+    return this.http.get<iProduct[]>(/*'http://188.210.222.87:8000/api/prices/'*/ 'http://localhost:8000/api/prices/' + this._prName);
   }
 
   public set prName(inp: string) {

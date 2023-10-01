@@ -8,10 +8,10 @@ let server;
   const start = async () => {
     server = Hapi.server({
       port:8000,
-      host: '188.210.222.87',
+      host: /*'188.210.222.87'*/ 'localhost',
       "routes": {
         "cors": {
-          "origin": ["Access-Control-Allow-Origin","http://srv59554.seohost.com.pl"],
+          "origin": ["Access-Control-Allow-Origin",/*"http://srv59554.seohost.com.pl"*/ "http://localhost:4200"],
           "headers": ["Accept", "Content-Type"],
           "additionalHeaders": ["X-Requested-With"]
         }
