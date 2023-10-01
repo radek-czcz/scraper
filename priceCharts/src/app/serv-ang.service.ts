@@ -12,7 +12,7 @@ export class ServAngService {
   constructor(private http: HttpClient) { }
 
   public getResponse(): Observable<iProduct[]> {
-    return this.http.get<iProduct[]>('http://188.210.222.87:8000/api/all2');
+    return this.http.get<iProduct[]>(/*'http://188.210.222.87:8000/api/all2'*/ 'http://localhost:8000/api/all2');
   }
 
 }

@@ -3,10 +3,10 @@ import mysql2 from 'mysql2';
 
 // UTWORZENIE POŁĄCZENIA Z BAZĄ DANYCH
   const connection = mysql2.createPool({
-    host: /*'localhost'*/ '188.210.222.87',
-    user: /*'hapi-server'*/ 'srv59554_mojeprodukty',
-    password: 'XXX',
-    database: /*'store'*/ 'srv59554_mojeprodukty'
+    host: 'localhost' /*'188.210.222.87'*/,
+    user: 'hapi-server' /*'srv59554_mojeprodukty'*/,
+    password: 'asd2%yhfA',
+    database: 'store' /*'srv59554_mojeprodukty'*/
   });
 
   //for (let mem in connection) {console.log(mem)};
