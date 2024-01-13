@@ -2,11 +2,9 @@
     <mat-expansion-panel-header>
       <mat-panel-title>
                 <p>{{pr.prName}}</p>
-        <!--{title}-->
       </mat-panel-title>
       <mat-panel-description>
-
-
+        {{auth.isLoggedIn}}
       </mat-panel-description>
     </mat-expansion-panel-header>
     <p>Cena: {{pr.prPrice}}</p>

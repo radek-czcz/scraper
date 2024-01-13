@@ -1,0 +1,28 @@
+<div class="comp">
+	<button mat-raised-button disabled color="primary">&#9664;&#9664;</button>
+	<button mat-raised-button color="primary" (click)="playPause()">&#9654;</button>
+	<button mat-raised-button disabled color="primary">&#9654;&#9654;</button>
+</div>
+<div class="comp">
+	<button mat-raised-button disabled color="primary">RAT3</button>
+	<button mat-raised-button disabled color="primary">RAT4</button>
+	<button mat-raised-button color="primary" (click)="nextAlbum()">NEXT ALBUM</button>
+</div>
+<div class="playInfos" *ngIf="this.player.playedArtist"[@myTrigger]>
+	<div>
+		<h3>Now Playing:</h3>
+		<p>{{this.player.playedArtist}}</p>
+		<p>{{this.player.playedAlbum}}</p>
+		<p>{{this.player.playedSong}}</p>
+	</div>
+	<ng-container #container1></ng-container>
+</div>
+<!-- <ng-container *ngIf="this.playNext; then nextPlayTempl" #container1></ng-container> -->
+
+
+<ng-template #nextPlayTempl>
+	<div *ngIf='this.playNext'>
+		<h3>Next playing:</h3>
+		<p>{{this.playNext}}</p>
+	</div>
+</ng-template>

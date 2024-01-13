@@ -1,0 +1,23 @@
+<p>
+  <mat-toolbar>
+    <mat-toolbar-row>
+      <div>Aplikacja wyświetlająca ceny artykułów</div>
+      <!-- <button (click) = "play()">Play</button> -->
+      <button mat-raised-button color="primary"
+        (click)="play()"
+        >Player
+      </button>
+      <app-auth></app-auth>
+    </mat-toolbar-row>
+  </mat-toolbar>
+</p>
+<p>
+<app-player-component></app-player-component>
+</p>
+<app-filtering-chip></app-filtering-chip>
+<app-filtering-price></app-filtering-price>
+<ng-container>
+  <app-components-list></app-components-list>
+
+</ng-container>
+<p *ngIf="authorName">autor: Radosław Czyżowicz</p>

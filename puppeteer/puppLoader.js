@@ -26,7 +26,7 @@ function loadPuppeteer(headless) {
 
 function getExistingBrowser() {
   return puppeteer.connect(
-      {browserWSEndpoint: 'ws://127.0.0.1:65048/devtools/browser/ddd8c69e-41f1-4793-8e5c-f982c3c86225'}
+      {browserWSEndpoint: 'ws://127.0.0.1:53946/devtools/browser/2d783f79-3779-4077-81d6-469ad462ba92'}
   ).then(res => {
     console.dir(res, {depth: 0});
     exBr = res;
@@ -35,19 +35,15 @@ function getExistingBrowser() {
 }
 
 function getExistingPage() {
-  return exBr.pages().then(res => res[1])
+  return exBr.pages().then(res => res[0])
 }
 
 async function loadPage(url) {
-  const page = await pu.newPage();
-  await page.goto(url, {
-   waitUntil: 'networkidle2'
-  }
-  );
+  const page = await pu.pages();
+  await page[0].goto(url, {
+    waitUntil: 'networkidle2'
+  });
   console.log  ('page opened')
-  //console.log(page);
-  pa = page;
-  //setTimeout(() => {pu.close()}, 5000)
   return page;
 }
 
@@ -64,18 +60,8 @@ function getPu() {
 function getPage() {
   console.log('pEval from inner')
   return getPu().then(res => res.pages())
-  .then(res => {
-    let names = [res[0].title(), res[1].title()];
-    let pages2 = [res[0], res[1]];
-    let page;
-    return Promise.all(names)
-      .then(res => {
-        page = res[0] ? pages2[0] : pages2[1];
-        console.dir('page ' + page, {depth: 0})
-        return page;
-      })
-    //return page;
-  }).catch(err => console.log('error in getPage'))
+  .then(res => res[0])
+  .catch(err => console.log('error in getPage'))
 }
 
 

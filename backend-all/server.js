@@ -35,6 +35,24 @@ let server;
             return 'Hello World!';
         }
     });
+
+    server.route({
+      method: 'POST',
+      path: '/register',
+      handler: async (request, h) => {
+        let userID = request.payload.iduser;
+        let token;
+        db.query(`INSERT INTO users (iduser) VALUES ('${userID}')`, (err, res, fields) => {
+          if (!err) {
+            console.log('post success');
+            token = 'abcToken';
+            return res;
+          } else {console.log('error during POST method: ', err)}
+        });
+        return {resp: 'abcToken'};
+        // return userID;
+      }
+    })
         
     routes.forEach(route => server.route(route));
 

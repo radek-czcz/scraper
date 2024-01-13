@@ -1,0 +1,4 @@
+<p>Filtry</p>
+<mat-chip-listbox aria-label="Fish selection" [multiple]="true" #listbox>
+  <mat-chip-option *ngFor="let cat of prCategories">{{cat}}</mat-chip-option>
+</mat-chip-listbox>

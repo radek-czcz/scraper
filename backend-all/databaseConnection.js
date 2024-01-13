@@ -1,24 +1,13 @@
 import mysql2 from 'mysql2';
+import connSettings from './localConnectionSettings.js'
 
 
 // UTWORZENIE POŁĄCZENIA Z BAZĄ DANYCH
-  const connection = mysql2.createPool({
-    host: 'localhost' /*'188.210.222.87'*/,
-    user: 'hapi-server' /*'srv59554_mojeprodukty'*/,
-    password: 'asd2%yhfA',
-    database: 'store' /*'srv59554_mojeprodukty'*/
-  });
+  const connection = mysql2.createPool(connSettings.settings);
 
-  //for (let mem in connection) {console.log(mem)};
   console.log(connection);
-  /*setInterval(() => {
-    //console.log(connection);
-  },1000);*/
-
-
   connection.on('close', () => console.log('closing - info'));
   connection.on('error', () => console.log(connection));
-
 
 // OBIEKT db DO OBSŁUGI ZAPYTAŃ DO MYSQL
   export const db = {

@@ -1,0 +1,16 @@
+* {
+	font-size: 3.5vmin;
+	overflow: clip;
+	margin: inherit;
+}
+
+mat-radio-group {
+	margin: 0;
+	display: flex;
+	margin: inherit;
+	overflow: clip;
+}
+
+mat-radio-button {
+	margin: 0;
+}

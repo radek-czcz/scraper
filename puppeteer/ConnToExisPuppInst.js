@@ -10,25 +10,17 @@ function connectToExistingInstance() {
 	let pageUrl;
 	let pages = pLoader.getPu().then(res => res.pages())
 	.catch(err => console.log(err));
-	let titArray = [];
+	let titleOfPage;
 	pages.then(res => {
 		//console.dir(res, {depth: 0});
 		pageUrl = res[0].url();
 		console.log('res:');
 		console.dir(res, {depth: 1});
-		res.forEach(
-			(inp) => {
-				titArray.push(inp.title())
-		})
-		console.dir('titArray: ' + titArray, {depth: 0})
-		return titArray;
+		return res[0].title();
 	})
 
 	.then((res) => {
-		Promise.all(res)
-		.then(res2 => {
-			console.log(res2);
-		})
+		console.dir('titleOfPage: ' + res, {depth: 0})
 	})
 	.then(res => {
 		console.log('pEvaluator starting');
@@ -38,10 +30,6 @@ function connectToExistingInstance() {
   		console.log(urlParser(pageUrl).host);
 	    pWriter.main(res[0], res[1], urlParser(pageUrl).host)
 	});
-}
-
-function getBrowser() {
-	return browser;
 }
 
 function getBrowser() {

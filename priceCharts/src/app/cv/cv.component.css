@@ -1,0 +1,104 @@
+.all {
+	background-color: silver;
+	max-width: 80%;
+	margin-left: 20vw;
+	margin-right: 20vw;
+	margin-bottom: 3vw;
+	overflow: hidden;
+	border-radius: 15px;
+}
+
+div.header {
+	display: grid;
+	grid-template-columns: [first] 60% [sec] 40%
+/*  	grid-template-rows: [row1-start] 5% [row1-end] 95%px;*/
+}
+
+.framed {
+	border: 1px solid black;
+}
+
+.headerInfo-lv1 {
+	grid-column-start: 1;
+	grid-column-end: 2;
+	text-align: center;
+}
+
+.headerInfo {
+  margin: 0;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.headerInfo > h3 {
+	margin: 7px;
+}
+
+h3.spaced {
+	padding-bottom: 10px;
+}
+
+.photo {
+	margin: 3vh 0 3vh 0;
+	height: 35vh;
+	grid-column-start: 2;
+	grid-column-end: 3;
+}
+
+.photoFrame {
+/*	border: 1px solid black;*/
+	text-align: left;
+}
+
+mat-expansion-panel {
+	opacity: 1;
+	background-color: silver;
+/*	padding: 1vh 0 0vh 0;
+	margin: 1vh 0 0vh 0;*/
+}
+
+mat-expansion-panel-header {
+	border-top-style: solid;
+	border-top-width: 2px;
+	border-top-color: white;
+	background-color: silver;
+}
+
+.description-side {
+	margin: 0 4vw 0 4vh;
+}
+
+table {
+	table-layout: auto;
+}
+
+table.personalData > tbody > tr,
+table.absolved > tbody > tr,
+table.languages > tbody > tr {
+	padding: 0.4vh 0 0.4vh 0;
+}
+
+table.personalData > tbody > tr > td,
+table.absolved > tbody > tr > td,
+table.languages > tbody > tr > td {
+	padding: inherit;
+}
+
+
+table.workExperience > tbody > tr {
+	padding: 1vh 0 1vh 0;
+}
+
+table.workExperience > tbody > tr > td {
+	padding: inherit;
+}
+
+li {
+	padding-bottom: 0.7vh;
+}
+
+p.pers-data-resume {
+	margin: 0;
+	padding-bottom: 0.3vh;
+}

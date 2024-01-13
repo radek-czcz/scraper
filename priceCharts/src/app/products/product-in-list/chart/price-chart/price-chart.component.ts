@@ -1,12 +1,13 @@
-import { Input, Component, OnInit, AfterViewInit } from '@angular/core';
+import { Input, Component, OnInit, AfterViewInit, Self, SkipSelf } from '@angular/core';
 import { Chart } from 'chart.js/auto';
 import { ChartDataProviderService } from '../../../../services/chart-data-provider/chart-data-provider.service';
+//import { ChartDataProvider2Service } from '../../../../services/chart-data-provider/chart-data-provider2.service';
 import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-price-chart',
   templateUrl: './price-chart.component.html',
-  styleUrls: ['./price-chart.component.css']
+  styleUrls: ['./price-chart.component.css'],
 })
 export class PriceChartComponent implements OnInit, AfterViewInit {
 
@@ -82,4 +83,4 @@ export class PriceChartComponent implements OnInit, AfterViewInit {
       return result;
   }
 
-  }
+}

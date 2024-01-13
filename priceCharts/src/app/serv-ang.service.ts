@@ -1,18 +1,38 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, OnInit } from '@angular/core';
 import { iProduct } from './products/iProduct';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http'
-
+//import { ApiUrlsService } from './services/connections/api-urls.service'
+import { DOMAIN_PORT_TOKEN } from './services/connections/connections.config';
+import { SelectedCategoriesService } from './filtering/selected-categories.service';
+import { SelectedFiltersService } from './filtering/selected-filters.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ServAngService {
 
-  constructor(private http: HttpClient) { }
+  private urlApiEnd: string = '/api/all2';
+  private selection: string[] = [];
 
-  public getResponse(): Observable<iProduct[]> {
-    return this.http.get<iProduct[]>(/*'http://188.210.222.87:8000/api/all2'*/ 'http://localhost:8000/api/all2');
-  }
+  constructor(
+    private http: HttpClient, 
+    @Inject(DOMAIN_PORT_TOKEN) private domPor: string,
+    private selected: SelectedCategoriesService,
+    private selectedFilters: SelectedFiltersService
+  ) { }
 
+  // send request to backend server
+    public getResponse(): Observable<iProduct[]> {
+      let url: string;
+      url = this.domPor + this.urlApiEnd + '?';
+      this.selected.sqlCategoriesString ? 
+        url = this.domPor + this.urlApiEnd + '?' + this.selected.sqlCategoriesString : null;
+        // url = this.domPor + this.urlApiEnd + this.selected.sqlCategoriesString
+
+
+      this.selectedFilters.getSqlFiltersString() ? url += '&' + this.selectedFilters.getSqlFiltersString() : null;
+      console.log('serv.ang URL: ', url);
+      return this.http.get<iProduct[]>(url);
+    }
 }
