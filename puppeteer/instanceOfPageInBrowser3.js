@@ -9,8 +9,8 @@ const categories = require('./categories.js')
 let browser;
 let page;
 // let prodCategory = "Karty pamięci";
-let prodCategory = "Lodówki";
-// let prodCategory = "Zmywarki";
+// let prodCategory = "Lodówki";
+let prodCategory = "Zmywarki";
 // let prodCategory = "Klawiatury";
 // let prodCategory = "Pendrive";
 
@@ -27,9 +27,24 @@ function loadBrowserAndPage() {
 		return pLoader.loadPage(urlInp);
 		}
 	})
-	.then(res => {
+	.then(async res => {
 		// res[0].mouse.click(50,50);
-		// return res[0].waitForSelector('label.ctp-checkbox-label>input', {timeout: 10000});
+		let selector1 = await res[0].waitForSelector(
+			// 'label.ctp-checkbox-label>input',
+			'#onetrust-accept-btn-handler',
+			 {timeout: 10000}
+		);
+
+		await res[0].click('#onetrust-accept-btn-handler');
+
+		// const rect = await res[0].evaluate(el => {
+		//     const {x, y} = el.getBoundingClientRect();
+		//     console.log({x, y});
+		//     return {x, y};
+		// }, selector1);
+
+
+
 		// res[0].mouse.click(50,50);
 		// document.querySelector('label.ctp-checkbox-label>input')
 		let seconds = 20

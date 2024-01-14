@@ -14,7 +14,7 @@ mat-toolbar-row {
 
 mat-toolbar-row > div {
 /*	height: auto;*/
-	font-size: 1.5vh;
+	font-size: 1.1vw;
 	margin-right: 1vw;
 	color: white;
 	overflow: clip;
