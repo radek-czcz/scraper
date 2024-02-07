@@ -3,7 +3,7 @@ import { Subscription, fromEvent, Observable, first } from 'rxjs';
 import { HttpClient } from '@angular/common/http'
 import { iSong } from './iSong';
 import { ApiUrlsService } from '../connections/api-urls.service';
-import { AppConfigService } from '../app-config.service';
+import { AppConfigService } from '../app-config/app-config.service';
 import { nextAlbumObject } from '../../player/player-component/nextAlbumObject'
 
 @Injectable({
@@ -17,40 +17,51 @@ export class PlayerService {
   private domainAndPort: string = '';
 
   constructor(private http: HttpClient, private urlApi: ApiUrlsService, private config: AppConfigService) {
-    this.domainAndPort = config.data.playerApiUrl + ':' + config.data.playerApiPort;
-    let random = Math.floor(Math.random()*100);
-    console.log('config: ', this.domainAndPort)
-    this.audio.src = this.domainAndPort + '/song' /*'http://srv59554.seohost.com.pl:8055/song'*/ /*'http://192.168.0.108:8012/song'*/ + random
-    console.log(this.audio.src);
-    this.sub = fromEvent(this.audio, 'ended').subscribe((inp: any) => {
-        this.currentlyPlayed.artist = '';
-        this.currentlyPlayed.album = '';
-        this.currentlyPlayed.title = '';
-      console.log('song ended');
-      this.http.get<any>( this.domainAndPort + '/songcounter').subscribe();
-      console.log('before next');
-      let receiver1 = this.http.get<string>(this.domainAndPort + '/nextSong').subscribe(res => {
-        console.log(res);
-        random = Math.floor(Math.random()*100);
-        this.audio.src = this.domainAndPort + '/song'/*'http://srv59554.seohost.com.pl:8055/song'*/ /*'http://192.168.0.108:8012/song'*/ + random
-        console.log(this.audio.src);
-        this.play();
+    // config the domain and port
+      this.domainAndPort = config.data.playerApiUrl + ':' + config.data.playerApiPort;
+
+    // get random number to attach to song sources endpoint's url
+      let random = Math.floor(Math.random()*100);
+
+    // set audio source 
+      this.audio.src = this.domainAndPort + '/song' + random
+    
+    // define what to do when song ends
+      this.sub = fromEvent(this.audio, 'ended').subscribe((inp: any) => {
+
+        // reset currently played song's displayed infos
+          this.currentlyPlayed.artist = '';
+          this.currentlyPlayed.album = '';
+          this.currentlyPlayed.title = '';
+          // console.log('song ended');
+
+        // make a http call to send the song data to db, to count how many times the song has been played
+          this.http.get<any>( this.domainAndPort + '/songcounter').subscribe();
+
+        // get infos about next song to be played
+          let receiver1 = this.http.get<string>(this.domainAndPort + '/nextSong').subscribe(res => {
+            random = Math.floor(Math.random()*100);
+            this.audio.src = this.domainAndPort + '/song'/*'http://srv59554.seohost.com.pl:8055/song'*/ /*'http://192.168.0.108:8012/song'*/ + random
+            console.log(this.audio.src);
+            this.play();
+          })
       })
-    })
   }
 
   play(): void {
-    this.audio.play();
-    let loaded = fromEvent(this.audio, 'play').pipe(first()).subscribe(inp => {
-      let receiver = this.http.get<iSong>(this.domainAndPort + '/songdata').subscribe(res => {
-        console.log('now playing: ', res);
-        setTimeout(() => {
-          this.currentlyPlayed.artist = res.artist;
-          this.currentlyPlayed.album = res.album;
-          this.currentlyPlayed.title = res.title;
-        }, 1000)
+    // start playing
+      this.audio.play();
+    // get the data of currently played song
+      let loaded = fromEvent(this.audio, 'play').pipe(first()).subscribe(inp => {
+        let receiver = this.http.get<iSong>(this.domainAndPort + '/songdata').subscribe(res => {
+          console.log('now playing: ', res);
+          setTimeout(() => {
+            this.currentlyPlayed.artist = res.artist;
+            this.currentlyPlayed.album = res.album;
+            this.currentlyPlayed.title = res.title;
+          }, 1000)
+        });
       });
-    });
   }
 
   get playedArtist(){
@@ -66,12 +77,10 @@ export class PlayerService {
   }
 
   nextAlbum(): Observable<nextAlbumObject> {
-    let nextAlbum;
-    nextAlbum = this.http.get<nextAlbumObject>(this.domainAndPort + '/nextalbum')/*.subscribe(res => {
-      console.log(res);
-      return res;
-    });*/
-    return nextAlbum;
+    // get the name of next album to be played
+      let nextAlbum;
+      nextAlbum = this.http.get<nextAlbumObject>(this.domainAndPort + '/nextalbum');
+      return nextAlbum;
   }
 
   playPause(): void {
