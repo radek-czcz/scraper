@@ -1,6 +1,0 @@
-{
-	"pricesApiUrl": "http://localhost",
-	"pricesApiPort": "8000",
-	"playerApiUrl": "http://localhost",
-	"playerApiPort": "8012"
-}

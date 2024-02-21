@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http'
-import { DOMAIN_PORT_TOKEN } from './connections/connections.config';
+import { DOMAIN_PORT_TOKEN } from '../connections/connections.config';
 
 @Injectable({
   providedIn: 'root'

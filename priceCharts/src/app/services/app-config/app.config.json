@@ -1,0 +1,14 @@
+{
+	"pricesApiUrl": "http://srv59554.seohost.com.pl",
+	"pricesApiPort": "8000",
+	"playerApiUrl": "http://srv59554.seohost.com.pl",
+	"playerApiPort": "8055"
+}
+
+/*{
+	"pricesApiUrl": "http://localhost",
+	"pricesApiPort": "8000",
+	"playerApiUrl": "http://localhost",
+	"playerApiPort": "8012"
+}
+*/

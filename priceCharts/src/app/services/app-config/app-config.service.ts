@@ -13,7 +13,7 @@ export class AppConfigService {
 
   load(defaults?: AppConfig): Promise<AppConfig> {
     return new Promise<AppConfig>(resolve => {
-      this.http.get('./app.config-r.json').subscribe(res => {
+      this.http.get('./assets/app.config-r.json').subscribe(res => {
         console.log('using server-side configuration');
         this.data = Object.assign({}, defaults || {}, res || {});
         resolve(this.data);
