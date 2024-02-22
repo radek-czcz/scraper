@@ -10,5 +10,7 @@
     <p>Cena: {{pr.prPrice}}</p>
     <p>Sprzedawca: {{pr.prSeller}}</p>
     <p>Data: {{pr.extractDate | date:'YYYY-MM-dd'}}</p>
-<app-price-chart [productKey] = 'pr.prName'></app-price-chart>
+  <ng-template matExpansionPanelContent>
+  <app-price-chart [productKey] = 'pr.prName'></app-price-chart>
+  </ng-template>
   </mat-expansion-panel>
