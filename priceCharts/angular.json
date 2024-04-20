@@ -24,7 +24,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/app.config.json"
+              "src/app/services/app-config/app.config-r.json"
             ],
             "styles": [
               "src/custom-theme.scss",

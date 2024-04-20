@@ -1,11 +1,11 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
-import { MatExpansionModule } from '@angular/material/expansion';
+// import { MatExpansionModule } from '@angular/material/expansion';
 import { ServAngService } from '../../serv-ang.service';
 import { Observable } from 'rxjs';
 import { iProduct } from '../iProduct'
 import { DateFormatterService } from '../../services/date-formatter/date-formatter.service'
-import { SelectedCategoriesService } from '../../filtering/selected-categories.service';
-import { SelectedFiltersService } from '../../filtering/selected-filters.service';
+import { SelectedCategoriesService } from '../../services/selected-categories/selected-categories.service';
+import { SelectedFiltersService } from '../../services/selected-filters/selected-filters.service';
 
 @Component({
   selector: 'app-components-list',
@@ -14,19 +14,18 @@ import { SelectedFiltersService } from '../../filtering/selected-filters.service
 })
 export class ComponentsListComponent  implements OnInit {
 
-  // Array of listed products
+  // ARRAY OF LISTED PRODUCTS
     allProductsToShow: iProduct[] = [];
-  subSelected: string[] = [];
 
-  // DI injections
+  // DI INJECTIONS
     constructor(
       private servPr: ServAngService, 
-      private dateFormatterService: DateFormatterService,
+      // private dateFormatterService: DateFormatterService,
       private selected: SelectedCategoriesService,
       private selectedFilters: SelectedFiltersService
     ) {}
 
-  // ngOnInit - first receival of all products
+  // NGONINIT - FIRST RECEIVAL OF ALL PRODUCTS
     ngOnInit(): void {
       this.servPr.getResponse().subscribe(results => {
         this.allProductsToShow = results;
@@ -36,7 +35,7 @@ export class ComponentsListComponent  implements OnInit {
       })
     }
 
-  // ngAfterViewInit - fake-subscribe to 'selected' and sub to get selected products
+  // NGAFTERVIEWINIT - SUBSCRIPTIONS TO "SELECTED" SERVICES
     ngAfterViewInit(): void {
       this.selected.selectedCategoriesSub.subscribe(inp => {
         console.log('watching the selected');

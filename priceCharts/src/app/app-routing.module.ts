@@ -6,7 +6,7 @@ import { MainComponent } from './main/main.component'
 const routes: Routes = [
 	{ path: '', component: MainComponent },
 	{ path: 'cv', component: CvComponent },
-	{path: '**', redirectTo: '/index.html', pathMatch: 'full'}
+	{path: '**', redirectTo: '/index.html', pathMatch: 'full'},
 ];
 
 @NgModule({

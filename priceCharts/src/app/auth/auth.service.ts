@@ -12,7 +12,7 @@ export class AuthService {
 
   login(): Observable<string> {
     return this.http.post<string>('http://localhost:8000/register', {
-      iduser: 'david_r',
+      iduser: 'david_o',
     }).pipe(tap(token => {
       console.log(token);
       this.token = token;

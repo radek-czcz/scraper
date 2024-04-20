@@ -25,10 +25,7 @@ export class PriceChartComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     let chartData: {};
-
     this.dataProvider.prName = this._productKey;
-
-
     this.dataProvider.getChartData().subscribe(chartData => {
       let dateLabels: Array<string> = [];
       let prPrices: Array<number> = [];
@@ -61,14 +58,9 @@ export class PriceChartComponent implements OnInit, AfterViewInit {
       });
 
     })
-
-
-
-
   }
 
   ngOnInit() {
-
   }
 
   makeid(length: number) {

@@ -55,3 +55,8 @@ app-filtering-price {
 app-player-component {
 	
 }
+
+.myName {
+	background-color: yellow;
+/*	display: inline;*/
+}

@@ -1,6 +1,6 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { PlayerService } from './services/player-service/player-service.service'
-import { MainComponent } from './main/main.component'
+// import { MainComponent } from './main/main.component'
 
 @Component({
   selector: 'app-root',

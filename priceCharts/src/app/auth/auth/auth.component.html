@@ -1,8 +1,16 @@
 <button mat-raised-button color="primary"
 [hidden]="authService.isLoggedIn"
-(click)="authService.login().subscribe()"
+(click)="authService.login().subscribe();value='enter your name'"
 >Login</button>
 <button mat-raised-button color="primary"
 [hidden]="!authService.isLoggedIn"
 (click)="authService.logout()"
 >Logout</button>
+<mat-form-field *ngIf="value" class="example-form-field">
+  <mat-label>Clearable input</mat-label>
+  <input matInput type="text" [(ngModel)]="value">
+  
+    <button matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
+      <mat-icon>close</mat-icon>
+    </button>
+</mat-form-field>

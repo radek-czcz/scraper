@@ -6,7 +6,7 @@ import { db } from '../databaseConnection';
     path: '/api/all2',
     handler: async (reg, h) => {
       console.dir(await reg.query['catg'])
-      console.log('querying the db');
+      console.log('all products queried');
 
       let sqlInClause = '';
       let filter = reg.query['price'] ? reg.query['price'] : 1.0;
@@ -15,7 +15,7 @@ import { db } from '../databaseConnection';
       let arrayOfFilters;
 
       if (category !== 'undefined' && category !== null) {
-        console.log("reg.query['catg'] positive", reg.query['catg'])
+        console.log("Category (Chip) of product selected - ", reg.query['catg'])
         arrayOfFilters = reg.query['catg'].split(',');
         arrayOfFilters.forEach((inp, nth) => {
         inp = `'` + inp;
@@ -26,8 +26,10 @@ import { db } from '../databaseConnection';
       })
 
       } else {
-        console.log("reg.query['catg'] negative")
+        console.log("Category (Chip) of product not selected")
       }
+      console.log("Price range - ", filter)
+      
 
 
 
@@ -53,21 +55,21 @@ import { db } from '../databaseConnection';
         derived1.prName = mojeprodukty.prName
         ${sqlInClause});`
 
-      console.log(queryString);
+      // console.log(queryString);
 
       const results = await db.query(queryString);
-      console.log('ending querying');
+      // console.log('ending querying');
       return results;
     }
   }
 
 async function dateFormat() {
   let maxDate = await db.query('SELECT MAX(extractDate) from mojeprodukty');
-  console.log(maxDate[0]['MAX(extractDate)'].toString());
+  // console.log(maxDate[0]['MAX(extractDate)'].toString());
   maxDate = new Date(Date.parse(maxDate[0]['MAX(extractDate)'] + ' ' + 'GMT'));
-  console.log('maxDate: ', maxDate);
+  // console.log('maxDate: ', maxDate);
   maxDate = maxDate.toISOString().split('T')[0];
   maxDate = "'" + maxDate + "'";
-  console.log('maxDate: ', maxDate);
+  // console.log('maxDate: ', maxDate);
   return maxDate;
 }

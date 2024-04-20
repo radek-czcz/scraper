@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 const dates = require('../dates/date.js');
-const category = require('../puppeteer/instanceOfPageInBrowser2.js').prodCategory;
+const category = require('../puppeteer/instanceOfPageInBrowser3.js').prodCategory;
 
 let connection;
 

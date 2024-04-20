@@ -1,0 +1,13 @@
+div.myMain {
+  background-color: #cacaff;
+  margin: 30px;
+  padding: 5px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.name, .dayHeader {
+  color: #124040;
+  font-size: 18px;
+  font-weight:  600;
+}
