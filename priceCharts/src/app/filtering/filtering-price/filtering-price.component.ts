@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatRadioModule, MatRadioGroup } from '@angular/material/radio';
-import { SelectedFiltersService } from '../selected-filters.service';
+import { SelectedFiltersService } from '../../services/selected-filters/selected-filters.service';
+import { RouterModule, Router } from '@angular/router'
 
 @Component({
   selector: 'app-filtering-price',
@@ -11,14 +12,18 @@ export class FilteringPriceComponent {
 
   @ViewChild( MatRadioGroup, {read: MatRadioGroup} ) private group!: MatRadioGroup;
 
-  // Default filter value, which is being changed by clicking on radio button
+  // DEFAULT FILTER VALUE, WHICH IS BEING CHANGED BY CLICKING ON RADIO BUTTON
     private priceMultFactor: number = 1.1;
 
-  // Injection
-    constructor(private selectedFilters: SelectedFiltersService) {}
+  // INJECTION
+    constructor(private selectedFilters: SelectedFiltersService, private router: Router) {}
 
-  // CONNECTION MatRadioGroup - SelectedFiltersService
+  // CONNECTION MATRADIOGROUP - SELECTEDFILTERSSERVICE
     ngAfterViewInit() {
       this.selectedFilters.addFiltersSub(this.group.change);
+    }
+
+    nav() {
+      this.router.navigate(['/', 'cv']);
     }
 }

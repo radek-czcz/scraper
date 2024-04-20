@@ -10,9 +10,9 @@ let browser;
 let page;
 // let prodCategory = "Karty pamięci";
 // let prodCategory = "Lodówki";
-let prodCategory = "Zmywarki";
+// let prodCategory = "Zmywarki";
 // let prodCategory = "Klawiatury";
-// let prodCategory = "Pendrive";
+let prodCategory = "Pendrive";
 
 function loadBrowserAndPage() {
 
@@ -32,7 +32,7 @@ function loadBrowserAndPage() {
 		let selector1 = await res[0].waitForSelector(
 			// 'label.ctp-checkbox-label>input',
 			'#onetrust-accept-btn-handler',
-			 {timeout: 10000}
+			 {timeout: 50000}
 		);
 
 		await res[0].click('#onetrust-accept-btn-handler');
@@ -47,7 +47,7 @@ function loadBrowserAndPage() {
 
 		// res[0].mouse.click(50,50);
 		// document.querySelector('label.ctp-checkbox-label>input')
-		let seconds = 20
+		let seconds = 2
 		let n = 0;
 		let counter = function() {
 			n++;

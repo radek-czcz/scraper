@@ -5,6 +5,7 @@ import { iSong } from './iSong';
 import { ApiUrlsService } from '../connections/api-urls.service';
 import { AppConfigService } from '../app-config/app-config.service';
 import { nextAlbumObject } from '../../player/player-component/nextAlbumObject'
+import { Inject } from '@angular/core'
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +26,7 @@ export class PlayerService {
 
     // set audio source 
       this.audio.src = this.domainAndPort + '/song' + random
+      console.log(this.audio.src);
     
     // define what to do when song ends
       this.sub = fromEvent(this.audio, 'ended').subscribe((inp: any) => {

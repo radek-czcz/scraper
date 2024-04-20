@@ -1,7 +1,7 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { MatChipListboxChange, MatChipListbox } from '@angular/material/chips';
-import { GetCategoriesService } from '../../services/get-categories.service';
-import { SelectedCategoriesService } from '../selected-categories.service';
+import { GetCategoriesService } from '../../services/get-categories/get-categories.service';
+import { SelectedCategoriesService } from '../../services/selected-categories/selected-categories.service';
 
 @Component({
   selector: 'app-filtering-chip',
