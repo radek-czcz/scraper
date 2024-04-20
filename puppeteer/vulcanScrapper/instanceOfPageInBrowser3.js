@@ -15,7 +15,7 @@ function loadBrowserAndPage() {
 		else {
 			return pLoader.loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
 		}
-	})
+	}).catch(err => console.log(err))
 	.then(async res => {
 		page = res;
 		let selector1 = await res[0].waitForSelector(
@@ -25,7 +25,9 @@ function loadBrowserAndPage() {
 		return selector1.click('a.loginButtonDziennikVulcan');
 	})
 	.then(() => {
-		const child = spawn('node', ['continuation.js'])
+		const child = spawn('node', ['test1.js'],{
+			stdio: [null, null, null, 'pipe']
+		})
 
 		child.stdout.on('data', (data) => {
 		  console.log(`stdout:\n${data}`);
@@ -42,10 +44,13 @@ function loadBrowserAndPage() {
 		child.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);
 		});
+		/*console.log('child: ');
+		console.dir(child, {depth: 1});*/
+		child.stdio[3].write('message from father')
 	})
-	.then(() => pLoader.getPu())
+	/*.then(() => pLoader.getPu())
 	.then(res => res.close())
-	/*.then(() => {
+	.then(() => {
 		log();
 	})*/
 }

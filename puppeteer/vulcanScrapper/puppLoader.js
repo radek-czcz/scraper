@@ -13,7 +13,7 @@ puppeteer.use(StealthPlugin());
 
 function loadPuppeteer(headless) {
   return puppeteer.launch({
-      userDataDir: "./user_data",
+      // userDataDir: "./user_data",
       headless: headless,
       args: ['--no-sandbox'/*, '--incognito'*/],
       /*devtools: false,*/
@@ -44,15 +44,13 @@ function loadPuppeteer(headless) {
           connection.pipe(connection);
         });
 
-        server.listen(8085, function() { 
+        server.listen(8088, function() { 
           console.log('server is listening');
         });
 
     console.log('endpoint in loader: ', endpoint);
     return res;
   })
-  //return inst.then(res => res)
-  //return inst;
 }
 
 function getExistingBrowser() {
@@ -96,22 +94,4 @@ function getPage() {
   .catch(err => console.log('error in getPage'))
 }
 
-let connect = new Promise((res) => {
-  client = net.connect({port: 8085}, function() {
-   console.log('net.client says: connected to server!');  
-  });
-
-  client.on('data', function(data) {
-    console.log('net.client says: data received - ', data.toString());
-    endpoint = data.toString();
-    // client.end();
-    res(client);
-  });
-
-  client.on('end', function() { 
-   console.log('net.client says: disconnected from server');
-  });
-})
-
-
-module.exports = {loadPuppeteer, loadPage, getPu, getPage, getExistingPage, connect};
+module.exports = {loadPuppeteer, loadPage, getPu, getPage, getExistingPage/*, connect*/};

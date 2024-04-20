@@ -1,12 +1,31 @@
 const pLoader = require('./puppLoader.js');
+var net = require('net');
 
 // 1. TYPE IN LOGIN AND PASSWORD
 // 2. CLICK SUBMIT BUTTON
 function connectToExistingInstance() {
 	let pageUrl;
 	let page;
+	let client;
 
-	pLoader.connect.then((res) => {
+let connect = new Promise((res) => {
+  client = net.connect({port: 8088}, function() {
+   console.log('net.client says: connected to server!');  
+  });
+
+  client.on('data', function(data) {
+    console.log('net.client says: data received - ', data.toString());
+    // endpoint = data.toString();
+    // client.end();
+    res(client);
+  });
+
+  client.on('end', function() { 
+   console.log('net.client says: disconnected from server');
+  });
+})
+
+	connect.then((res) => {
 
 		let pages = pLoader.getPu().then(res => res.pages())
 		.catch(err => console.log('pages() function failed: ', err));
