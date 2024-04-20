@@ -1,5 +1,5 @@
 var net = require('net');
-var client = net.connect({port: 8085}, function() {
+var client = net.connect({port: 8088}, function() {
    console.log('connected to server!');  
 });
 
