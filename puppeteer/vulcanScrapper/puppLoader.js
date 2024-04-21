@@ -6,7 +6,6 @@ let pu;
 let pa;
 let exBr;
 let endpoint;
-let client;
 let server;
 
 puppeteer.use(StealthPlugin());
@@ -94,4 +93,37 @@ function getPage() {
   .catch(err => console.log('error in getPage'))
 }
 
-module.exports = {loadPuppeteer, loadPage, getPu, getPage, getExistingPage/*, connect*/};
+function getBrowserFromParentProcess() {
+  let endpoint;
+
+  let connect = new Promise((res) => {
+    client = net.connect({port: 8088}, function() {
+      console.log('net.child says: connected to server!');  
+    });
+
+    client.on('data', function(data) {
+      console.log('net.child says: data received - ', data.toString());
+      // endpoint = data.toString();
+      
+      endpoint = data.toString();
+      client.end();
+      res(client);
+    });
+    
+    client.on('end', function() { 
+      console.log('net.child says: disconnected from server');
+    });
+  })
+
+  console.log('endpoint from getBrowserFromParentProcess(): ', endpoint)
+
+  return connect.then(() => puppeteer.connect(
+    {browserWSEndpoint: endpoint}
+  ))
+  .then(res => {
+    pu = res;
+    return res;
+  });
+}
+
+module.exports = {loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess/*, connect*/};
