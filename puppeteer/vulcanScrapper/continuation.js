@@ -8,24 +8,25 @@ function connectToExistingInstance() {
 	let page;
 	let client;
 
-let connect = new Promise((res) => {
-  client = net.connect({port: 8088}, function() {
-   console.log('net.client says: connected to server!');  
-  });
+	/*let connect = new Promise((res) => {
+		client = net.connect({port: 8088}, function() {
+			console.log('net.client says: connected to server!');  
+		});
 
-  client.on('data', function(data) {
-    console.log('net.client says: data received - ', data.toString());
-    // endpoint = data.toString();
-    // client.end();
-    res(client);
-  });
+		client.on('data', function(data) {
+			console.log('net.client says: data received - ', data.toString());
+			// endpoint = data.toString();
+			// client.end();
+			res(client);
+		});
 
-  client.on('end', function() { 
-   console.log('net.client says: disconnected from server');
-  });
-})
+		client.on('end', function() { 
+			console.log('net.client says: disconnected from server');
+		});
+	})*/
 
-	connect.then((res) => {
+	pLoader.getBrowserFromParentProcess()
+	/*connect*/.then((res) => {
 
 		let pages = pLoader.getPu().then(res => res.pages())
 		.catch(err => console.log('pages() function failed: ', err));
@@ -43,16 +44,16 @@ let connect = new Promise((res) => {
 		})
 		.then(res => {
 			console.log('writing login');
-			return page.type('#LoginName', 'kamila.@gmail.com', {delay: 100})
+			return page.type('#LoginName', 'kamila.miterska7@gmail.com', {delay: 100})
 			.then((res, err) => {
 				console.log('writing password');
-				return page.type('#Password', '', {delay: 100});
+				return page.type('#Password', 'Hubik3Cz', {delay: 100});
 			})
 			.then((res, err) => {
 				return page.click('div.center > input[type="submit"]')
 			})
 		})
-	}).then(res => res.write('close server, please'))
+	})
+		// }).then(res => res.write('close server, please'))
 }
-
 connectToExistingInstance();

@@ -24,7 +24,7 @@ function loadBrowserAndPage() {
 		);
 		return selector1.click('a.loginButtonDziennikVulcan');
 	})
-	.then(() => {
+	/*.then(() => {
 		const child = spawn('node', ['test1.js'],{
 			stdio: [null, null, null, 'pipe']
 		})
@@ -44,11 +44,9 @@ function loadBrowserAndPage() {
 		child.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);
 		});
-		/*console.log('child: ');
-		console.dir(child, {depth: 1});*/
 		child.stdio[3].write('message from father')
 	})
-	/*.then(() => pLoader.getPu())
+	.then(() => pLoader.getPu())
 	.then(res => res.close())
 	.then(() => {
 		log();
