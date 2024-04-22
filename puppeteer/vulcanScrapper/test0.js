@@ -1,7 +1,11 @@
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 
-const child = spawn('node', ['test1.js'],{
-			stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+console.log(process.env.PATH)
+
+const child = spawn('npx', ['babel-node', 'test1'], { 
+			shell: true
+			// stdio: ['pipe', 'pipe', 'pipe', 'ipc']
 		})
 
 		child.stdout.on('data', (data) => {
@@ -19,7 +23,8 @@ const child = spawn('node', ['test1.js'],{
 		child.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);
 		});
-		// console.log('child: ');
-		// console.dir(child. stdin, {depth: 0});
-		child.stdin.write('abc')
-		child.send('message from father')
+
+		process.stdin.on('data', (data) => child.stdin.write(data))
+
+		// child.stdin.write('abc')
+		// child.send('message from father')
