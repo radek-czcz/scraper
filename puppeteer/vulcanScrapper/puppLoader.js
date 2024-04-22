@@ -1,6 +1,7 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-var net = require('net');
+// const puppeteer = require('puppeteer-extra');
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import net from 'net';
 
 let pu;
 let pa;
@@ -97,7 +98,7 @@ function getBrowserFromParentProcess() {
   let endpoint;
 
   let connect = new Promise((res) => {
-    client = net.connect({port: 8088}, function() {
+    let client = net.connect({port: 8088}, function() {
       console.log('net.child says: connected to server!');  
     });
 
@@ -126,4 +127,4 @@ function getBrowserFromParentProcess() {
   });
 }
 
-module.exports = {loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess/*, connect*/};
+module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };

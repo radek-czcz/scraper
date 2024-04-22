@@ -1,6 +1,5 @@
-const pLoader = require('./puppLoader.js');
-const { spawn } = require('child_process');
-const log = require('why-is-node-running');
+import { loadPuppeteer, loadPage } from './puppLoader.js';
+import { spawn } from 'child_process';
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -9,11 +8,11 @@ function loadBrowserAndPage() {
 
 	let page;
 
-	pLoader.loadPuppeteer(false)
+	loadPuppeteer(false)
 	.then((res, err) => {
 		if (err) {console.dir(err)}
 		else {
-			return pLoader.loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
+			return /*pLoader.*/loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
 		}
 	}).catch(err => console.log(err))
 	.then(async res => {
@@ -24,11 +23,11 @@ function loadBrowserAndPage() {
 		);
 		return selector1.click('a.loginButtonDziennikVulcan');
 	})
-	/*.then(() => {
-		const child = spawn('node', ['test1.js'],{
-			stdio: [null, null, null, 'pipe']
+	// .then(() => spawn('node', ['continuation.js']))
+	.then(() => {
+		const child = spawn('npx', ['babel-node', 'continuation'],{
+			shell: true
 		})
-
 		child.stdout.on('data', (data) => {
 		  console.log(`stdout:\n${data}`);
 		});
@@ -44,15 +43,14 @@ function loadBrowserAndPage() {
 		child.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);
 		});
-		child.stdio[3].write('message from father')
+
+		process.stdin.on('data', (data) => child.stdin.write(data))
 	})
-	.then(() => pLoader.getPu())
+	/*.then(() => pLoader.getPu())
 	.then(res => res.close())
 	.then(() => {
 		log();
 	})*/
 }
 
-loadBrowserAndPage()
-
-module.exports = { loadBrowserAndPage };
+loadBrowserAndPage();

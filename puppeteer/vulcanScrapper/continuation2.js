@@ -1,40 +1,52 @@
-const pLoader = require('./puppLoader.js');
-const pWriter = require('./puppWriterDB.js')
-
-
+import { getBrowserFromParentProcess, getPage } from './puppLoader.js';
+import { main } from './puppWriterDB.js';
+import log from 'why-is-node-running';
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 function connectToExistingInstance() {
-	let pageUrl;
+
 	let browser;
-	let page;
-	pLoader.connect.then(() => {
 
-		browser = pLoader.getPu();
-		let pages = browser.then(res => res.pages())
-		.catch(err => console.log(err));
-		let titleOfPage;
+	getBrowserFromParentProcess()
+	.then((res) => {
 
-		pages.then(res => {
-			pageUrl = res[0].url();
-			console.log('res:');
-			console.dir(res, {depth: 1});
-			page = res[0]
-			return res[0].title();
-		})
-		.then((res) => {
-			console.dir('titleOfPage: ' + res, {depth: 0})
-		})
+		let page
+		let bPlan;
+		let hPlan;
+		let exams;
+		let examsPromise;
+		let examsPromise2;
+		let hPlanPromise;
+		let bPlanPromise;
+
+		browser = res;
+
+		let pagePromise = getPage()
+		.catch(err => console.log('getPage() function failed: ', err));
+
+		let getHtmlString = pagePromise
 		.then(res => {
 			console.log('getting plan');
-			return page.$eval('div.panel.sprawdziany > div.subDiv.pCont > div', res => res.outerHTML)
+			examsPromise = res.$eval('div.panel.sprawdziany > div.subDiv.pCont > div', res => res.outerHTML)
+			let plan;
+			plan = res.$$eval('div.panel.plan > div.subDiv.pCont > div', res => res.map(inp => inp.outerHTML))
+			hPlanPromise = plan.then(res => hPlan = res[0]);
+			bPlanPromise = plan.then(res => bPlan = res[1]);
+			examsPromise2 = examsPromise.then(res => exams = res);
+			return Promise.all( [ hPlanPromise, bPlanPromise, examsPromise2 ] )
 		})
+
+		let writeToDB = getHtmlString
 		.then(res => {
-			console.log(res);
 			console.log('writing to db');
-			pWriter.main(res);
+			main([exams, bPlan, hPlan]);
 		})
 		.catch(err => console.log(err))
+
+		/*let closeBrowser = getHtmlString
+		.then(() => browser.close()).catch(err => console.log('error in closing browser'))
+
+		closeBrowser.then(() => console.log('browser closed'))*/
 	})
 }
 
