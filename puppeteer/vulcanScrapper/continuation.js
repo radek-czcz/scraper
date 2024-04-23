@@ -28,6 +28,14 @@ function connectToExistingInstance() {
 		.then((res, err) => {
 			return page.click('div.center > input[type="submit"]')
 		})
+
+		let waiting = clickSubmit
+		.then(res => {
+			let pr1 = page.waitForSelector('div.panel.sprawdziany > div.subDiv.pCont > div');
+			let pr2 = page.waitForSelector('div.panel.plan > div.subDiv.pCont > div');
+			return Promise.all([pr1, pr2]);
+		})
+
 		.then(() => spawn('npx', ['babel-node', 'continuation2']))
 	})
 }

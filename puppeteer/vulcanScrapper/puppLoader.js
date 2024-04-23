@@ -13,7 +13,7 @@ puppeteer.use(StealthPlugin());
 
 function loadPuppeteer(headless) {
   return puppeteer.launch({
-      // userDataDir: "./user_data",
+      userDataDir: "./user_data",
       headless: headless,
       args: ['--no-sandbox'/*, '--incognito'*/],
       /*devtools: false,*/

@@ -1,3 +1,8 @@
+div.mainComponent {
+  display: flex;
+  justify-content: center;
+}
+
 div.myMain {
   background-color: #cacaff;
   margin: 30px;
