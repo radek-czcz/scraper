@@ -27,11 +27,11 @@ function connectToExistingInstance() {
 		let getHtmlString = pagePromise
 		.then(res => {
 			console.log('getting plan');
-			examsPromise = res.$eval('div.panel.sprawdziany > div.subDiv.pCont > div', res => res.outerHTML)
+			examsPromise = res.$eval('div.panel.sprawdziany > div:nth-child(4)', res => res.outerHTML)
 			let plan;
 			plan = res.$$eval('div.panel.plan > div.subDiv.pCont > div', res => res.map(inp => inp.outerHTML))
-			hPlanPromise = plan.then(res => hPlan = res[0]);
-			bPlanPromise = plan.then(res => bPlan = res[1]);
+			hPlanPromise = plan.then(res => bPlan = res[0]);
+			bPlanPromise = plan.then(res => hPlan = res[1]);
 			examsPromise2 = examsPromise.then(res => exams = res);
 			return Promise.all( [ hPlanPromise, bPlanPromise, examsPromise2 ] )
 		})
@@ -39,7 +39,7 @@ function connectToExistingInstance() {
 		let writeToDB = getHtmlString
 		.then(res => {
 			console.log('writing to db');
-			main([exams, bPlan, hPlan]);
+			main([exams, hPlan, bPlan]);
 		})
 		.catch(err => console.log(err))
 

@@ -1,5 +1,5 @@
-import { getHTML } from './getHTML';
+import { getHTML, getbPlan, gethPlan } from './getHTML';
 
-const exportedMembers = [ getHTML ]
+const exportedMembers = [ getHTML, getbPlan, gethPlan ]
 
 export default exportedMembers
