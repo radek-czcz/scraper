@@ -16,3 +16,5 @@ import fs from 'fs'
 		// console.log(rd);
 		
 	})
+
+	process.stdout.write("ended");

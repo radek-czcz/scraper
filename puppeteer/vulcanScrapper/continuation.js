@@ -36,7 +36,9 @@ function connectToExistingInstance() {
 			return Promise.all([pr1, pr2]);
 		})
 
-		.then(() => spawn('npx', ['babel-node', 'continuation2']))
+		return waiting.then(res => {process.stdout.write('ended'); page.browser().disconnect()})
+
+		// .then(() => spawn('npx', ['babel-node', 'continuation2'], {shell: true}))
 	})
 }
 connectToExistingInstance();

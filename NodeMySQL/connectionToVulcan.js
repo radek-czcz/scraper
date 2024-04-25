@@ -29,17 +29,19 @@ function insert(htmlExams, hPlan, bPlan) {
       password: 'uUjAEstAnJEdEXTPbmKW',
     })
 
-    console.log(query1)
-    connection.query(query1, [dateNow, timeNow, htmlExams], (err, res, f) => {
-      if (err) { console.log(err) }
-      // connection.end(() => console.log("mysql connection ended"));
-    });    
-    connection.query(query2, [dateNow, timeNow, bPlan], (err, res, f) => {
-      if (err) { console.log(err) }
-    });    
-    connection.query(query3, [dateNow, timeNow, hPlan], (err, res, f) => {
-      if (err) { console.log(err) }
-    });
+    let promise1 = () => new Promise((res, rej) => connection.query(query1, [dateNow, timeNow, htmlExams], (err, result, f) => {
+      if (err) { console.log(err); rej() }
+      res();
+    }));
+    let promise2 = () => new Promise((res, rej) => connection.query(query2, [dateNow, timeNow, bPlan], (err, result, f) => {
+      if (err) { console.log(err); rej() }
+      res();
+    }));    
+    let promise3 = () => new Promise((res, rej) => connection.query(query3, [dateNow, timeNow, hPlan], (err, result, f) => {
+      if (err) { console.log(err); rej() }
+      res();
+    }));
+    Promise.all([promise1(), promise2(), promise3()]).then(() => connection.end((err) => {!err ? console.log('mysql connection ended'): console.log('error by closing mysql connection')}))
 }
 
 module.exports = { insert };
