@@ -3,7 +3,7 @@ import { main } from './puppWriterDB.js';
 import log from 'why-is-node-running';
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
-function connectToExistingInstance() {
+export default function connectToExistingInstance() {
 
 	let browser;
 
@@ -28,6 +28,7 @@ function connectToExistingInstance() {
 		.then(res => {
 			console.log('getting plan');
 			examsPromise = res.$eval('div.panel.sprawdziany > div:nth-child(4)', res => res.outerHTML)
+			.catch(err => {console.error(err)});
 			let plan;
 			plan = res.$$eval('div.panel.plan > div.subDiv.pCont > div', res => res.map(inp => inp.outerHTML))
 			hPlanPromise = plan.then(res => bPlan = res[0]);
@@ -38,6 +39,7 @@ function connectToExistingInstance() {
 
 		let writeToDB = getHtmlString
 		.then(res => {
+			browser.disconnect();
 			console.log('writing to db');
 			main([exams, hPlan, bPlan]);
 		})
