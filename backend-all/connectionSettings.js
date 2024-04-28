@@ -2,7 +2,7 @@
 let settings = {
     host: '188.210.222.87',
     user: 'srv59554_mojeprodukty',
-    password: '2!gTaC83GwseD',
+    password: 'XasR1Mh&dcAq8G',
     database: 'srv59554_mojeprodukty'
   }
 

@@ -16,7 +16,7 @@ function insert(names, prices, seller) {
       port:3306,
       database: 'srv59554_mojeprodukty',
       user: 'srv59554_mojeprodukty',
-      password: '2!gTaC83GwseD',
+      password: 'XasR1Mh&dcAq8G',
 
       /*host:'localhost',
       port:3306,

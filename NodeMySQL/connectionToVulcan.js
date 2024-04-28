@@ -26,7 +26,7 @@ function insert(htmlExams, hPlan, bPlan) {
       port:3306,
       database: 'srv59554_vulcan',
       user: 'srv59554_vulcan',
-      password: 'uUjAEstAnJEdEXTPbmKW',
+      password: 'ZeIqX&3$5!8Gv$3',
     })
 
     let promise1 = () => new Promise((res, rej) => connection.query(query1, [dateNow, timeNow, htmlExams], (err, result, f) => {
