@@ -127,4 +127,5 @@ function getBrowserFromParentProcess() {
   });
 }
 
-module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
+// module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
+export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };

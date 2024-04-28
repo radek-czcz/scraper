@@ -4,3 +4,5 @@ priceCharts/.angular/
 priceCharts/node_modules
 priceCharts/.vscode
 testy/
+puppeteer/vulcanScrapper/VulcanConnectionSettings.js
+NodeMySQL/VulcanDBConnectionSettings.js

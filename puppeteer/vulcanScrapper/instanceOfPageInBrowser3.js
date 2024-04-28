@@ -67,8 +67,7 @@ function loadBrowserAndPage() {
 		  console.error(`error: ${error.message}`);});
 		childProcessWriteLogingPassword.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);});
-		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))})
-}
+		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))})}
 
 function clickLogin() {
 	return page.then(async (res, err) => {
