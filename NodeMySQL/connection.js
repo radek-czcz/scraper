@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const dates = require('../dates/date.js');
 const category = require('../puppeteer/instanceOfPageInBrowser3.js').prodCategory;
+const settings = require('../backend-all/connectionSettingsVulcan.js')
 
 let connection;
 
@@ -15,14 +16,14 @@ function insert(names, prices, seller) {
       host: '188.210.222.87',
       port:3306,
       database: 'srv59554_mojeprodukty',
-      user: 'srv59554_mojeprodukty',
-      password: '2!gTaC83GwseD',
+      user: settings.user,
+      password: settings.password,
 
       /*host:'localhost',
       port:3306,
       database:'store',
       user:'root',
-      password:'asd2%yhfA'*/
+      password:'*/
       
     })
 

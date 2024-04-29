@@ -2,7 +2,6 @@
   "scripts": {
     "dev": "npx nodemon --exec babel-node backend-all/server.js"
   },
-  "type": "module",
   "dependencies": {
     "@babel/runtime": "^7.22.10",
     "@hapi/boom": "^10.0.1",

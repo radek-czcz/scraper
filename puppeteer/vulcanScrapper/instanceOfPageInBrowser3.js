@@ -46,7 +46,7 @@ function loadBrowserAndPage() {
 						console.log(`child process exited with code ${code}`);
 					});
 				}, waittime)*/
-					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'test4'], {shell: true})
+					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'continuation21'], {shell: true})
 					childProcessWriteDataToDB.stdout.on('data', (data) => {
 						console.log(`stdout:\n${data}`);
 					});

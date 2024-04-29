@@ -1,4 +1,4 @@
-import { insert } from '../../NodeMySQL/connectionToVulcan.js';
+import { insert } from './connectionToVulcan.js';
 
 async function main(inp) {
   let [ex, hP, bP] = inp;
