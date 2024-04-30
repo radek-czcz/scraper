@@ -11,6 +11,7 @@ priceCharts/node_modules
 priceCharts/src/assets/
 puppeteer/vulcanScrapper/user_data/
 puppeteer/vulcanScrapper/VulcanConnectionSettings.js
+puppeteer/vulcanScrapper/VulcanDBConnectionSettings.js
 react/appno2/
 react/wrapper-tutorial/
 testy/
