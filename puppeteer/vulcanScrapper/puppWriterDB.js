@@ -1,8 +1,8 @@
-import { insert } from './connectionToVulcan.js';
+const pWriter = require('./connectionToVulcan.js');
 
 async function main(inp) {
   let [ex, hP, bP] = inp;
-  insert(ex, hP, bP);
+  pWriter.insert(ex, hP, bP);
 }
 
-export {main};
+module.exports = {main};

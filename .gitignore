@@ -1,3 +1,4 @@
+node_modules/
 .vs/
 backend-all/music/
 backend-all/connectionSettings.js
@@ -8,6 +9,9 @@ NodeMySQL/VulcanDBConnectionSettings.js
 priceCharts/.angular/
 priceCharts/.vscode
 priceCharts/node_modules
+priceCharts/.vscode
+testy/
+backend-all/music/
 priceCharts/src/assets/
 puppeteer/vulcanScrapper/user_data/
 puppeteer/vulcanScrapper/VulcanConnectionSettings.js
@@ -16,3 +20,4 @@ react/appno2/
 react/wrapper-tutorial/
 testy/
 zadanie/
+puppeteer/vulcanScrapper/user_data/

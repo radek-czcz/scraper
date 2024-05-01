@@ -8,8 +8,8 @@ let childProcessWriteDataToDB;
 let intervalTimer;
 
 function connectToExistingInstance() {
-	const date1 = new Date('April 29, 2024 20:34:15');
-	const date2 = new Date('April 29, 2024 20:34:30');
+	const date1 = new Date('April 27, 2024 13:33:15');
+	const date2 = new Date('April 27, 2024 13:33:30');
 	let now = new Date();
 	let waittime1 = date1.getTime() - now.getTime();
 	let waittime2 = date2.getTime() - now.getTime();

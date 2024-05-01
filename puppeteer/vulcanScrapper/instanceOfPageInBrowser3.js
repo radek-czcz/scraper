@@ -17,11 +17,8 @@ function loadBrowserAndPage() {
 	const date1 = new Date('April 25, 2024 20:17:00');
 	let now = new Date();
 	let waittime = date1.getTime() - now.getTime();
-	browser = loadPuppeteer(false);
-	page = browser.then((res, err) => {
-		if (err) {console.dir(err)}
-		else {
-		return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');}})
+	browser = loadPuppeteer(true);
+	page = browser.then(() => goToPage())
 	.catch(err => console.log(err));
 	let click1 = page.then(() => clickLogin())
 	let spawnProcess = click1.then(() => {
@@ -46,7 +43,7 @@ function loadBrowserAndPage() {
 						console.log(`child process exited with code ${code}`);
 					});
 				}, waittime)*/
-					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'continuation21'], {shell: true})
+					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'test4'], {shell: true})
 					childProcessWriteDataToDB.stdout.on('data', (data) => {
 						console.log(`stdout:\n${data}`);
 					});
@@ -68,7 +65,6 @@ function loadBrowserAndPage() {
 		childProcessWriteLogingPassword.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);});
 		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))})}
-
 function clickLogin() {
 	return page.then(async (res, err) => {
 		page = res;
@@ -78,7 +74,10 @@ function clickLogin() {
 		);
 		return selector1.click('a.loginButtonDziennikVulcan');
 	})}
-
+function goToPage(res, err) {
+		if (err) {console.dir(err)}
+		else {
+		return loadPage('https://uonetplus.vulcan.net.pl/gminawolow')}}
 /*function checkIfSelectorsAvailable() {
 	let titleOfPAge = page[0].title();
 
