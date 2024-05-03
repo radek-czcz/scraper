@@ -25,28 +25,28 @@ function loadPuppeteer(headless) {
     pu = res;
     endpoint = pu.wsEndpoint();
 
-        server = net.createServer(function(connection) {
-          console.log('net.server says: client connected');
+    server = net.createServer(function(connection) {
+      console.log('net.server says: client connected');
 
-          connection.on('end', function() {
-            console.log('net.server says: client disconnected');
-            // server.close(() => console.log('server closed'));
-          });
+      connection.on('end', function() {
+        console.log('net.server says: client disconnected');
+        // server.close(() => console.log('server closed'));
+      });
 
-          connection.on('data', function(data) {
-            if (data.toString() === "close server, please") {
-              console.log('net.server says: client requested to close server');
-              server.close(() => console.log('server closed'));
-            }
-          });
+      connection.on('data', function(data) {
+        if (data.toString() === "close server, please") {
+          console.log('net.server says: client requested to close server');
+          server.close(() => console.log('server closed'));
+        }
+      });
 
-          connection.write(endpoint);
-          connection.pipe(connection);
-        });
+      connection.write(endpoint);
+      connection.pipe(connection);
+    });
 
-        server.listen(8088, function() { 
-          console.log('server is listening');
-        });
+    server.listen(8088, function() { 
+      console.log('server is listening');
+    });
 
     console.log('endpoint in loader: ', endpoint);
     return res;
@@ -127,4 +127,5 @@ function getBrowserFromParentProcess() {
   });
 }
 
-module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
+// module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
+export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };

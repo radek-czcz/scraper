@@ -17,54 +17,39 @@ function loadBrowserAndPage() {
 	const date1 = new Date('April 25, 2024 20:17:00');
 	let now = new Date();
 	let waittime = date1.getTime() - now.getTime();
-	browser = loadPuppeteer(true);
+	browser = loadPuppeteer(false);
 	page = browser.then(() => goToPage())
 	.catch(err => console.log(err));
-	let click1 = page.then(() => clickLogin())
+	let click1 = page.then(() => clickLogin());
 	let spawnProcess = click1.then(() => {
 		childProcessWriteLogingPassword = spawn('npx', ['babel-node', 'continuation'],{
 			shell: true})
 		childProcessWriteLogingPassword.stdout.on('data', (data) => {
 			if ( data.toString() === 'ended' ) {
-				console.log("Login to Vulcan system has ended, so I'm gonna run timing processes which collect data")
-				/*setTimeout(() => {
-					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'continuation2'], {shell: true})
-					intervalTimer = setTimeout(() => spawn('npx', ['babel-node', 'continuation2'], {shell: true}), getTime(1/60*3/2, 1/120));
-					childProcessWriteDataToDB.stdout.on('data', (data) => {
-						console.log(`stdout:\n${data}`);
-					});
-					childProcessWriteDataToDB.stderr.on('data', (data) => {
-						console.error(`stderr: ${data}`);
-					});
-					childProcessWriteDataToDB.on('error', (error) => {
-						console.error(`error: ${error.message}`);
-					});
-					childProcessWriteDataToDB.on('close', (code) => {
-						console.log(`child process exited with code ${code}`);
-					});
-				}, waittime)*/
+				console.log("childProcessWriteLogingPassword: Login to Vulcan system has ended")
 					childProcessWriteDataToDB = spawn('npx', ['babel-node', 'test4'], {shell: true})
 					childProcessWriteDataToDB.stdout.on('data', (data) => {
-						console.log(`stdout:\n${data}`);
+						console.log(`   childProcessWriteDataToDB:${data}`);
 					});
 					childProcessWriteDataToDB.stderr.on('data', (data) => {
-						console.error(`stderr: ${data}`);
+						console.error(`   childProcessWriteDataToDB, error: ${data}`);
 					});
 					childProcessWriteDataToDB.on('error', (error) => {
-						console.error(`error: ${error.message}`);
+						console.error(`   childProcessWriteDataToDB, error: ${error.message}`);
 					});
 					childProcessWriteDataToDB.on('close', (code) => {
-						console.log(`child process exited with code ${code}`);
+						console.log(`   childProcessWriteDataToDB: child process exited with code ${code}`);
 					});
 			}
-			console.log(`stdout:\n${data}`);});
+			console.log(`childProcessWriteLogingPassword: ${data}`);});
 		childProcessWriteLogingPassword.stderr.on('data', (data) => {
 		  console.error(`stderr: ${data}`);});
 		childProcessWriteLogingPassword.on('error', (error) => {
 		  console.error(`error: ${error.message}`);});
 		childProcessWriteLogingPassword.on('close', (code) => {
 		  console.log(`child process exited with code ${code}`);});
-		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))})}
+		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))})
+	}
 function clickLogin() {
 	return page.then(async (res, err) => {
 		page = res;
