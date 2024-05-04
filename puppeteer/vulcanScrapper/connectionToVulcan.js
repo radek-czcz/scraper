@@ -17,10 +17,9 @@ function insert(htmlExams, hPlan, bPlan) {
       `INSERT INTO bPlan (date, time, htmlElement)
       VALUES (?, ?, ?)`;
     let query3 = 
-    `INSERT INTO hPlan (date, time, htmlElement)
-    VALUES (?, ?, ?)`;
+      `INSERT INTO hPlan (date, time, htmlElement)
+      VALUES (?, ?, ?)`;
   // CREATE DB CONNECTION
-    console.log(settings.user, settings.password)
     connection = mysql.createPool({
       connectionLimit : 3,
       host: '188.210.222.87',
@@ -32,17 +31,26 @@ function insert(htmlExams, hPlan, bPlan) {
     let promise1 = () => new Promise(
       (res, rej) => connection.query(query1, [dateNow, timeNow, htmlExams], (err, result, f) => {
         if (err) { console.log(err); rej() }
-        res();}));
+        res();
+      })
+    )
     let promise2 = () => new Promise(
       (res, rej) => connection.query(query2, [dateNow, timeNow, bPlan], (err, result, f) => {
-      if (err) { console.log(err); rej() }
-      res();}));    
+        if (err) { console.log(err); rej() }
+        res();
+      })
+    )   
     let promise3 = () => new Promise(
       (res, rej) => connection.query(query3, [dateNow, timeNow, hPlan], (err, result, f) => {
-      if (err) { console.log(err); rej() }
-      res();}));
+        if (err) { console.log(err); rej() }
+        res();
+      })
+    )
     Promise.all([promise1(), promise2(), promise3()]).then(
       () => connection.end(
-        (err) => {!err ? console.log('mysql connection ended'): console.log('error by closing mysql connection')}))}
+        (err) => {!err ? console.log('mysql connection ended'): console.log('error by closing mysql connection')}
+      )
+    )
+}
 
 export { insert };

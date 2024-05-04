@@ -8,11 +8,13 @@ let childProcessWriteDataToDB;
 let intervalTimer;
 
 function connectToExistingInstance() {
-	const date1 = new Date('May 02, 2024 20:48:35');
-	const date2 = new Date('May 02, 2024 20:49:05');
-	let now = new Date();
-	let waittime1 = date1.getTime() - now.getTime();
-	let waittime2 = date2.getTime() - now.getTime();
+	let now1 = new Date();
+	// const date1 = new Date('May 02, 2024 20:48:35');
+	// const date2 = new Date('May 02, 2024 20:49:05');
+	const date1 = new Date(now1.getTime() + 1000*14);
+	const date2 = new Date(now1.getTime() + 1000*75);
+	let waittime1 = date1.getTime() - now1.getTime();
+	let waittime2 = date2.getTime() - now1.getTime();
 
 	let spawnWrapFunction = function(processObj) {
 		processObj.stdout.on('data', (data) => {

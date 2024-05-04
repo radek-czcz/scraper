@@ -4,11 +4,11 @@ import credentials from './VulcanConnectionSettings.js'
 
 // 1. TYPE IN LOGIN AND PASSWORD
 // 2. CLICK SUBMIT BUTTON
+// 3. WAIT FOR SELECTORS
 function connectToExistingInstance() {
 
 	getBrowserFromParentProcess()
 	.then(() => {
-
 		let page
 
 		let pagePromise = getPage()
@@ -38,8 +38,7 @@ function connectToExistingInstance() {
 		})
 
 		return waiting.then(res => {process.stdout.write('ended'); page.browser().disconnect()})
-
-		// .then(() => spawn('npx', ['babel-node', 'continuation2'], {shell: true}))
 	})
 }
+
 connectToExistingInstance();
