@@ -37,7 +37,7 @@ function connectToExistingInstance() {
 			return Promise.all([pr1, pr2]);
 		})
 
-		return waiting.then(res => {process.stdout.write('ended'); page.browser().disconnect()})
+		return waiting.then(res => {process.stdout.write('singning in was successful'); page.browser().disconnect()})
 	})
 }
 

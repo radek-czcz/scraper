@@ -2,6 +2,7 @@ import { getBrowserFromParentProcess, getPage } from './puppLoader.js';
 import { spawn } from 'child_process';
 import getTime from './RandomTimeInterval.js'
 import process from 'node:process';
+import attachFunc from './ProcessListenersManager.js'
 
 let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
@@ -16,31 +17,33 @@ function connectToExistingInstance() {
 	let waittime1 = date1.getTime() - now1.getTime();
 	let waittime2 = date2.getTime() - now1.getTime();
 
-	let spawnWrapFunction = function(processObj) {
-		processObj.stdout.on('data', (data) => {
-			console.log(`  Writing To DB: stdout:\n  ${data}`);});
-		processObj.stderr.on('data', (data) => {
-			console.error(`Writing To DB: error has occured:\n  ${data}`);});
-		processObj.on('error', (error) => {
-			console.error(`Writing To DB: error has occured:\n  ${error.message}`);});
-		processObj.on('close', (code) => {
-			console.log(`Writing To DB: Process has ended with code:${code}`);
-			let spawning = () => {
-			console.log("Writing To DB: Starting new process")
-				let process1 = spawn('npx', ['babel-node', 'continuation2'], {shell: true});
-				spawnWrapFunction(process1)}
-			setTimeout(spawning, getTime((1/60), ((1/60)*(1/10))))})}
+	let spawnWrapFunction = function() {
+		let processOfFetchAndWriteInner;
+		processOfFetchAndWriteInner = spawn('npx', ['babel-node', 'continuation2'], {shell: true})
+		let name1 = 'fetching data & writing data';
+		attachFunc({
+			processObject: processOfFetchAndWriteInner,
+			onClose: function(code) {
+				console.log(`Process of ${name1} has ended with code:${code}`);
+				function spawning() {
+					console.log(`Process of ${name1}: Starting new process`)
+					let process1 = spawn('npx', ['babel-node', 'continuation2'], {shell: true});
+					spawnWrapFunction()
+				}
+				setTimeout(spawnWrapFunction, getTime((1/30), ((1/55)*(1/10))))
+			},
+			name: name1,
+		})
+	}
 
 	getBrowserFromParentProcess()
 	.then(() => {
-		let spawning = function() {
-			console.log("Writing To DB: Starting new process")
-			let process1 = spawn('npx', ['babel-node', 'continuation2'], {shell: true});
-			spawnWrapFunction(process1)}
 		console.log("Writing To DB: Starting new cyclic process")
-		setTimeout(spawning, waittime1);
+		setTimeout(spawnWrapFunction, waittime1);
 		console.log(`it's ${waittime1/(1000*60*60)} hours left to run`)
-		setTimeout(spawning, waittime2);
-		console.log(`it's ${waittime2/(1000*60*60)} hours left to run`)})}
+		setTimeout(spawnWrapFunction, waittime2);
+		console.log(`it's ${waittime2/(1000*60*60)} hours left to run`)
+	})
+}
 
 connectToExistingInstance();

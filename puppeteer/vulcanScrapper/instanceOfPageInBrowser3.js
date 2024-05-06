@@ -1,6 +1,7 @@
 import { loadPuppeteer, loadPage } from './puppLoader.js';
 import { spawn } from 'child_process';
 import getTime from './RandomTimeInterval.js'
+import attachFunc from './ProcessListenersManager.js'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -24,29 +25,23 @@ function loadBrowserAndPage() {
 
 	let cookiesSet = browser.then(() => {
 		let processToSetCookies;
-		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetter'],{shell: true})
-		processToSetCookies.stdout.on('data', (data) => {
-			if ( data.toString() === 'cookies set' ) {
-				resolver();
+		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetter'],{shell: true});
+		let name1 = 'Cookies setting';
+		attachFunc({
+			processObject: processToSetCookies,
+			name: name1,
+			onData: function(data) {
+				if ( data.toString() === 'cookies set' ) {
+					// resolver();
+				}
+				console.log(`Process of ${name1} produced output:\n  ${data}`);
 			}
-			console.log(`childProcessWriteLogingPassword: ${data}`);
-		});
-		processToSetCookies.stderr.on('data', (data) => {
-		  console.error(`stderr: ${data}`);
-		});
-		processToSetCookies.on('error', (error) => {
-		  console.error(`error: ${error.message}`);
-		});
-		processToSetCookies.on('close', (code) => {
-		  console.log(`child process (processToSetCookies) exited with code ${code}`);
-		});
-		/*process.stdin.on('data', (data) => processToSetCookies.stdin.write(data))*/
+		})
 	})
 
 	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
 	.catch(err => console.log(err));
 
-	// let click1 = page.then(() => clickLogin());
 	let click1 = page.then(() => logOrFetchData());
 
 	// let spawnProcess = writeLoginAndPassword();
@@ -99,7 +94,6 @@ function goToPage(res, err) {
 }
 
 function logOrFetchData() {
-	console.log
 	let page1;
 	let titleOfPAge = page.then(res => {page1 = res[0]; return res[0].title()});
 
@@ -110,6 +104,7 @@ function logOrFetchData() {
 					clickLogin()
 					.then(writeLoginAndPassword)
 					.then(saveCookies)
+					.then(fetchData)
 				} else if (await page1.$('div.panel.sprawdziany') !== null) {
 					fetchData();
 				}
@@ -120,6 +115,26 @@ function logOrFetchData() {
 }
 
 function writeLoginAndPassword() {
+		let resolver;
+		let loginPromise = new Promise(res => {resolver = res});
+		let processToSignIn;
+		processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
+		let name1 = 'signing in';
+		attachFunc({
+			processObject: processToSignIn,
+			name: name1,
+			onData: function(data) {
+				if ( data.toString() === 'singning in was successful' ) {
+					console.log(`Process of ${name1} produced output:\n  ${data}`)
+					resolver();
+				}
+			}
+		})
+		return loginPromise;
+}
+
+
+/*function writeLoginAndPassword() {
 	return new Promise((res1, rej) => {
 		childProcessWriteLogingPassword = spawn('npx', ['babel-node', 'continuation'],{
 			shell: true})
@@ -137,45 +152,28 @@ function writeLoginAndPassword() {
 		  console.log(`child process exited with code ${code}`);});
 		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))
 	})
-}
+}*/
+
+
 
 function saveCookies(res, rej) {
-		let res1;
-		let proc;
-		proc = spawn('npx', ['babel-node', 'CookiesFetcher'],{
-			shell: true})
-		proc.stdout.on('data', (data) => {
-			if ( data.toString() === 'ended' ) {
-				console.log("process: cookies saving has ended")
-				res1();
-			}
-			console.log(`process: cookies saving: ${data}`);});
-		proc.stderr.on('data', (data) => {
-		  console.error(`stderr: ${data}`);});
-		proc.on('error', (error) => {
-		  console.error(`error: ${error.message}`);});
-		proc.on('close', (code) => {
-		  console.log(`child process exited with code ${code}`);});
-		process.stdin.on('data', (data) => proc.stdin.write(data))
-		return new Promise((res, rej) => {
-			res1 = res;
+		let processOfSavingCookies;
+		processOfSavingCookies = spawn('npx', ['babel-node', 'CookiesFetcher'], {shell: true})
+		let name1 = 'fetching cookies';
+		attachFunc({
+			processObject: processOfSavingCookies,
+			name: name1,
 		})
 }
 
 function fetchData(res, rej) {
-	childProcessWriteDataToDB = spawn('npx', ['babel-node', 'test4'], {shell: true})
-	childProcessWriteDataToDB.stdout.on('data', (data) => {
-		console.log(`   childProcessWriteDataToDB:${data}`);
-	});
-	childProcessWriteDataToDB.stderr.on('data', (data) => {
-		console.error(`   childProcessWriteDataToDB, error: ${data}`);
-	});
-	childProcessWriteDataToDB.on('error', (error) => {
-		console.error(`   childProcessWriteDataToDB, error: ${error.message}`);
-	});
-	childProcessWriteDataToDB.on('close', (code) => {
-		console.log(`   childProcessWriteDataToDB: child process exited with code ${code}`);
-	});
+		let processOfFetchAndWrite;
+		processOfFetchAndWrite = spawn('npx', ['babel-node', 'test4'], {shell: true})
+		let name1 = 'fetching and saving data';
+		attachFunc({
+			processObject: processOfFetchAndWrite,
+			name: name1,
+		})
 }
 
 loadBrowserAndPage();

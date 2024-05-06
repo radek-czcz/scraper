@@ -2,7 +2,7 @@
 
 export default function attachListeners(processObj) {
 
-	const {processObject, name, oc} = processObj;
+	const {processObject, name, onData, onErrData, onError, onClose} = processObj;
 	
 	let onDataCallback = function(data) {
 		console.log(`Process of ${processObj.name} produced output:\n  ${data}`);
@@ -16,12 +16,12 @@ export default function attachListeners(processObj) {
 	let onCloseCallback = function(code) {
 		console.log(`Process of ${processObj.name} has ended with code:${code}`);
 	}
-	let ocl = oc ? oc : onCloseCallback
+
 	let spawnWrapFunction = function(processObj1) {
-		processObj1.processObject.stdout.on('data', onDataCallback);
-		processObj1.processObject.stderr.on('data', onErrorDataCallback);
-		processObj1.processObject.on('error', onErrorCallback);
-		processObj1.processObject.on('close', ocl)
+		processObject.stdout.on('data', onData ? onData : onDataCallback);
+		processObject.stderr.on('data', onErrData ? onErrData : onErrorDataCallback);
+		processObject.on('error', onError ? onError : onErrorCallback);
+		processObject.on('close', onClose ? onClose : onCloseCallback)
 	}
 
 	spawnWrapFunction(processObj);
