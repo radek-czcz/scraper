@@ -32,7 +32,7 @@ function loadBrowserAndPage() {
 			name: name1,
 			onData: function(data) {
 				if ( data.toString() === 'cookies set' ) {
-					// resolver();
+					resolver();
 				}
 				console.log(`Process of ${name1} produced output:\n  ${data}`);
 			}

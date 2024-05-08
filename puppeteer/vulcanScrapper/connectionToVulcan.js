@@ -27,30 +27,43 @@ function insert(htmlExams, hPlan, bPlan) {
       database: 'srv59554_vulcan',
       user: settings.user,
       password: settings.password})
+    let promise1;
+    let promise2;
+    let promise3;
   // PROMISIFIED QUERY FUNCTIONS
-    let promise1 = () => new Promise(
+    if (htmlExams) {
+    promise1 = () => new Promise(
       (res, rej) => connection.query(query1, [dateNow, timeNow, htmlExams], (err, result, f) => {
         if (err) { console.log(err); rej() }
         res();
       })
-    )
-    let promise2 = () => new Promise(
+    )} else {
+      promise1 = () => Promise.reject('exams not saved')
+    }
+    if (bPlan) {
+    promise2 = () => new Promise(
       (res, rej) => connection.query(query2, [dateNow, timeNow, bPlan], (err, result, f) => {
         if (err) { console.log(err); rej() }
         res();
       })
-    )   
-    let promise3 = () => new Promise(
+    )} else {
+      promise2 = () =>  Promise.reject('bPlan not saved')
+    }
+    if (hPlan) {
+    promise3 = () => new Promise(
       (res, rej) => connection.query(query3, [dateNow, timeNow, hPlan], (err, result, f) => {
         if (err) { console.log(err); rej() }
         res();
       })
-    )
+    )} else {
+      promise3 = () => Promise.reject('hPlan not saved')
+    }
     Promise.all([promise1(), promise2(), promise3()]).then(
       () => connection.end(
         (err) => {!err ? console.log('mysql connection ended'): console.log('error by closing mysql connection')}
       )
-    )
+    ).catch(err => {console.log('not all data has been saved'); console.dir(err, {depth: 1})})
 }
+
 
 export { insert };

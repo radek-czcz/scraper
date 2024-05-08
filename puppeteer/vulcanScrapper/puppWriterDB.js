@@ -1,8 +1,8 @@
 import { insert } from './connectionToVulcan.js';
 
 async function main(inp) {
-  let [ex, hP, bP] = inp;
-  insert(ex, hP, bP);
+  let {exams, hPlan, bPlan} = inp;
+  insert(exams, hPlan, bPlan);
 }
 
 export {main};

@@ -36,14 +36,11 @@ function connectToExistingInstance() {
 		})
 	}
 
-	getBrowserFromParentProcess()
-	.then(() => {
-		console.log("Writing To DB: Starting new cyclic process")
-		setTimeout(spawnWrapFunction, waittime1);
-		console.log(`it's ${waittime1/(1000*60*60)} hours left to run`)
-		setTimeout(spawnWrapFunction, waittime2);
-		console.log(`it's ${waittime2/(1000*60*60)} hours left to run`)
-	})
+	console.log("Writing To DB: Starting new cyclic process")
+	setTimeout(spawnWrapFunction, waittime1);
+	console.log(`it's ${waittime1/(1000*60*60)} hours left to run`)
+	setTimeout(spawnWrapFunction, waittime2);
+	console.log(`it's ${waittime2/(1000*60*60)} hours left to run`)
 }
 
 connectToExistingInstance();
