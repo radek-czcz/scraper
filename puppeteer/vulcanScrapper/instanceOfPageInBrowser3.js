@@ -14,6 +14,15 @@ let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
 let intervalTimer;
 
+process.stdin.on('data', data => {
+	if (data.toString() === "close test11") {
+		processOfFetchAndWrite.stdout.on('data', data => {
+			console.log(data);
+		})
+		processOfFetchAndWrite.stdin.write(data);
+	}
+})
+
 function loadBrowserAndPage() {
 	const date1 = new Date('April 25, 2024 20:17:00');
 	let now = new Date();

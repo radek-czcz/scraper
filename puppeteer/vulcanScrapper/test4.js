@@ -8,6 +8,13 @@ let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
 let intervalTimer;
 
+process.stdin.on('data', data => {
+	if (data.toString() === "close test11") {
+		console.log("trying to close test11");
+		process.disconnect();
+	}
+})
+
 function connectToExistingInstance() {
 	let now1 = new Date();
 	// const date1 = new Date('May 02, 2024 20:48:35');
