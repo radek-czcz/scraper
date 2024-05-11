@@ -19,11 +19,11 @@ function connectToExistingInstance() {
 
 	let spawnWrapFunction = function() {
 		let processOfFetchAndWriteInner;
-		processOfFetchAndWriteInner = spawn('npx', ['babel-node', 'continuation2'], {shell: true})
-		let name1 = 'fetching data & writing data';
+		processOfFetchAndWriteInner = spawn('npx', ['babel-node', 'test5'], {shell: true})
+		let name1 = 'testing error';
 		attachFunc({
 			processObject: processOfFetchAndWriteInner,
-			onClose: function(code) {
+			/*onClose: function(code) {
 				console.log(`Process of ${name1} has ended with code:${code}`);
 				function spawning() {
 					console.log(`Process of ${name1}: Starting new process`)
@@ -31,6 +31,9 @@ function connectToExistingInstance() {
 					spawnWrapFunction()
 				}
 				setTimeout(spawnWrapFunction, getTime((1/30), ((1/55)*(1/10))))
+			},*/
+			onError: function(error) {
+				console.log('error intercepted by test4 module'); console.err(error); throw error;
 			},
 			name: name1,
 		})

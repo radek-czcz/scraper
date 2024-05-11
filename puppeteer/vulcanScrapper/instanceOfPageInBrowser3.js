@@ -173,6 +173,7 @@ function fetchData(res, rej) {
 		attachFunc({
 			processObject: processOfFetchAndWrite,
 			name: name1,
+			onError: function(error) {console.log('error intercepted by main module'); throw error}
 		})
 }
 

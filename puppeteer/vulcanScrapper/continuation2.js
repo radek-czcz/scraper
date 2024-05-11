@@ -55,7 +55,7 @@ export default function connectToExistingInstance() {
 			bPlan ? objToDB.bPlan = bPlan: null;
 			main(/*[exams, hPlan, bPlan]*/objToDB);
 		})
-		.catch(err => {console.log(err); browser.disconnect()})
+		.catch(err => {console.log(err); browser.disconnect(); throw err})
 	})}
 
 connectToExistingInstance();

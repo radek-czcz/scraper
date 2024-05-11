@@ -5,13 +5,13 @@ export default function attachListeners(processObj) {
 	const {processObject, name, onData, onErrData, onError, onClose} = processObj;
 	
 	let onDataCallback = function(data) {
-		console.log(`Process of ${processObj.name} produced output:\n  ${data}`);
+		console.log(`Output emitted by ${processObj.name}:\n  ${data}`);
 	}
 	let onErrorDataCallback = function(data) {
-		console.error(`Process of ${processObj.name}: error has occured:\n  ${data}`);
+		console.error(`Error emitted by ${processObj.name}:\n  ${data}`);
 	}
 	let onErrorCallback = function(error) {
-		console.error(`Process of ${processObj.name}: error has occured:\n  ${error.message}`);
+		console.error(`Error emitted by ${processObj.name}:\n  ${error.message}`);
 	}
 	let onCloseCallback = function(code) {
 		console.log(`Process of ${processObj.name} has ended with code:${code}`);
