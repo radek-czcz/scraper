@@ -58,11 +58,12 @@ function insert(htmlExams, hPlan, bPlan) {
     )} else {
       promise3 = () => Promise.reject('hPlan not saved')
     }
-    Promise.all([promise1(), promise2(), promise3()]).then(
-      () => connection.end(
+    Promise.allSettled([promise1(), promise2(), promise3()]).then(
+      (res, rej) => {
+      return connection.end(
         (err) => {!err ? console.log('mysql connection ended'): console.log('error by closing mysql connection')}
       )
-    ).catch(err => {console.log('not all data has been saved'); console.dir(err, {depth: 1})})
+    }).catch(err => {console.log('not all data has been saved'); console.dir(err, {depth: 1})})
 }
 
 

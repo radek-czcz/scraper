@@ -50,8 +50,7 @@ function loadBrowserAndPage() {
 
 	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
 	.catch(err => console.log(err));
-
-	let click1 = page.then(() => logOrFetchData());
+	// let click1 = page.then(() => logOrFetchData());
 
 	// let spawnProcess = writeLoginAndPassword();
 	// let spawnProcess = click1.then(() => {

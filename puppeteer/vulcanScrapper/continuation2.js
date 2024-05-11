@@ -36,8 +36,9 @@ export default function connectToExistingInstance() {
 			bPlanPromise = plan.then(res => res[1] ? bPlan = res[1] : null, rejected);
 			examsPromise2 = examsPromise.then( res => exams = res, rejected);
 			let allPromises = Promise.allSettled( [ hPlanPromise, bPlanPromise, examsPromise2 ] ).then((res) => {
-				console.log('hPlanPromise: \n', hPlanPromise, '\n', 'bPlanPromise: \n', bPlanPromise, '\n', 'examsPromise2: \n', examsPromise2)
-				console.log('res2: \n', res)
+				// console.log('hPlanPromise: \n', hPlanPromise, '\n', 'bPlanPromise: \n', bPlanPromise, '\n', 'examsPromise2: \n', examsPromise2)
+				console.log('res2: \n');
+				res.forEach(elem => console.log(elem.status))
 				let retVal = res.filter(inp => inp.status === 'fulfilled')
 
 				return retVal.length === 0 ? Promise.reject("no promise fulfilled") : Promise.resolve(retVal);
@@ -55,7 +56,7 @@ export default function connectToExistingInstance() {
 			bPlan ? objToDB.bPlan = bPlan: null;
 			main(/*[exams, hPlan, bPlan]*/objToDB);
 		})
-		.catch(err => {console.log(err); browser.disconnect()})
+		.catch(err => {console.log(err); browser ? browser.disconnect() : null})
 	})}
 
 connectToExistingInstance();
