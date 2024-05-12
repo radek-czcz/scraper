@@ -72,7 +72,7 @@ async function loadPage(url) {
   const page = await pu.pages();
   await page[0].goto(url, {
     waitUntil: 'networkidle2'
-  });
+  }).catch(err => console.log('browser could not navigate to the page address'));
   console.log  ('page opened')
   return page;
 }

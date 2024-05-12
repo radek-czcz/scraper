@@ -49,47 +49,28 @@ function loadBrowserAndPage() {
 	})
 
 	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
-	.catch(err => console.log(err));
-	// let click1 = page.then(() => logOrFetchData());
+	.catch(err => console.log(err))
+	let logging = page.then(logOrFetchData);
 
-	// let spawnProcess = writeLoginAndPassword();
-	// let spawnProcess = click1.then(() => {
-	// 	childProcessWriteLogingPassword = spawn('npx', ['babel-node', 'continuation'],{
-	// 		shell: true})
-	// 	childProcessWriteLogingPassword.stdout.on('data', (data) => {
-	// 		if ( data.toString() === 'ended' ) {
-	// 			console.log("childProcessWriteLogingPassword: Login to Vulcan system has ended")
-	// 				childProcessWriteDataToDB = spawn('npx', ['babel-node', 'test4'], {shell: true})
-	// 				childProcessWriteDataToDB.stdout.on('data', (data) => {
-	// 					console.log(`   childProcessWriteDataToDB:${data}`);
-	// 				});
-	// 				childProcessWriteDataToDB.stderr.on('data', (data) => {
-	// 					console.error(`   childProcessWriteDataToDB, error: ${data}`);
-	// 				});
-	// 				childProcessWriteDataToDB.on('error', (error) => {
-	// 					console.error(`   childProcessWriteDataToDB, error: ${error.message}`);
-	// 				});
-	// 				childProcessWriteDataToDB.on('close', (code) => {
-	// 					console.log(`   childProcessWriteDataToDB: child process exited with code ${code}`);
-	// 				});
-	// 		}
-	// 		console.log(`childProcessWriteLogingPassword: ${data}`);});
-	// 	childProcessWriteLogingPassword.stderr.on('data', (data) => {
-	// 	  console.error(`stderr: ${data}`);});
-	// 	childProcessWriteLogingPassword.on('error', (error) => {
-	// 	  console.error(`error: ${error.message}`);});
-	// 	childProcessWriteLogingPassword.on('close', (code) => {
-	// 	  console.log(`child process exited with code ${code}`);});
-	// 	process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))
-	// })
+	let gettingCookies = logging.then(res => {
+		if (res === 'continue after login') {
+			saveCookies();
+		}
+	})
+
+	let fetchingData = logging.then(res => {
+		console.log('from fetching');
+		return fetchData();
+	});
 }
 
 function clickLogin() {
 	return page.then(async (res, err) => {
-		page = res;
+		// page = res;
+		console.log('waiting for selector')
 		let selector1 = await res[0].waitForSelector(
 			loginButtonSelector,
-			 {timeout: 5000}
+			{timeout: 5000}
 		);
 		return selector1.click('a.loginButtonDziennikVulcan');
 	})
@@ -98,71 +79,50 @@ function clickLogin() {
 function goToPage(res, err) {
 	if (err) {console.dir(err)}
 	else {
-	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow')}
+	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
+	}
 }
 
-function logOrFetchData() {
-	let page1;
-	let titleOfPAge = page.then(res => {page1 = res[0]; return res[0].title()});
+function logOrFetchData(res) {
+	let page1 = res[0];
+	let titleOfPAge = page1.title();
 
-	titleOfPAge.then(async (res, rej) => {
+	return titleOfPAge.then(async (res, rej) => {
+		console.log(res.toLowerCase());
 		switch (res.toLowerCase()) {
 			case 'dziennik vulcan':
 				if (await page1.$(loginButtonSelector) !== null) {
-					clickLogin()
+					console.log('opt1');
+					return clickLogin()
 					.then(writeLoginAndPassword)
-					.then(saveCookies)
-					.then(fetchData)
 				} else if (await page1.$('div.panel.sprawdziany') !== null) {
-					fetchData();
+					console.log('opt2');
+					return Promise.resolve();
 				}
-			break;
+				break;
 			case 'logowanie (gminawolow)':
 		}
 	})
 }
 
 function writeLoginAndPassword() {
-		let resolver;
-		let loginPromise = new Promise(res => {resolver = res});
-		let processToSignIn;
-		processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
-		let name1 = 'signing in';
-		attachFunc({
-			processObject: processToSignIn,
-			name: name1,
-			onData: function(data) {
-				if ( data.toString() === 'singning in was successful' ) {
-					console.log(`Process of ${name1} produced output:\n  ${data}`)
-					resolver();
-				}
+	let resolver;
+	let loginPromise = new Promise(res => {resolver = res});
+	let processToSignIn;
+	processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
+	let name1 = 'signing in';
+	attachFunc({
+		processObject: processToSignIn,
+		name: name1,
+		onData: function(data) {
+			if ( data.toString() === 'singning in was successful' ) {
+				console.log(`Process of ${name1} produced output:\n  ${data}`)
+				resolver('continue after login');
 			}
-		})
-		return loginPromise;
-}
-
-
-/*function writeLoginAndPassword() {
-	return new Promise((res1, rej) => {
-		childProcessWriteLogingPassword = spawn('npx', ['babel-node', 'continuation'],{
-			shell: true})
-		childProcessWriteLogingPassword.stdout.on('data', (data) => {
-			if ( data.toString() === 'ended' ) {
-				console.log("childProcessWriteLogingPassword: Login to Vulcan system has ended")
-				res1();
-			}
-			console.log(`childProcessWriteLogingPassword: ${data}`);});
-		childProcessWriteLogingPassword.stderr.on('data', (data) => {
-		  console.error(`stderr: ${data}`);});
-		childProcessWriteLogingPassword.on('error', (error) => {
-		  console.error(`error: ${error.message}`);});
-		childProcessWriteLogingPassword.on('close', (code) => {
-		  console.log(`child process exited with code ${code}`);});
-		process.stdin.on('data', (data) => childProcessWriteLogingPassword.stdin.write(data))
+		}
 	})
-}*/
-
-
+	return loginPromise;
+}
 
 function saveCookies(res, rej) {
 		let processOfSavingCookies;
@@ -181,6 +141,15 @@ function fetchData(res, rej) {
 		attachFunc({
 			processObject: processOfFetchAndWrite,
 			name: name1,
+			onData: function(data) {
+				if (data === "Error seen in test4:  user must log in again") {
+					clickLogin()
+					.then(writeLoginAndPassword)
+					.then(processOfFetchAndWrite.stdin.write('browser has already logged again'))
+				} else {
+					console.log(`Process of ${name1} produced output:\n  ${data}`)
+				}
+			}
 		})
 }
 

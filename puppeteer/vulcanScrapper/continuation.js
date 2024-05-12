@@ -34,7 +34,8 @@ function connectToExistingInstance() {
 		.then(res => {
 			let pr1 = page.waitForSelector('div.panel.sprawdziany > div.subDiv.pCont > div');
 			let pr2 = page.waitForSelector('div.panel.plan > div.subDiv.pCont > div');
-			return Promise.all([pr1, pr2]);
+			return Promise.all([pr1, pr2])
+			.catch(err => cosnole.log('waiting for selectors failed'));
 		})
 
 		return waiting.then(res => {process.stdout.write('singning in was successful'); page.browser().disconnect()})

@@ -6,6 +6,9 @@ import attachFunc from './ProcessListenersManager.js'
 let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
 let intervalTimer;
+let parentProcessResolver;
+
+
 
 function connectToExistingInstance() {
 	let now1 = new Date();
@@ -15,8 +18,9 @@ function connectToExistingInstance() {
 	const date2 = new Date(now1.getTime() + 1000*65);
 	let waittime1 = date1.getTime() - now1.getTime();
 	let waittime2 = date2.getTime() - now1.getTime();
-
 	let counter = 0;
+
+
 
 	let spawnWrapFunction = function() {
 		let processOfFetchAndWriteInner;
@@ -28,7 +32,22 @@ function connectToExistingInstance() {
 			onClose: function(code) {
 				console.log(`Process of ${name1} has ended with code:${code}`);
 				counter++;
-				if (counter < 3) {setTimeout(spawnWrapFunction, getTime((1/30), ((1/55)*(1/10))))}
+				if (counter < 3) {setTimeout(spawnWrapFunction, getTime(2, (1/55)*(1/10)))}
+			},
+			onErrData: function(err) {
+				if (err = 'user must log in again') {
+					process.stdin.removeAllListeners();
+					console.log('Error seen in test4: ', err);
+					throw err;
+					new Promise((resolve2, reject) => {
+						process.stdin.on('data', data => {
+							if (data = 'browser has already logged again') {
+								resolve2();
+							}
+						})
+					})
+					.then(spawnWrapFunction)
+				}
 			},
 			name: name1,
 		})

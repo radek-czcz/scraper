@@ -1,30 +1,62 @@
-// const { spawn } = require('child_process');
+import { loadPuppeteer, loadPage } from './puppLoader.js';
 import { spawn } from 'child_process';
+import getTime from './RandomTimeInterval.js'
+import attachFunc from './ProcessListenersManager.js'
 
-console.log(process.env.PATH)
+// 1. OPEN BROWSER
+// 2. LOAD WEBPAGE
+// 3. CLICK LOGIN BUTTON
 
-const child = spawn('npx', ['babel-node', 'test1'], { 
-			shell: true
-			// stdio: ['pipe', 'pipe', 'pipe', 'ipc']
+let browser;
+let page;
+const loginButtonSelector = 'a.loginButtonDziennikVulcan';
+let childProcessWriteLogingPassword;
+let childProcessWriteDataToDB;
+let intervalTimer;
+
+process.stdin.on('data', data => {
+	if (data.toString() === "close test11") {
+		processOfFetchAndWrite.stdout.on('data', data => {
+			console.log(data);
 		})
+		processOfFetchAndWrite.stdin.write(data);
+	}
+})
 
-		child.stdout.on('data', (data) => {
-		  console.log(`stdout:\n${data}`);
-		});
+function loadBrowserAndPage() {
+	const date1 = new Date('April 25, 2024 20:17:00');
+	let now = new Date();
+	let waittime = date1.getTime() - now.getTime();
 
-		child.stderr.on('data', (data) => {
-		  console.error(`stderr: ${data}`);
-		});
+	browser = loadPuppeteer(false);
+	let resolver;
+	let cookiesPromise = new Promise(res => {resolver = res});
 
-		child.on('error', (error) => {
-		  console.error(`error: ${error.message}`);
-		});
+	let cookiesSet = browser.then(() => {
+		let processToSetCookies;
+		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetter'],{shell: true});
+		let name1 = 'Cookies setting';
+		attachFunc({
+			processObject: processToSetCookies,
+			name: name1,
+			onData: function(data) {
+				if ( data.toString() === 'cookies set' ) {
+					resolver();
+				}
+				console.log(`Process of ${name1} produced output:\n  ${data}`);
+			}
+		})
+	})
 
-		child.on('close', (code) => {
-		  console.log(`child process exited with code ${code}`);
-		});
+	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
+	.catch(err => console.log(err))
+}
 
-		process.stdin.on('data', (data) => child.stdin.write(data))
+function goToPage(res, err) {
+	if (err) {console.dir(err)}
+	else {
+	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
+	}
+}
 
-		// child.stdin.write('abc')
-		// child.send('message from father')
+loadBrowserAndPage();

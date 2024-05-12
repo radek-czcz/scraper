@@ -13,8 +13,10 @@ function connectToExistingInstance() {
 
 		function getCookies() {
 			return new Promise ((res1, rej) => fs.readFile('./cookies.json', function(err, data) {
-				if(err)
+				if(err) {
+					console.log('reading cookies file failed');
 					throw err;
+				}
 				cookies = JSON.parse(data);
 				res1()
 			}))
@@ -36,7 +38,8 @@ function connectToExistingInstance() {
 	    		process.stdout.write('cookies set')
 	    	} else console.error(err);
 	    	page.browser().disconnect();
-	    });
+	    })
+	    .catch(err => console.log('cookies could not been set'));
 	})
 }
 connectToExistingInstance();
