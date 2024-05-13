@@ -28,7 +28,7 @@ function loadBrowserAndPage() {
 	let now = new Date();
 	let waittime = date1.getTime() - now.getTime();
 
-	browser = loadPuppeteer(false);
+	browser = loadPuppeteer(true);
 	let resolver;
 	let cookiesPromise = new Promise(res => {resolver = res});
 

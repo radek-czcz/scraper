@@ -12,10 +12,10 @@ let parentProcessResolver;
 
 function connectToExistingInstance() {
 	let now1 = new Date();
-	// const date1 = new Date('May 02, 2024 20:48:35');
-	// const date2 = new Date('May 02, 2024 20:49:05');
-	const date1 = new Date(now1.getTime() + 1000*4);
-	const date2 = new Date(now1.getTime() + 1000*65);
+	const date1 = new Date('May 14, 2024 11:30:35');
+	const date2 = new Date('May 14, 2024 18:00:05');
+	// const date1 = new Date(now1.getTime() + 1000*4);
+	// const date2 = new Date(now1.getTime() + 1000*65);
 	let waittime1 = date1.getTime() - now1.getTime();
 	let waittime2 = date2.getTime() - now1.getTime();
 	let counter = 0;
