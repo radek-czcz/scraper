@@ -1,4 +1,4 @@
-import { loadPuppeteer, loadPage } from './puppLoader.js';
+import { loadPuppeteer, loadPage, getPage } from './puppLoader.js';
 import { spawn } from 'child_process';
 import getTime from './RandomTimeInterval.js'
 import attachFunc from './ProcessListenersManager.js'
@@ -28,7 +28,7 @@ function loadBrowserAndPage() {
 	let now = new Date();
 	let waittime = date1.getTime() - now.getTime();
 
-	browser = loadPuppeteer(true);
+	browser = loadPuppeteer(false);
 	let resolver;
 	let cookiesPromise = new Promise(res => {resolver = res});
 
@@ -50,6 +50,9 @@ function loadBrowserAndPage() {
 
 	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
 	.catch(err => console.log(err))
+
+
+																// page =browser.then(res => res.pages())
 	let logging = page.then(logOrFetchData);
 
 	let gettingCookies = logging.then(res => {
@@ -65,15 +68,12 @@ function loadBrowserAndPage() {
 }
 
 function clickLogin() {
-	return page.then(async (res, err) => {
-		// page = res;
-		console.log('waiting for selector')
-		let selector1 = await res[0].waitForSelector(
-			loginButtonSelector,
-			{timeout: 5000}
-		);
-		return selector1.click('a.loginButtonDziennikVulcan');
-	})
+	return getPage()
+	.then(res => res.waitForSelector(
+		loginButtonSelector,
+		{timeout: 5000}
+	))
+	.then(res => res.click())
 }
 
 function goToPage(res, err) {
@@ -119,6 +119,7 @@ function writeLoginAndPassword() {
 				console.log(`Process of ${name1} produced output:\n  ${data}`)
 				resolver('continue after login');
 			}
+			else {console.log(`Process of ${name1} produced output:\n${data}`);}
 		}
 	})
 	return loginPromise;
@@ -141,13 +142,12 @@ function fetchData(res, rej) {
 		attachFunc({
 			processObject: processOfFetchAndWrite,
 			name: name1,
-			onData: function(data) {
-				if (data === "Error seen in test4:  user must log in again") {
+			onData: function(errData) {
+				console.log(errData.toString());
+				if (errData.toString().includes('user must log in again')) {
 					clickLogin()
 					.then(writeLoginAndPassword)
-					.then(processOfFetchAndWrite.stdin.write('browser has already logged again'))
-				} else {
-					console.log(`Process of ${name1} produced output:\n  ${data}`)
+					.then(fetchData);
 				}
 			}
 		})

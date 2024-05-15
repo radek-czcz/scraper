@@ -29,3 +29,5 @@ function connectToExistingInstance() {
 }
 
 connectToExistingInstance();
+
+export default connectToExistingInstance
