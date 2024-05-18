@@ -3,8 +3,8 @@ const ppage = require('./puppLoader.cjs');
 
 async function main() {
    const page = ppage.getPage();
-   page.then(res => {
-      res.evaluate(() => new Promise((resolve) => {
+   return page.then(res => {
+      return res.evaluate(() => new Promise((resolve) => {
          var scrollTop = -1;
          const interval = setInterval(() => {
             window.scrollBy(0, 300);

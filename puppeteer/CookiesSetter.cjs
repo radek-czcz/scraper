@@ -18,15 +18,11 @@ function setCookies() {
 			}))
 		}
 
-		let cookieF = getCookies();
+		let cookiePr = getCookies().then((res) => {console.dir(res, {depth: 0}); cookies = res});
 
-		cookieF.then((res) => {console.dir(res, {depth: 0}); cookies = res})
-
-		let pageF = pupp.getExistingPage();
-
-		pageF.then((res) => {console.dir(res, {depth: 0}), page = res})
+		let pagePr = pupp.getExistingPage().then((res) => {console.dir(res, {depth: 0}), page = res});
 		
-		let ret2 = Promise.all([page, cookieF]).then(res => {
+		let ret = Promise.all([pagePr, cookiePr]).then(res => {
 	    	return page.setCookie(...cookies).then(() => console.log('cookies set'));
 	    })
 
@@ -38,7 +34,7 @@ function setCookies() {
 	    // 	// page.browser().disconnect();
 	    // })
 	    .catch(err => console.log('cookies could not been set'));
-	    return ret2
+	    return ret
 }
 
 module.exports = { setCookies }
