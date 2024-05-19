@@ -1,5 +1,4 @@
-import { getBrowserFromParentProcess, getPage } from './index.mjs';
-import { writerDB } from './index.mjs';
+import { getBrowserFromParentProcess, getPage, writerDB } from './index.mjs';
 import log from 'why-is-node-running';
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
@@ -11,11 +10,11 @@ export default function connectToExistingInstance() {
 		let hPlan;
 		let exams;
 		
-
-		
 		browser = res;
+
 		let pagePromise = getPage()
 		.catch(err => console.log('getPage() function failed: ', err));
+
 		let getHtmlString = pagePromise
 		.then(async (res, reject) => {
 			let examsPromise2;
@@ -29,48 +28,47 @@ export default function connectToExistingInstance() {
 			let selectorNo1 = await res.$('div.css-1d90tha').then(res => res !== null)
 			if (selectorNo1) {
 				console.log('getting offers');
-				// return examsPromise = res.$$eval('div.css-1venxj6', divs => divs.map(inp => inp.textContent))
 				return examsPromise = res.$$eval('div.css-1venxj6', divs => divs.map(function(inp) {
-					function getPrice() { return inp.querySelector('p.css-tyui9s.er34gjf0').textContent };
+					function getPrice() { let str = inp.querySelector('p.css-tyui9s.er34gjf0').textContent; 
+						str = str.replace(' ', '').replace(' zł', '')
+						return str.endsWith('do negocjacji') ? str.replace('do negocjacji', '') : str };
 					function getYearAndMileage() { return inp.querySelector('span.css-efx9z5').textContent }
 					function getYear() { return getYearAndMileage().split(' - ')[0] }
-					function getMileage() { return getYearAndMileage().split(' - ')[1] }
+					function getMileage() { return parseInt(getYearAndMileage().split(' - ')[1].replace(' km', '')) }
+					function getCityAndDate() { return inp.querySelector('p.css-1a4brun.er34gjf0').textContent }
+					function getCity() { return getCityAndDate().split(' - ')[0] }
+					function getDate() {  return getCityAndDate().split(' - ')[1]  }
+					function getDescription() { return inp.querySelector('h6.css-16v5mdi.er34gjf0').textContent }
+					function getBrand() { return getDescription().toLowerCase().includes('toyota') ? 'Toyota' : null}
+					function getModel() { return getDescription().toLowerCase().includes('avensis') ? 'Avensis' : null}
+					function GFG_Fun() { let date = new Date(); return date.toISOString().slice(0, 19).replace('T', ' ') }
 					return {
 						price: getPrice(),
-						year: getYear(),
-						mileage: getMileage()
+						prodYear: getYear(),
+						mileage: getMileage(),
+						city: getCity(),
+						offerDate: getDate(),
+						descr: getDescription(),
+						brand: getBrand(),
+						model: getModel(),
+						fetchDate: GFG_Fun()
 					}
 				}))
 				.catch(err => {
 					console.log(err);
 					Promise.reject(new Error("offers could not be found"))
 				});
-				/*plan = res.$$eval('div.panel.plan > div.subDiv.pCont > div', res => res.map(inp => inp.outerHTML))
-				.then(res => res.length===0 ? Promise.reject(new Error("empty eval, plan could not be found")) : res)
-				hPlanPromise = plan.then(res => res[0] ? hPlan = res[0] : null, rejected);
-				bPlanPromise = plan.then(res => res[1] ? bPlan = res[1] : null, rejected);
-				examsPromise2 = examsPromise.then( res => exams = res, rejected);
-				let allPromises = Promise.allSettled( [ hPlanPromise, bPlanPromise, examsPromise2 ] ).then((res) => {
-					// console.log('hPlanPromise: \n', hPlanPromise, '\n', 'bPlanPromise: \n', bPlanPromise, '\n', 'examsPromise2: \n', examsPromise2)
-					console.log('res2: \n');
-					res.forEach(elem => console.log(elem.status))
-					let retVal = res.filter(inp => inp.status === 'fulfilled')
-	
-					return retVal.length === 0 ? Promise.reject("no promise fulfilled") : Promise.resolve(retVal);
-				})
-				return allPromises;*/
 			} else throw 'user must log in again';
 		})
 		let writeToDB = getHtmlString
 		.then((res) => {
 			browser.disconnect()
-			console.log('res3: \n', res);
+			// console.log('res3: \n', res);
 			console.log('writing to db');
-			let objToDB = {}
-			exams ? objToDB.exams = exams: null;
-			hPlan ? objToDB.hPlan = hPlan: null;
-			bPlan ? objToDB.bPlan = bPlan: null;
-			main(/*[exams, hPlan, bPlan]*/objToDB);
+			for (let nth=5; nth<=6/*res.length-1*/; nth++) {
+				writerDB(res[nth]);
+			}
+			// writerDB(res[4]);
 		})
 		.catch(err => {
 			if (err.toString().includes('user must log in again'))
