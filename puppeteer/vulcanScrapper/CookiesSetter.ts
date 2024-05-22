@@ -11,13 +11,23 @@ export function connectToExistingInstance():void {
 	getBrowserFromParentProcess()
 	.then(() => {
 
-		// type tp = argv['path']
-		let arg1 = argv['path']
+		console.log(argv);
+		// type member = keyof typeof argv;
+
+		// argv.forEach(inp => console.log(inp))
+
+		// function getProperty<T, K extends keyof T>(obj: T, key: K) {
+		//     return obj[key];
+		// }
+
+		// console.log(getProperty(argv, 'path'));
 		
-		let pathToCookies = arg1 ? arg1 : './cookies.json'
+		let pathToCookies = /*argv[0] ? argv[0] :*/ './cookies.json'
+		console.log(pathToCookies);
+		// let pathToCookies = arg1 ? arg1 : './cookies.json'
 
 		let page:Page;
-		let cookies:Object[];
+		let cookies:any;
 
 		function getCookies():Promise<void> {
 			return new Promise ((res1, rej) => fs.readFile(pathToCookies, function(err, data) {
@@ -30,18 +40,18 @@ export function connectToExistingInstance():void {
 			}))
 		}
 
-		let cokkieF:Object = getCookies();
+		let cokkieF:any = getCookies();
 
-		let pagePromise:Promise<Page|void> = getPage()
-		.catch((err:Error) => console.log('getPage() function failed: ', err));
+		let pagePromise:Promise<Page> = getPage().then(res => {if (res) return res; else throw 'page not available'})
+		.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
 		let setC:Promise<void> = pagePromise
 		.then((res:Page) => {
 			page = res;
 	    })
-	    .then(() => page.setCookie(...cookies))
+	    .then(() => {if (page) return page.setCookie(...cookies)})
 	    .then(
-	    	(res:void) => {console.log('cookies have been set'); process.stdout.write('cookies set')},
+	    	(res:void) => {console.log('cookies have been set'); process.stdout.write('cookies set'); page.browser().disconnect();},
 	    	(rej:void) => {console.error(rej); return page.browser().disconnect()}
 	    )
 	    .catch(err => {console.log('cookies could not been set'); page.browser().disconnect()});
