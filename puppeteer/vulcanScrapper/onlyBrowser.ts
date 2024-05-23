@@ -8,10 +8,10 @@ import attachFunc from './ProcessListenersManager.js'
 // 2. LOAD WEBPAGE
 // 3. CLICK LOGIN BUTTON
 
-let browser: Promise<Browser>;
-let page: Page;
-
 function loadBrowserAndPage(): void {
+
+	let browser: Promise<Browser>;
+	let page: Page;
 
 	browser = loadPuppeteer(false);
 	let resolver: Function;

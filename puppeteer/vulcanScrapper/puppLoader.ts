@@ -87,11 +87,11 @@ function getPu(): Promise<Browser> {
   }).catch(err => console.log('error in getPu'))
 }
 
-function getPage(): Promise<Page|void> {
+function getPage(): Promise<Page> {
   console.log('pEval from inner')
   return getPu().then((res:Browser) => res.pages())
   .then((res: Page[]) => res[0])
-  .catch((err:Error) => console.log('error in getPage'))
+  .catch((err:Error) => {console.log('error in getPage'); throw err})
 }
 
 function getBrowserFromParentProcess(): Promise<Browser> {
