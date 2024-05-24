@@ -10,7 +10,7 @@ puppeteer.use(StealthPlugin());
 function loadPuppeteer(headless) {
   return puppeteer.launch({
       headless: headless,
-      args: ['--no-sandbox'/*, '--incognito'*/],
+      args: ['--no-sandbox'],
       /*devtools: false,*/
       slowMo:300
       //args: ['--no-sandbox', '--incognito']
@@ -26,9 +26,9 @@ function loadPuppeteer(headless) {
 
 function getExistingBrowser() {
   return puppeteer.connect(
-      {browserWSEndpoint: 'ws://127.0.0.1:49173/devtools/browser/83e10002-a92a-4e05-88ed-5fff72707616'}
+      {browserWSEndpoint: 'ws://127.0.0.1:64599/devtools/browser/5610fa6f-e961-4a34-bddf-e6444b7b4945'}
   ).then(res => {
-    console.dir(res, {depth: 0});
+    // console.dir(res, {depth: 0});
     exBr = res;
     return res;
   });
@@ -39,7 +39,7 @@ function getExistingPage() {
 }
 
 async function loadPage(url) {
-  const page = pu ? await pu.pages() : exBr ? await exBr.pages() : console.log('neither of existing instance nor new Browser instance available');
+  const page = await pu.pages();
   await page[0].goto(url, {
     waitUntil: 'networkidle2'
   });
@@ -50,6 +50,9 @@ async function loadPage(url) {
 function getPu() {
   return pu ? Promise.resolve(pu) : getExistingBrowser()
   .then(res => {
+    // console.dir(res, {depth: 0})
+    //console.log("pu:");
+    //console.dir(pu, {depth: 1});
     return res ? res : pu ?  pu : console.log('neither of existing instance nor new Browser instance available');
   }).catch(err => console.log('error in getPu'))
 }

@@ -8,14 +8,14 @@ let browser;
 
 function connectToExistingInstance() {
 	let pageUrl;
-	let pages = pLoader.getPu().then(res => res.pages())
+	let pages = pLoader.getPu().then(res => {browser = res; return res.pages()})
 	.catch(err => console.log(err));
 	let titleOfPage;
 	pages.then(res => {
-		console.dir(res, {depth: 0});
+		// console.dir(res, {depth: 0});
 		pageUrl = res[0].url();
-		console.log('res:');
-		console.dir(res, {depth: 1});
+		// console.log('res:');
+		// console.dir(res, {depth: 1});
 		return res[0].title();
 	})
 
@@ -27,6 +27,7 @@ function connectToExistingInstance() {
 		return pEvaluator.main();
 	})
   	.then(res => {
+  		browser.disconnect();
   		console.log(urlParser(pageUrl).host);
 	    pWriter.main(res[0], res[1], urlParser(pageUrl).host)
 	});

@@ -1,6 +1,5 @@
 const ppage = require('./puppLoader.cjs');
 
-
 async function main() {
    const page = ppage.getPage();
    return page.then(res => {

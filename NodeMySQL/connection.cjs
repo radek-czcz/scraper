@@ -1,11 +1,10 @@
 const mysql = require('mysql2');
 const dates = require('../dates/date.cjs');
-const category = require('../puppeteer/instanceOfPageInBrowser3.cjs').prodCategory;
+const category = require('../puppeteer/categories.cjs').urlArr[0].category;
 
 let connection;
 
 function insert(names, prices, seller) {
-  console.log('seller from insert ' + seller)
   // let arrayOfData = []
   let query1 = 'INSERT INTO mojeprodukty '
   let dateNow = dates.dateToSqlFormat(new Date());
@@ -79,6 +78,7 @@ function insert(names, prices, seller) {
                 console.dir('inserted:');
                 console.dir('    ', names[nth]);
               }
+              connection.end(() => console.log('connection ended'));
             } 
           );
         }
@@ -115,7 +115,7 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
       connection.query(query1,
         (err, results, fields) => {
           if (err) {console.log(err)}
-          console.log(results);
+          // console.log(results);
           queryRes = results;
           resolve();
         })
@@ -123,12 +123,12 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
     .catch(err => {if (err) {console.log('error by queryForColumnsNames '+ err)}})
     .then(res => {
       let returned = [];
-      console.log(queryRes);
+      // console.log(queryRes);
       for (let key = 0; key < queryRes.length; key++) {
         returned.push(queryRes[key].Field);
         console.log(queryRes[key].Field);
       }
-      console.log('quer = ' + returned);
+      // console.log('quer = ' + returned);
       resString = '(' + returned[0];
       for (let nth=1; nth<returned.length; nth++ ) {
         resString = resString + ', ' + returned[nth];
@@ -138,7 +138,7 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
         resString = resString + ', ?';
       }
       resString = resString+')';
-      console.log ('resString = ' + resString);
+      // console.log ('resString = ' + resString);
       resolve(resString);
     })
   })
