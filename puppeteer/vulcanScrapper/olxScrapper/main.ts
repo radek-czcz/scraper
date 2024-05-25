@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 // import { loadPage, loadPuppeteer, getPage, attachFunc, getPu, getBrowserFromParentProcess } from './index'
-import attachFunc from './ProcessListenersManager.js'
-import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess} from './puppLoader.js'
+import attachFunc from '../ProcessListenersManager'
+import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess} from '../puppLoader'
 import {Browser, Page} from 'puppeteer'
 
 // 1. OPEN BROWSER
@@ -9,51 +9,61 @@ import {Browser, Page} from 'puppeteer'
 // 3. CLICK LOGIN BUTTON
 
 let browser: Browser;
-let page;
+let page:Promise<Page>;
 let childProcessWriteDataToDB;
 let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
 
-function loadBrowserAndPage() {
+function run() {
+	// some variables initializations
+		let resolver:Function;
+		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 
-	let resolver;
-	let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
+	// get browser from existing session 
+		// let brow1:Promise<Browser> = getBrowserFromParentProcess()
+		
+	// or start new Browser
+		let brow1:Promise<Browser> = loadPuppeteer(false)
 
-	// browser = loadPuppeteer(false);
-	let brow1 = getBrowserFromParentProcess()
-	.then(res => browser = res)
+		.then(res => new Promise<Browser>(res1 => {browser = res; res1(res)}))
 
-	let tab1 = brow1.then(addNewTab)
+	// create new tab or take existing to operate on
+		let tab1:Promise<Page> = brow1.then(addNewTab)
 
-	/*let cookiesSet = browser.then(() => {
-		let processToSetCookies;
-		processToSetCookies = spawn('npx', ['babel-node', '../CookiesSetter', 'path=./cookies.json'],{shell: true});
-		let name1 = 'Cookies setting';
-		attachFunc({
-			processObject: processToSetCookies,
-			name: name1,
-			onData: function(data) {
-				if ( data.toString() === 'cookies set' ) {
-					resolver();
+	// set cookies on browser
+		let cookiesSet = tab1.then(() => {
+			let processToSetCookies;
+			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
+			let name1 = 'Cookies setting';
+			attachFunc({
+				processObject: processToSetCookies,
+				name: name1,
+				onData: function(data:string) {
+					if ( data.toString() === 'cookies set' ) {
+						resolver();
+					}
+					console.log(`Process of ${name1} produced output:\n  ${data}`);
 				}
-				console.log(`Process of ${name1} produced output:\n  ${data}`);
-			}
+			})
 		})
-	})*/
 
-	// tab1.then((res) => {let str = res.title(); str.then(res => console.log('title: ', res))})
-	tab1.then(function (res) { res.browser().disconnect() })
+	// go to desired page
+		let openedPage:Promise<Page> = Promise.all([tab1, cookiesSet, cookiesPromise]).then(res => {
+			console.log('Opening page');
+			res[0].goto(url1, { waitUntil: 'networkidle2' });
+			return res[0];
+		})
 
-	/*page = cookiesPromise
-		.then(() => browser.then(res => res.pages()))
-		.then(res => res[0].goto(url1, 
-			{ waitUntil: 'networkidle2' }
-		))*/
-	.catch(err => console.log(err));
+	// save cookies
+		let getCookies = openedPage.then((page:Page) => {saveCookies()})
+
+	// catcher
+		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
+		openedPage.catch(err => console.log(err));
 }
 
-function saveCookies(res: void, rej: void) {
+function saveCookies(res: void) {
 		let processOfSavingCookies;
-		processOfSavingCookies = spawn('npx', ['babel-node', 'CookiesFetcher'], {shell: true})
+		processOfSavingCookies = spawn('ts-node', ['../CookiesFetcher.ts'], {shell: true})
 		let name1 = 'fetching cookies';
 		attachFunc({
 			processObject: processOfSavingCookies,
@@ -61,17 +71,20 @@ function saveCookies(res: void, rej: void) {
 		})
 }
 
-async function addNewTab(res: Browser, rej: void): Promise<Page> {
-	console.log('adding tab');
-	let tabs = await browser.pages();
-	console.dir(tabs, {depth:0});
-	let tab = tabs[tabs.length-1];
-	let title = await tab.title();
-	if (title === "about:blank" || title === "Nowa karta") {
-		console.log('existing tab');
-		page = tab
-		return Promise.resolve(tab)
-	} else { page = browser.newPage(); return page }
+async function addNewTab(res: Browser): Promise<Page> {
+	console.log('Getting tab to operate');
+	let tabs:Page[] = await browser.pages();
+	let tab:Page = tabs[tabs.length-1];
+	let title:string = await tab.title();
+	if (title === "") {
+		console.log('Getting existing tab');
+		page = Promise.resolve(tab)
+		return page;
+	} else {
+		page = browser.newPage();
+		page.then(() => {console.log('New tab created')});
+		return page
+	}
 }
 
-loadBrowserAndPage();
+run();

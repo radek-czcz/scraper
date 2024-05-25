@@ -1,12 +1,9 @@
 import { Browser, Page } from 'puppeteer';
 import { loadPuppeteer, loadPage } from './puppLoader';
 import { spawn } from 'child_process';
-import getTime from './RandomTimeInterval.js'
-import attachFunc from './ProcessListenersManager.js'
+import attachFunc from './ProcessListenersManager.js';
 
-// 1. OPEN BROWSER
-// 2. LOAD WEBPAGE
-// 3. CLICK LOGIN BUTTON
+let webPageUrl:string;
 
 function loadBrowserAndPage(): void {
 
@@ -19,7 +16,7 @@ function loadBrowserAndPage(): void {
 
 	let cookiesSet = browser.then(() => {
 		let processToSetCookies;
-		processToSetCookies = spawn('ts-node', ['CookiesSetter.ts'],{shell: true});
+		processToSetCookies = spawn('ts-node', ['./CookiesSetter.ts'],{shell: true});
 		let name1 = 'Cookies setting';
 		attachFunc({
 			processObject: processToSetCookies,
@@ -34,15 +31,32 @@ function loadBrowserAndPage(): void {
 	})
 
 	Promise.all([cookiesPromise, cookiesSet]).then(goToPage, onError)
-	// page = browser.then(goToPage)
 }
 
 function goToPage(res: void[]): Page {
-	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
+	return loadPage(webPageUrl);
 }
 
 function onError(err: Error): void {
 	if (err) {console.dir(err)}
 }
 
-loadBrowserAndPage();
+function selectPage():void {
+
+	let listOfWebpagesToSelect: string[] = [
+		'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000',
+		'https://uonetplus.vulcan.net.pl/gminawolow'
+	]
+
+	console.log('select the webpage to scrap:\n1. olx (cars)\n2. vulcan');
+	process.stdin.once('data', (data:Buffer) => {
+		console.log(`you selected ${data}`);
+		process.stdin.removeAllListeners();
+		let selected:number = parseInt(data.toString()) - 1;
+		webPageUrl = listOfWebpagesToSelect[selected];
+		loadBrowserAndPage();
+	});
+}
+
+selectPage();
+// loadBrowserAndPage();

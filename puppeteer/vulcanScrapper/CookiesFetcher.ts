@@ -11,7 +11,7 @@ function connectToExistingInstance() {
 		function fetchFunc2():void {console.log(cookies)}
 
 		let pagePromise:Promise<Page> = getPage()
-		.catch(err => {console.log('getPage() function failed: ', err); throw err});
+		.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
 		let fetchCookies = pagePromise
 		.then(async (res) => {

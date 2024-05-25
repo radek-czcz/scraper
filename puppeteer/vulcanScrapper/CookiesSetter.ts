@@ -11,20 +11,20 @@ export function connectToExistingInstance():void {
 	getBrowserFromParentProcess()
 	.then(() => {
 
-		console.log(argv);
-		// type member = keyof typeof argv;
+		argv.forEach(inp => console.log(inp))
 
-		// argv.forEach(inp => console.log(inp))
+		let argsOb:Function =  function():{} {
+			let ob:{[key: string]: string} = {}
+			argv.forEach((inp, index) => {
+				if (inp.split("=").length === 2) ob[inp.split("=")[0]] = inp.split("=")[1]
+				else ob[index] = inp
+			})
+			return ob;
+		}
 
-		// function getProperty<T, K extends keyof T>(obj: T, key: K) {
-		//     return obj[key];
-		// }
+		let pathArg = argsOb().path
 
-		// console.log(getProperty(argv, 'path'));
-		
-		let pathToCookies = /*argv[0] ? argv[0] :*/ './cookies.json'
-		console.log(pathToCookies);
-		// let pathToCookies = arg1 ? arg1 : './cookies.json'
+		let pathToCookies = pathArg ? pathArg : './cookies.json'
 
 		let page:Page;
 		let cookies:any;
