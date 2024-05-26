@@ -1,7 +1,7 @@
 import { Browser, Page } from 'puppeteer';
 import { loadPuppeteer, loadPage } from './puppLoader';
 import { spawn } from 'child_process';
-import attachFunc from './ProcessListenersManager.js';
+import attachFunc from './ProcessListenersManager';
 
 let webPageUrl:string;
 
@@ -16,7 +16,7 @@ function loadBrowserAndPage(): void {
 
 	let cookiesSet = browser.then(() => {
 		let processToSetCookies;
-		processToSetCookies = spawn('ts-node', ['./CookiesSetter.ts'],{shell: true});
+		processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts'],{shell: true});
 		let name1 = 'Cookies setting';
 		attachFunc({
 			processObject: processToSetCookies,

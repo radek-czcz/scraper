@@ -4,6 +4,8 @@ import getTime from '../RandomTimeInterval.js'
 import attachFunc from '../ProcessListenersManager'
 import { main as writerDB } from './puppWriterDB.js';
 import { dateToSqlFormat, dateToClockTime } from '../date.js'
+import timingFunctions from './TimingFunctions'
 
 // export default exportedMembers = [ spawn, loadPuppeteer, loadPage ]
-export { spawn, loadPuppeteer, loadPage, getPage, attachFunc, getTime, getBrowserFromParentProcess, writerDB, getPu, dateToSqlFormat, dateToClockTime }
+export { spawn, loadPuppeteer, loadPage, getPage, attachFunc, getTime, getBrowserFromParentProcess,
+		writerDB, getPu, dateToSqlFormat, dateToClockTime, timingFunctions }

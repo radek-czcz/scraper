@@ -1,8 +1,9 @@
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'node:child_process';
 // import { loadPage, loadPuppeteer, getPage, attachFunc, getPu, getBrowserFromParentProcess } from './index'
 import attachFunc from '../ProcessListenersManager'
 import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess} from '../puppLoader'
 import {Browser, Page} from 'puppeteer'
+import {timingFunctions} from './index'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -23,7 +24,6 @@ function run() {
 		
 	// or start new Browser
 		let brow1:Promise<Browser> = loadPuppeteer(false)
-
 		.then(res => new Promise<Browser>(res1 => {browser = res; res1(res)}))
 
 	// create new tab or take existing to operate on
@@ -31,7 +31,7 @@ function run() {
 
 	// set cookies on browser
 		let cookiesSet = tab1.then(() => {
-			let processToSetCookies;
+			let processToSetCookies:ChildProcess;
 			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
 			let name1 = 'Cookies setting';
 			attachFunc({
@@ -59,6 +59,9 @@ function run() {
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		openedPage.catch(err => console.log(err));
+
+	// timing functions
+		openedPage.then(() => timingFunctions());
 }
 
 function saveCookies(res: void) {

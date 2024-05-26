@@ -13,11 +13,15 @@ export default function connectToExistingInstance() {
 			let pagePromise:Promise<Page> = getPage()
 			.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
+		// refresh the page
+			let refresh:Promise<any> = pagePromise.then(page => {/*Promise.resolve()*/page.reload({ waitUntil: 'networkidle0' }); return page})
+			.then((page) => page.waitForSelector('div.css-1d90tha'))
+
 		// get all offers divs and extract data
-			let getHtmlString = pagePromise
+			let getHtmlString:Promise<any> = Promise.all([pagePromise, refresh]).then((res:Array<Page|void>) => <Page>res[0])
 			.then(async (res:Page) => {
-				let selectorNo1:boolean = await res.$('div.css-1d90tha').then(res => res !== null)
-				.catch((err:Error) => {throw err})
+				let selectorNo1:boolean|void = await res.$('div.css-1d90tha').then(res => res !== null)
+				.catch((err:Error) => {console.log(err)/*;throw err*/})
 				if (selectorNo1) {
 					console.log('getting offers');
 					let examsPromise:Promise<any> = res.$$eval('div.css-1venxj6', divs => divs.map(function(inp) {
@@ -57,22 +61,24 @@ export default function connectToExistingInstance() {
 		// disconnect browser and write data to DB
 			let writeToDB = getHtmlString
 			.then((res) => {
-				browser.disconnect();
+				console.log('from writing');
 				console.log('writing to db');
 				for (let nth=7; nth<=8/*res.length-1*/; nth++) {
 					try {
 						writerDB(res[nth]);
 					} catch (err:any) {
 						if (err.errorno === 1062) {console.log('continue in Fetcher'); continue}
+						else {console.log('here2');}
 					}
 				}
+				browser.isConnected() ? browser.disconnect() : {};
 			})
 
 		// catcher
 			.catch((err:Error) => {
-				if (err.toString().includes('user must log in again'))
-				{process.stdout.write('user must log in again')}
-				browser.disconnect();
+				console.log('from catcher');
+				browser.isConnected() ? browser.disconnect() : {};
+				console.log('from catcher 2');
 			})
 	})}
 
