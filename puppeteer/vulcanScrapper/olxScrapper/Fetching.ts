@@ -63,6 +63,16 @@ export default function connectToExistingInstance() {
 			.then((res) => {
 				console.log('from writing');
 				console.log('writing to db');
+				let counter = 0
+
+				let promiseCounter = function(resolve:Function) {
+					counter<=2 ? counter++ : resolve();
+				}
+
+				let promiseAllInsertsDone = new Promise(resolve => {
+					resolve = promiseCounter;
+				})
+
 				for (let nth=7; nth<=8/*res.length-1*/; nth++) {
 					try {
 						writerDB(res[nth]);
@@ -71,7 +81,7 @@ export default function connectToExistingInstance() {
 						else {console.log('here2');}
 					}
 				}
-				browser.isConnected() ? browser.disconnect() : {};
+				// browser.isConnected() ? browser.disconnect() : {};
 			})
 
 		// catcher
