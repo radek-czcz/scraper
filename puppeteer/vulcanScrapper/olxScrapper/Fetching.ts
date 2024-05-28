@@ -1,5 +1,6 @@
-import { getBrowserFromParentProcess, getPage, writerDB } from './index';
+import { getBrowserFromParentProcess, getPage, writerDB, refreshPage } from './index';
 import {Browser, Page, ElementHandle} from 'puppeteer';
+const log = require('why-is-node-running');
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
@@ -14,12 +15,13 @@ export default function connectToExistingInstance() {
 			.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
 		// refresh the page
-			let refresh:Promise<any> = pagePromise.then(page => {/*Promise.resolve()*/page.reload({ waitUntil: 'networkidle0' }); return page})
-			.then((page) => page.waitForSelector('div.css-1d90tha'))
+			// let refresh:Promise<any> = pagePromise.then(page => {/*Promise.resolve()*/page.reload({ waitUntil: 'domcontentloaded' }); return page})
+			// .then((page) => page.waitForSelector('div.css-1d90tha'))
 
 		// get all offers divs and extract data
-			let getHtmlString:Promise<any> = Promise.all([pagePromise, refresh]).then((res:Array<Page|void>) => <Page>res[0])
+			let getHtmlString:Promise<any> = Promise.all([pagePromise/*, refresh*/]).then((res:Array<Page|void>) => <Page>res[0])
 			.then(async (res:Page) => {
+				browser = res.browser();
 				let selectorNo1:boolean|void = await res.$('div.css-1d90tha').then(res => res !== null)
 				.catch((err:Error) => {console.log(err)/*;throw err*/})
 				if (selectorNo1) {
@@ -61,35 +63,44 @@ export default function connectToExistingInstance() {
 		// disconnect browser and write data to DB
 			let writeToDB = getHtmlString
 			.then((res) => {
-				console.log('from writing');
+				browser.disconnect();
 				console.log('writing to db');
-				let counter = 0
+				let big = 8;
+				let small = 7;
+				let counter = 0;
+				let resolver:any;
 
-				let promiseCounter = function(resolve:Function) {
-					counter<=2 ? counter++ : resolve();
+				let promiseCounter = function() {
+					console.log('from counter');
+					let calc:number = big - small
+					console.log(calc, counter, counter<=calc);
+					counter === calc ? resolver() : counter++;
 				}
 
 				let promiseAllInsertsDone = new Promise(resolve => {
-					resolve = promiseCounter;
+					resolver = resolve;
 				})
 
 				for (let nth=7; nth<=8/*res.length-1*/; nth++) {
-					try {
-						writerDB(res[nth]);
-					} catch (err:any) {
+					/*try {*/
+						writerDB(res[nth]).then(promiseCounter)
+						.catch(err => console.log('error in writing'))
+					/*} catch (err:any) {
 						if (err.errorno === 1062) {console.log('continue in Fetcher'); continue}
 						else {console.log('here2');}
-					}
+					}*/
 				}
+
+				promiseAllInsertsDone.then(() => {console.log('closing browser connection'); setTimeout(() => log(), 1000)/*; browser.isConnected() ? browser.disconnect() : {}*/})
 				// browser.isConnected() ? browser.disconnect() : {};
 			})
 
 		// catcher
 			.catch((err:Error) => {
 				console.log('from catcher');
-				browser.isConnected() ? browser.disconnect() : {};
+				// browser.isConnected() ? browser.disconnect() : {};
 				console.log('from catcher 2');
 			})
 	})}
-
-connectToExistingInstance();
+refreshPage()
+.then(() => connectToExistingInstance());

@@ -2,7 +2,7 @@
 import {Browser, Page} from 'puppeteer'
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import {Server}, net from 'net';
+import net, {Server} from 'net';
 
 let pu: Browser;
 let exBr: Browser;
@@ -11,7 +11,7 @@ let server: Server;
 
 puppeteer.use(StealthPlugin());
 
-function loadPuppeteer(headless): Promise<Browser> {
+function loadPuppeteer(headless:boolean): Promise<Browser> {
   return puppeteer.launch({
       // executablePath:'E:/Users/Kamila i Radek/JavaScript workspace - scraper/node_modules/puppeteer/.local-chromium/105/chrome-win/chrome.exe',
       headless: headless,
@@ -68,13 +68,12 @@ function getExistingPage(): Promise<Page> {
   return exBr.pages().then((res: Page[]) => res[0])
 }
 
-async function loadPage(url): Page {
-  const page:Page[] = await pu.pages();
-  await page[0].goto(url, {
-    waitUntil: 'networkidle2'
-  }).catch(err => console.log(`browser could not navigate to the page address\n${err}`));
+function loadPage(url:string):Promise<Page> {
+  let pages:Promise<Page[]> = pu.pages();
+  let going = pages.then((res) => res[0].goto(url, {waitUntil: 'networkidle2'}))
+  .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
   console.log  ('page opened')
-  return page;
+  return Promise.all([pages, going]).then(res => res[0][0])
 }
 
 function getPu(): Promise<Browser> {
@@ -127,5 +126,9 @@ function getBrowserFromParentProcess(): Promise<Browser> {
   });
 }
 
+function refreshPage():Promise<any> {
+  getBrowserFromParentProcess().then(res => res.reload({ waitUntil: 'networkidle0' }));
+}
+
 // module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
-export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
+export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess, refreshPage };
