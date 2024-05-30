@@ -1,11 +1,11 @@
-import { getBrowserFromParentProcess, getPage, writerDB, refreshPage } from './index';
+import { getBrowserFromParentProcess, getPage, getPu, writerDB, refreshPage } from './index';
 import {Browser, Page, ElementHandle} from 'puppeteer';
-const log = require('why-is-node-running');
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
 	let browser:Browser;
-	getBrowserFromParentProcess()
+	// getBrowserFromParentProcess()
+	getPu()
 	.then((res:Browser) => {
 		// variable initializations
 			browser = res;
@@ -65,23 +65,19 @@ export default function connectToExistingInstance() {
 			.then((res) => {
 				browser.disconnect();
 				console.log('writing to db');
-				let big = 8;
-				let small = 7;
 				let counter = 0;
 				let resolver:any;
 
 				let promiseCounter = function() {
 					console.log('from counter');
-					let calc:number = big - small
-					console.log(calc, counter, counter<=calc);
-					counter === calc ? resolver() : counter++;
+					counter + 1 === res.length ? resolver() : counter++;
 				}
 
 				let promiseAllInsertsDone = new Promise(resolve => {
 					resolver = resolve;
 				})
 
-				for (let nth=7; nth<=8/*res.length-1*/; nth++) {
+				for (let nth=0; nth<=res.length-1; nth++) {
 					/*try {*/
 						writerDB(res[nth]).then(promiseCounter)
 						.catch(err => console.log('error in writing'))
@@ -91,7 +87,7 @@ export default function connectToExistingInstance() {
 					}*/
 				}
 
-				promiseAllInsertsDone.then(() => {console.log('closing browser connection'); setTimeout(() => log(), 1000)/*; browser.isConnected() ? browser.disconnect() : {}*/})
+				promiseAllInsertsDone.then(() => {console.log('all inserts done')/*; browser.isConnected() ? browser.disconnect() : {}*/})
 				// browser.isConnected() ? browser.disconnect() : {};
 			})
 
@@ -102,5 +98,8 @@ export default function connectToExistingInstance() {
 				console.log('from catcher 2');
 			})
 	})}
-refreshPage()
-.then(() => connectToExistingInstance());
+
+let refr:Promise<any> = refreshPage();
+
+refr.then(() => console.log('refresh done'))
+refr.then(() => connectToExistingInstance());

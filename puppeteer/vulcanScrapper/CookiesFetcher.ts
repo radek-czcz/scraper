@@ -1,4 +1,4 @@
-import { getBrowserFromParentProcess, getPage } from './puppLoader.js';
+import { getBrowserFromParentProcess, getPage } from './puppLoader';
 import { writeFile } from 'node:fs/promises';
 import {Browser, Page} from 'puppeteer';
 
@@ -29,6 +29,6 @@ function connectToExistingInstance() {
 	})
 }
 
-connectToExistingInstance();
+// connectToExistingInstance();
 
 export default connectToExistingInstance

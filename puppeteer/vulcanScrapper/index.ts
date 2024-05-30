@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { loadPuppeteer, loadPage, getPage, getBrowserFromParentProcess, getPu, refreshPage } from './puppLoader'
-import fetcher from './CookiesFetcher.js'
+import fetcher from './CookiesFetcher'
 
 
 

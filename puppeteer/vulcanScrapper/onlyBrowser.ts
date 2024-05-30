@@ -33,7 +33,7 @@ function loadBrowserAndPage(): void {
 	Promise.all([cookiesPromise, cookiesSet]).then(goToPage, onError)
 }
 
-function goToPage(res: void[]): Page {
+function goToPage(res: void[]):Promise<Page> {
 	return loadPage(webPageUrl);
 }
 

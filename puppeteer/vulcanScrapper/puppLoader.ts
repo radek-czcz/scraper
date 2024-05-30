@@ -2,7 +2,7 @@
 import {Browser, Page} from 'puppeteer'
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import net, {Server} from 'net';
+import net, {Server, Socket} from 'net';
 
 let pu: Browser;
 let exBr: Browser;
@@ -77,13 +77,17 @@ function loadPage(url:string):Promise<Page> {
 }
 
 function getPu(): Promise<Browser> {
-  return pu ? Promise.resolve(pu) : getExistingBrowser()
-  .then((res:Browser) => {
-    console.dir(res, {depth: 0})
+  let brwsr:Promise<Browser> = pu ? Promise.resolve(pu) : getExistingBrowser()
+  brwsr.catch(err => console.log('error in getPu'))
+  return brwsr;
+  // .then((res:Browser) => {
+  //   console.dir(res, {depth: 0})
     //console.log("pu:");
     //console.dir(pu, {depth: 1});
-    return res ? res : pu ?  pu : console.log('neither of existing instance nor new Browser instance available');
-  }).catch(err => console.log('error in getPu'))
+    // if (res) return res
+    // else return pu
+    // return res ? res : pu ?  pu : console.log('neither of existing instance nor new Browser instance available');
+  // }).catch(err => console.log('error in getPu'))
 }
 
 function getPage(): Promise<Page> {
@@ -93,11 +97,11 @@ function getPage(): Promise<Page> {
   .catch((err:Error) => {console.log('error in getPage'); throw err})
 }
 
-function getBrowserFromParentProcess(): Promise<Browser> {
+function getBrowserFromParentProcess():Promise<Browser> {
   let endpoint:string;
 
-  let connect:Promise<void> = new Promise((resFunc:void, rejFunc:void) => {
-    let client = net.connect({port: 8088}, function() {
+  let connect:Promise<Socket> = new Promise((resFunc, rejFunc) => {
+    let client:Socket = net.connect({port: 8088}, function() {
       console.log('net.child says: connected to server!');  
     });
 
@@ -105,7 +109,7 @@ function getBrowserFromParentProcess(): Promise<Browser> {
       console.log('net.child says: data received - ', data.toString());
       endpoint = data.toString();
       client.end();
-      res(client);
+      resFunc(client);
     });
     
     client.on('end', function() { 
@@ -113,7 +117,7 @@ function getBrowserFromParentProcess(): Promise<Browser> {
     });
   })
 
-  console.log('endpoint from getBrowserFromParentProcess(): ', endpoint)
+  // console.log('endpoint from getBrowserFromParentProcess(): ', endpoint)
 
   return connect.then(() => puppeteer.connect(
     {
@@ -127,7 +131,7 @@ function getBrowserFromParentProcess(): Promise<Browser> {
 }
 
 function refreshPage():Promise<any> {
-  getBrowserFromParentProcess().then(res => res.reload({ waitUntil: 'networkidle0' }));
+  return getBrowserFromParentProcess().then((res:Browser) => res.pages()).then((res:Page[]) => res[0].reload({ waitUntil: 'domcontentloaded'/*'networkidle2'*/ }));
 }
 
 // module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
