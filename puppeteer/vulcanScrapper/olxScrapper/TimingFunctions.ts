@@ -25,16 +25,18 @@ export default function startTimer():void {
 			name: name1,
 			onClose: function(code:number):void {
 				console.log(`Process of ${name1} has ended with code:${code}`);
-				let time = getTime(1/55, (1/65)*(1/10))
-				// setTimeout(spawnWrapFunction, time)
+				let time = getTime(1/1.7, (1/6))
+				setTimeout(spawnWrapFunction, time)
 				console.log(`next fetch in ${time*(1/60)*(1*60)*(1/1000)} seconds`)
+				console.log(`next fetch in ${time*(1/60)*(1/1000)} minutes`)
 			},
 			onErrData: function(err:Error):void {
 				console.log(`Error in ${name1} ocurred\n`);
-				console.error(err);
-				let time = getTime(1/55, (1/65)*(1/10))
-				// setTimeout(spawnWrapFunction, time)
-				console.log(`next fetch in ${time*(1/60)*(1*60)*(1/1000)} seconds`)
+				console.error(err.toString());
+				let time = getTime(1/1.7, (1/6))
+				setTimeout(spawnWrapFunction, time)
+				console.log(`next fetch after error in ${time*(1/60)*(1*60)*(1/1000)} seconds`)
+				console.log(`next fetch in ${time*(1/60)*(1/1000)} minutes`)
 			}
 		})
 	}

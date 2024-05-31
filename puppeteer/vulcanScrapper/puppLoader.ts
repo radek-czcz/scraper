@@ -97,6 +97,28 @@ function getPage(): Promise<Page> {
   .catch((err:Error) => {console.log('error in getPage'); throw err})
 }
 
+function getPageWithSelect(): Promise<Page> {
+  let tabId = 0
+  let allTabs:Promise<Page[]> = getPu().then((res:Browser) => res.pages());
+  let tabsCount:Promise<number> = allTabs.then((res:Page[]) => new Promise<number>((resolve1:Function) => {if (res.length > 1) {
+        console.log(`puppLoader > getPage(), question: which (non-zero) tab should be used? There are ${res.length} tabs available`);
+        let ev = process.stdin.on('data', (data:Buffer) => {
+          tabId = parseInt(data.toString()) - 1;
+          resolve1(tabId);
+        });
+      } else {
+        resolve1(0)
+      }
+    }));
+
+  return Promise.all([allTabs, tabsCount]).then((res:[Page[], number]) => {
+    process.stdin.pause();
+    process.stdin.removeAllListeners();
+    return res[0][res[1]] 
+  })
+  .catch((err:Error) => {console.log('error in getPage'); throw err})
+}
+
 function getBrowserFromParentProcess():Promise<Browser> {
   let endpoint:string;
 
@@ -135,4 +157,4 @@ function refreshPage():Promise<any> {
 }
 
 // module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
-export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess, refreshPage };
+export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess, refreshPage, getPageWithSelect };

@@ -23,6 +23,26 @@ function insert(inp:CarData):Promise<void> {
       `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
+    // let query2Ask =
+    //   `SELECT * FROM offers WHERE
+    //   prodYear = ${prodYear} AND
+    //   mileage = ${mileage} AND
+    //   fetchDate = ${fetchDate}`
+
+      console.log(`'${prodYear.slice(0, 4)}'`, `'${mileage}'`, `'${fetchDate.slice(0, 10)}'`);
+
+    let query2Ask =
+      `SELECT COUNT(*) FROM offers WHERE
+      'prodYear' = ? AND
+      'mileage' = ? AND
+      'fetchDate' = ?`
+
+    // let query2Ask =
+    //   `SELECT * FROM offers WHERE
+    //   prodYear = ? AND
+    //   mileage = ? AND
+    //   fetchDate = ?`
+
   // CREATE DB CONNECTION
     if (!connection) {
       connection = mysql.createPool({
@@ -44,9 +64,16 @@ function insert(inp:CarData):Promise<void> {
         console.log('executing query');
         // console.log(prodYear);
 
+        // function promise1() {return new Promise<void>(
+        //   (res, rej) => connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
+        //     if (error) { rej(error) } else {console.log('query executed with success');}
+        //     res();
+        //   })
+        // )}
+
         function promise1() {return new Promise<void>(
-          (res, rej) => connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
-            if (error) { rej(error) } else {console.log('query executed with success');}
+          (res, rej) => connection.query(query2Ask, [prodYear.slice(0, 4), mileage, fetchDate.slice(0, 10)], (error, results, fields) => {
+            if (error) { console.error(error); rej(error) } else {console.log('query executed with success'); console.log(results);}
             res();
           })
         )}
@@ -63,7 +90,11 @@ function insert(inp:CarData):Promise<void> {
 
   // CATCHER
       return queryFunction().catch(err => {
-        if (err.errno === 1062) {console.log('duplcate occured - skipped'); return}
+        if (err.errno === 1062) {
+          console.log('duplcate occured - skipped');
+          console.dir(err, {depth:0})
+          return
+        }
         else {
           console.log('not all data has been saved');
           console.dir(err, {depth: 1});

@@ -4,14 +4,15 @@ import {Browser, Page, ElementHandle} from 'puppeteer';
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
 	let browser:Browser;
-	// getBrowserFromParentProcess()
-	getPu()
+	getBrowserFromParentProcess()
+	// getPu()
 	.then((res:Browser) => {
 		// variable initializations
 			browser = res;
 
 		// get page from connected browser
 			let pagePromise:Promise<Page> = getPage()
+			// let pagePromise:Promise<Page> = getPageWithSelect();
 			.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
 		// refresh the page
@@ -99,7 +100,9 @@ export default function connectToExistingInstance() {
 			})
 	})}
 
-let refr:Promise<any> = refreshPage();
+// let refr:Promise<any> = refreshPage();
 
-refr.then(() => console.log('refresh done'))
-refr.then(() => connectToExistingInstance());
+// refr.then(() => console.log('refresh done'))
+// refr.then(() => connectToExistingInstance());
+
+connectToExistingInstance()
