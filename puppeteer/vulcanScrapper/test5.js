@@ -15,23 +15,23 @@ let intervalTimer;
 
 function connect() {
 	getBrowserFromParentProcess()
-	.then(async (res) => {
-		page = getPage();
-		// let ti = await page.title();
-		// console.log(ti);
-		fetchData();
-	});
+	.then(res => getPage()) 
+	.then(res => res.waitForSelector(
+		loginButtonSelector,
+		{timeout: 5000}
+	))
+	.then(res => res.click())
 }
 
 function clickLogin() {
-	return page.then(async (res, err) => {
+	return page.then(res => {
 		// page = res;
 		console.log('waiting for selector')
-		let selector1 = await res.waitForSelector( //UWAGA TUTAJ MA BYĆ res[0]
+		let selector1 = res.waitForSelector( //UWAGA TUTAJ MA BYĆ res[0]
 			loginButtonSelector,
 			{timeout: 5000}
 		).catch((err) => console.error(err))
-		return selector1.click('a.loginButtonDziennikVulcan');
+		return selector1.then(() => res.click(loginButtonSelector));
 	})
 }
 
@@ -89,7 +89,7 @@ function fetchData(res, rej) {
 				if (errData.toString().includes('user must log in again')) {
 					clickLogin()
 					.then(writeLoginAndPassword)
-					.then(fetchData);
+					.then(fetchData());
 				}
 			}
 		})

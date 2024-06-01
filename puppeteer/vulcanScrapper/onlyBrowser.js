@@ -14,27 +14,15 @@ let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
 let intervalTimer;
 
-process.stdin.on('data', data => {
-	if (data.toString() === "close test11") {
-		processOfFetchAndWrite.stdout.on('data', data => {
-			console.log(data);
-		})
-		processOfFetchAndWrite.stdin.write(data);
-	}
-})
-
 function loadBrowserAndPage() {
-	const date1 = new Date('April 25, 2024 20:17:00');
-	let now = new Date();
-	let waittime = date1.getTime() - now.getTime();
-
 	browser = loadPuppeteer(false);
+
 	let resolver;
 	let cookiesPromise = new Promise(res => {resolver = res});
 
 	let cookiesSet = browser.then(() => {
 		let processToSetCookies;
-		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetterRunner'],{shell: true});
+		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetter'],{shell: true});
 		let name1 = 'Cookies setting';
 		attachFunc({
 			processObject: processToSetCookies,
@@ -47,21 +35,8 @@ function loadBrowserAndPage() {
 			}
 		})
 	})
-
-	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
-	.catch(err => console.log(err))
-	let logging = page.then(logOrFetchData);
-
-	let gettingCookies = logging.then(res => {
-		if (res === 'continue after login') {
-			saveCookies();
-		}
-	})
-
-	let fetchingData = logging.then(res => {
-		console.log('from fetching');
-		return fetchData();
-	});
+	Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
+	// page = browser.then(goToPage)
 }
 
 function clickLogin() {

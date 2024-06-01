@@ -3,12 +3,6 @@ const cookiesSetter = require('./CookiesSetter.cjs');
 const categories = require('./categories.cjs');
 const pScroller = require('./puppScroller.cjs');
 
-let prodCategory = "Karty pamięci";
-// let prodCategory = "Lodówki";
-// let prodCategory = "Zmywarki";
-// let prodCategory = "Klawiatury";
-// let prodCategory = "Pendrive";
-
 // let urlInp = categories.map.get(prodCategory);
 let urlInp = categories.urlArr[0].url
 console.log(urlInp)
@@ -30,4 +24,4 @@ function loadBrowserAndPage() {
 
 loadBrowserAndPage()
 
-module.exports = { browser, loadBrowserAndPage, prodCategory }
+module.exports = { browser, loadBrowserAndPage }

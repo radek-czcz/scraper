@@ -21,4 +21,4 @@ function dateToClockTime(inpDate) {
 
 // console.log(dateToSqlFormat(new Date()));
 
-export {getOnlyYMD, dateToSqlFormat, dateToClockTime};
+export {getOnlyYMD, dateToSqlFormat, dateToClockTime}

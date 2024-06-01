@@ -1,9 +1,10 @@
 import { getBrowserFromParentProcess, getPage, writerDB } from './index.mjs';
 import log from 'why-is-node-running';
+import {Browser, Page} from 'puppeteer';
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
-	let browser;
+	let browser:Browser;
 	getBrowserFromParentProcess()
 	.then((res) => {
 		let bPlan;

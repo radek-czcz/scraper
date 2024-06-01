@@ -26,8 +26,7 @@ export default function connectToExistingInstance() {
 			// await res.reload();
 			function rejected(result) {console.error('rej1: ', result); throw result;}
 			function resolved(result) {console.log('res1: ', result); return result}
-			let selectorNo1 = await res.$('span.user-info').then(res => res !== null)
-			if (selectorNo1) {
+			if (res.$('span.user-info') !== null) {
 				console.log('getting plan');
 				examsPromise = res.$eval('div.panel.sprawdziany > div:nth-child(4)', res => res.outerHTML)
 				.catch(err => Promise.reject(
@@ -47,7 +46,7 @@ export default function connectToExistingInstance() {
 					return retVal.length === 0 ? Promise.reject("no promise fulfilled") : Promise.resolve(retVal);
 				})
 				return allPromises;
-			} else throw 'user must log in again';
+			} else throw new Error('user must log in again');
 		})
 		let writeToDB = getHtmlString
 		.then((res) => {
@@ -61,9 +60,9 @@ export default function connectToExistingInstance() {
 			main(/*[exams, hPlan, bPlan]*/objToDB);
 		})
 		.catch(err => {
-			if (err.toString().includes('user must log in again'))
-			{process.stdout.write('user must log in again')}
-			browser.disconnect();
+			console.log(err);
+			if (err = 'user must log in again') {browser ? browser.disconnect() : null; throw err;}
+			browser ? browser.disconnect() : null
 		})
 	})}
 

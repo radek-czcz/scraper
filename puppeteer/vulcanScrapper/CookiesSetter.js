@@ -3,16 +3,18 @@ import fs from 'fs';
 
 // 1. TYPE IN LOGIN AND PASSWORD
 // 2. CLICK SUBMIT BUTTON
-function connectToExistingInstance() {
+export function connectToExistingInstance() {
 
 	getBrowserFromParentProcess()
 	.then(() => {
+
+		let pathToCookies = process.argv['path'] ? process.argv['path'] : './cookies.json'
 
 		let page;
 		let cookies;
 
 		function getCookies() {
-			return new Promise ((res1, rej) => fs.readFile('./cookies.json', function(err, data) {
+			return new Promise ((res1, rej) => fs.readFile(pathToCookies, function(err, data) {
 				if(err) {
 					console.log('reading cookies file failed');
 					throw err;
@@ -37,9 +39,9 @@ function connectToExistingInstance() {
 	    		console.log('cookies have been set')
 	    		process.stdout.write('cookies set')
 	    	} else console.error(err);
-	    	page.browser().disconnect();
+	    	return page.browser().disconnect();
 	    })
-	    .catch(err => console.log('cookies could not been set'));
+	    .catch(err => {console.log('cookies could not been set'); page.browser().disconnect()});
 	})
 }
 connectToExistingInstance();

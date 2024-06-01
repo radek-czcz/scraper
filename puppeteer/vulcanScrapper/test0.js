@@ -1,62 +1,41 @@
-import { loadPuppeteer, loadPage } from './puppLoader.js';
 import { spawn } from 'child_process';
 import getTime from './RandomTimeInterval.js'
+import process from 'node:process';
 import attachFunc from './ProcessListenersManager.js'
 
-// 1. OPEN BROWSER
-// 2. LOAD WEBPAGE
-// 3. CLICK LOGIN BUTTON
-
-let browser;
-let page;
-const loginButtonSelector = 'a.loginButtonDziennikVulcan';
 let childProcessWriteLogingPassword;
 let childProcessWriteDataToDB;
 let intervalTimer;
+let parentProcessResolver;
 
-process.stdin.on('data', data => {
-	if (data.toString() === "close test11") {
-		processOfFetchAndWrite.stdout.on('data', data => {
-			console.log(data);
+
+
+function connectToExistingInstance() {
+	let now1 = new Date();
+	const date1 = new Date('May 14, 2024 11:30:35');
+	const date2 = new Date('May 14, 2024 18:00:05');
+	// const date1 = new Date(now1.getTime() + 1000*4);
+	// const date2 = new Date(now1.getTime() + 1000*65);
+	let waittime1 = date1.getTime() - now1.getTime();
+	let waittime2 = date2.getTime() - now1.getTime();
+
+	let spawnWrapFunction = function() {
+		let processOfFetchAndWriteInner;
+
+		processOfFetchAndWriteInner = spawn('npx', ['babel-node', 'continuation2'], {shell: true})
+		let name1 = 'fetching data & writing data';
+		processOfFetchAndWriteInner.on('uncaughtException', function(data){
+			console.log(data.toString());
 		})
-		processOfFetchAndWrite.stdin.write(data);
-	}
-})
-
-function loadBrowserAndPage() {
-	const date1 = new Date('April 25, 2024 20:17:00');
-	let now = new Date();
-	let waittime = date1.getTime() - now.getTime();
-
-	browser = loadPuppeteer(false);
-	let resolver;
-	let cookiesPromise = new Promise(res => {resolver = res});
-
-	let cookiesSet = browser.then(() => {
-		let processToSetCookies;
-		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetter'],{shell: true});
-		let name1 = 'Cookies setting';
 		attachFunc({
-			processObject: processToSetCookies,
+			processObject: processOfFetchAndWriteInner,
 			name: name1,
 			onData: function(data) {
-				if ( data.toString() === 'cookies set' ) {
-					resolver();
-				}
-				console.log(`Process of ${name1} produced output:\n  ${data}`);
+				console.log(data.toString());
 			}
 		})
-	})
-
-	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
-	.catch(err => console.log(err))
-}
-
-function goToPage(res, err) {
-	if (err) {console.dir(err)}
-	else {
-	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
 	}
+	spawnWrapFunction();
 }
 
-loadBrowserAndPage();
+connectToExistingInstance();

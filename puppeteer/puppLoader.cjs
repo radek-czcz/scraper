@@ -26,7 +26,7 @@ function loadPuppeteer(headless) {
 
 function getExistingBrowser() {
   return puppeteer.connect(
-      {browserWSEndpoint: 'ws://127.0.0.1:64599/devtools/browser/5610fa6f-e961-4a34-bddf-e6444b7b4945'}
+      {browserWSEndpoint: 'ws://127.0.0.1:55699/devtools/browser/2bdf3c93-e65f-4bbf-96bb-65ef53522a76'}
   ).then(res => {
     // console.dir(res, {depth: 0});
     exBr = res;
