@@ -78,7 +78,7 @@ export default function connectToExistingInstance() {
 					resolver = resolve;
 				})
 
-				for (let nth=0; nth<=res.length-1; nth++) {
+				for (let nth=10; nth<=11/*res.length-1*/; nth++) {
 					/*try {*/
 						writerDB(res[nth]).then(promiseCounter)
 						.catch(err => console.log('error in writing'))

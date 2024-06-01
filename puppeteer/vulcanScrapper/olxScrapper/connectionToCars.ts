@@ -1,6 +1,6 @@
 import {dateToSqlFormat, dateToClockTime, CarData} from './index';
 import settings from './CarsDBConnectionSettings.js';
-import mysql, { Pool, PoolOptions } from 'mysql2'
+import mysql, { Pool, PoolOptions, QueryResult, Query } from 'mysql2'
 
 let connection:Pool;
 let timer
@@ -19,7 +19,7 @@ function insert(inp:CarData):Promise<void> {
     let timeNow = dateToClockTime(dateNow0);
 
   // QUERIES' STRINGS
-    let query1 = 
+    let query1:string = 
       `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
@@ -29,23 +29,33 @@ function insert(inp:CarData):Promise<void> {
     //   mileage = ${mileage} AND
     //   fetchDate = ${fetchDate}`
 
-      console.log(`'${prodYear.slice(0, 4)}'`, `'${mileage}'`, `'${fetchDate.slice(0, 10)}'`);
+      console.log(`'${prodYear.slice(0, 4)}'`, `'${mileage}'`, `'${fetchDate.toString().slice(0, 10)}'`);
 
-    let query2Ask =
+    let query2Ask:string =
       `SELECT COUNT(*) FROM offers WHERE
-      'prodYear' = ? AND
-      'mileage' = ? AND
-      'fetchDate' = ?`
+      prodYear = ? AND
+      mileage = ? AND
+      city = ? AND
+      price = ?`
 
-    // let query2Ask =
+    // let query2Ask:string =
     //   `SELECT * FROM offers WHERE
     //   prodYear = ? AND
     //   mileage = ? AND
     //   fetchDate = ?`
 
+    let updateDateQuery:string = `UPDATE offers
+      SET lastSeen = CURDATE()
+      WHERE 
+        prodYear = ? AND
+        mileage = ? AND
+        city = ? AND
+        price = ?`
+
   // CREATE DB CONNECTION
     if (!connection) {
       connection = mysql.createPool({
+        // debug: true,
         connectionLimit : 2,
         host: '188.210.222.87',
         port:3306,
@@ -62,21 +72,42 @@ function insert(inp:CarData):Promise<void> {
   // PROMISIFIED QUERY FUNCTIONS
     function queryFunction():Promise<void> {
         console.log('executing query');
-        // console.log(prodYear);
+
+        function promise1() {return new Promise<void>(promiseCallb)}
 
         // function promise1() {return new Promise<void>(
-        //   (res, rej) => connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
-        //     if (error) { rej(error) } else {console.log('query executed with success');}
-        //     res();
-        //   })
-        // )}
+          //   (res, rej) => connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
+          //     if (error) { rej(error) } else {console.log('query executed with success');}
+          //     res();
+          //   })
+          // )}
 
-        function promise1() {return new Promise<void>(
-          (res, rej) => connection.query(query2Ask, [prodYear.slice(0, 4), mileage, fetchDate.slice(0, 10)], (error, results, fields) => {
-            if (error) { console.error(error); rej(error) } else {console.log('query executed with success'); console.log(results);}
-            res();
-          })
-        )}
+          // function promise1() {return new Promise<void>(
+          //   (res, rej) => connection.query(query2Ask, [prodYear, mileage, city, price], (error, results, fields) => {
+          //     let queryRes:QueryResult;
+          //     if (error) { console.error(error); rej(error) } 
+          //     else {
+          //       queryRes = results;
+          //       console.log('1st check query executed with success');
+          //       // console.log(Object.values(queryRes)[0]['COUNT(*)'] === 1);
+          //       if (Object.values(queryRes)[0]['COUNT(*)'] === 1) {
+          //         connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
+          //           let queryRes2:QueryResult;
+          //           if (error2) { console.error(error2); rej(error2) } 
+          //           else {
+          //             queryRes2 = results2;
+          //             console.log('Update query executed with success\n', results2);
+          //           }
+          //         })
+          //       } else {
+          //         connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
+          //           if (error) { rej(error) } else {console.log('Add query executed with success');}
+          //         })
+          //       }
+          //     }
+          //     res();
+          //   })
+          // )}
 
         function promise2() { return Promise.reject('exams not saved') }
 
@@ -86,6 +117,54 @@ function insert(inp:CarData):Promise<void> {
           console.log('rejecting promise');
           return promise2()
         }
+    }
+
+  // Advanced wrapping functions
+    let rejectingFunc:Function;
+    function promiseCallb(res:(value: void | PromiseLike<void>) => void, rej:(reason?: any) => void):Query {
+      // Make query to ask if entry exists - checks if exists entry
+      // for a given [prodYear, mileage, city, price] combination.
+        rejectingFunc = rej 
+        return connection.query(
+          query2Ask, 
+          [prodYear, mileage, city, price], 
+          (error, results, fields) => {
+            // If response comes without error, then check if exists only 1 entry
+              if (!error) { goCheckQuery(results) } 
+              else {
+                console.error(error); rej(error)
+              }
+            res();
+          }
+        )
+    }
+
+    function goCheckQuery(results:QueryResult) {
+      console.log('1st check query executed with success');
+      if (Object.values(results)[0]['COUNT(*)'] === 1) {
+        // If only 1 exists, then
+        // update entry with new 'lastSeen' date
+          if1();
+      } else {
+        // Else,
+        // add new entry
+          else2();
+      }
+    }
+
+    function if1() {
+      connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
+        if (error2) { console.error(error2); rejectingFunc(error2) } 
+        else {
+          console.log('Update query executed with success\n', results2);
+        }
+      })
+    }
+
+    function else2() {
+      connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
+        if (error) { rejectingFunc(error) } else {console.log('Add query executed with success');}
+      })
     }
 
   // CATCHER
