@@ -5,52 +5,48 @@ import mysql, { Pool, PoolOptions, QueryResult, Query } from 'mysql2'
 let connection:Pool;
 let timer
 
-function insert(inp:CarData):Promise<void> {
-    // console.log(arguments);
-    let promise1:Promise<void>;
+// QUERIES' STRINGS
+  let query1:string = 
+    `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  // DATA DECONSTRUCTION
-    let {prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate} = inp;
-    console.log(inp);
+  // let query2Ask =
+  //   `SELECT * FROM offers WHERE
+  //   prodYear = ${prodYear} AND
+  //   mileage = ${mileage} AND
+  //   fetchDate = ${fetchDate}`
 
-  // DATES AND TIME OF INSERTS
-    let dateNow0:Date = new Date();
-    let dateNow = dateToSqlFormat(dateNow0);
-    let timeNow = dateToClockTime(dateNow0);
+  // let query2Ask:string =
+  //   `SELECT * FROM offers WHERE
+  //   prodYear = ? AND
+  //   mileage = ? AND
+  //   city = ?`
 
-  // QUERIES' STRINGS
-    let query1:string = 
-      `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  let query2Ask:string =
+    `SELECT * FROM offers WHERE
+    prodYear = ? AND
+    mileage = ? AND
+    city = ?
+    ORDER BY lastSeen
+    LIMIT 1`
 
-    // let query2Ask =
-    //   `SELECT * FROM offers WHERE
-    //   prodYear = ${prodYear} AND
-    //   mileage = ${mileage} AND
-    //   fetchDate = ${fetchDate}`
+  // let query2Ask:string =
+  //   `SELECT * FROM offers WHERE
+  //   prodYear = ? AND
+  //   mileage = ? AND
+  //   fetchDate = ?`
 
-      console.log(`'${prodYear.slice(0, 4)}'`, `'${mileage}'`, `'${fetchDate.toString().slice(0, 10)}'`);
-
-    let query2Ask:string =
-      `SELECT COUNT(*) FROM offers WHERE
+  let updateDateQuery:string = `UPDATE offers
+    SET lastSeen = CURDATE()
+    WHERE 
       prodYear = ? AND
       mileage = ? AND
       city = ? AND
       price = ?`
 
-    // let query2Ask:string =
-    //   `SELECT * FROM offers WHERE
-    //   prodYear = ? AND
-    //   mileage = ? AND
-    //   fetchDate = ?`
-
-    let updateDateQuery:string = `UPDATE offers
-      SET lastSeen = CURDATE()
-      WHERE 
-        prodYear = ? AND
-        mileage = ? AND
-        city = ? AND
-        price = ?`
+function insert(inp:CarData):Promise<void> {
+    // console.log(arguments);
+    let promise1:Promise<void>;
 
   // CREATE DB CONNECTION
     if (!connection) {
@@ -69,7 +65,16 @@ function insert(inp:CarData):Promise<void> {
         timer = setTimeout(() => connection.end(() => console.log('connection closed')), 3500)
     }
 
-  // PROMISIFIED QUERY FUNCTIONS
+  // DATA DECONSTRUCTION
+    let {prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate} = inp;
+    console.log(inp);
+
+  // DATES AND TIME OF INSERTS
+    let dateNow0:Date = new Date();
+    let dateNow = dateToSqlFormat(dateNow0);
+    let timeNow = dateToClockTime(dateNow0);
+
+  // PROMISIFIED QUERY FUNCTION
     function queryFunction():Promise<void> {
         console.log('executing query');
 
@@ -127,7 +132,7 @@ function insert(inp:CarData):Promise<void> {
         rejectingFunc = rej 
         return connection.query(
           query2Ask, 
-          [prodYear, mileage, city, price], 
+          [prodYear, mileage, city], 
           (error, results, fields) => {
             // If response comes without error, then check if exists only 1 entry
               if (!error) { goCheckQuery(results) } 
@@ -141,10 +146,14 @@ function insert(inp:CarData):Promise<void> {
 
     function goCheckQuery(results:QueryResult) {
       console.log('1st check query executed with success');
-      if (Object.values(results)[0]['COUNT(*)'] === 1) {
+      // console.log(Object.values(results)[0])
+      // console.log(`exists ${Object.values(results)[0]['COUNT(*)']} entries`);
+      if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
         // If only 1 exists, then
         // update entry with new 'lastSeen' date
-          if1();
+          console.log(`'${Object.values(results)[0]['price']}', '${price}'`);
+          if (Object.values(results)[0]['price'] == price) if1()
+          else else2();
       } else {
         // Else,
         // add new entry
@@ -163,7 +172,7 @@ function insert(inp:CarData):Promise<void> {
 
     function else2() {
       connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
-        if (error) { rejectingFunc(error) } else {console.log('Add query executed with success');}
+        if (error) { console.log(error); rejectingFunc(error) } else {console.log('Add query executed with success');}
       })
     }
 

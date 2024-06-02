@@ -65,7 +65,7 @@ export default function connectToExistingInstance() {
 			let writeToDB = getHtmlString
 			.then((res) => {
 				browser.disconnect();
-				console.log('writing to db');
+				console.log('writing to db', res.length);
 				let counter = 0;
 				let resolver:any;
 
@@ -78,7 +78,7 @@ export default function connectToExistingInstance() {
 					resolver = resolve;
 				})
 
-				for (let nth=10; nth<=11/*res.length-1*/; nth++) {
+				for (let nth=0; nth<=res.length-1; nth++) {
 					/*try {*/
 						writerDB(res[nth]).then(promiseCounter)
 						.catch(err => console.log('error in writing'))
