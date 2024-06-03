@@ -126,6 +126,7 @@ function insert(inp:CarData):Promise<void> {
 
   // Advanced wrapping functions
     let rejectingFunc:Function;
+
     function promiseCallb(res:(value: void | PromiseLike<void>) => void, rej:(reason?: any) => void):Query {
       // Make query to ask if entry exists - checks if exists entry
       // for a given [prodYear, mileage, city, price] combination.
@@ -146,12 +147,14 @@ function insert(inp:CarData):Promise<void> {
 
     function goCheckQuery(results:QueryResult) {
       console.log('1st check query executed with success');
-      // console.log(Object.values(results)[0])
+      console.log('l1', Object.values(results)[0])
+      console.log('l2', Object.values(results).length/*[0]['COUNT(*)']*/ === 1)
       // console.log(`exists ${Object.values(results)[0]['COUNT(*)']} entries`);
       if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
         // If only 1 exists, then
         // update entry with new 'lastSeen' date
-          console.log(`'${Object.values(results)[0]['price']}', '${price}'`);
+          console.log('l3', `'${Object.values(results)[0]['price']}', '${price}'`);
+          console.log('l4', Object.values(results)[0]['price'] == price);
           if (Object.values(results)[0]['price'] == price) if1()
           else else2();
       } else {
