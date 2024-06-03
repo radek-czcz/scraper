@@ -7,8 +7,12 @@ let timer
 
 // QUERIES' STRINGS
   let query1:string = 
-    `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
+    `INSERT INTO offers IF NOT EXISTS (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+  let query2:string = 
+    `INSERT INTO prices (prodYear, mileage, city, fetchDate, price)
+    VALUES (?, ?, ?, ?, ?)`;
 
   // let query2Ask =
   //   `SELECT * FROM offers WHERE
@@ -23,11 +27,11 @@ let timer
   //   city = ?`
 
   let query2Ask:string =
-    `SELECT * FROM offers WHERE
+    `SELECT * FROM prices WHERE
     prodYear = ? AND
     mileage = ? AND
     city = ?
-    ORDER BY lastSeen
+    ORDER BY fetchDate DESC
     LIMIT 1`
 
   // let query2Ask:string =
@@ -36,13 +40,17 @@ let timer
   //   mileage = ? AND
   //   fetchDate = ?`
 
-  let updateDateQuery:string = `UPDATE offers
+  let updateDateQuery:string = `UPDATE prices
     SET lastSeen = CURDATE()
     WHERE 
       prodYear = ? AND
       mileage = ? AND
       city = ? AND
       price = ?`
+
+  let insertToParent:string = `
+    INSERT INTO offers IF NOT EXISTS
+  `
 
 function insert(inp:CarData):Promise<void> {
     // console.log(arguments);
@@ -77,44 +85,8 @@ function insert(inp:CarData):Promise<void> {
   // PROMISIFIED QUERY FUNCTION
     function queryFunction():Promise<void> {
         console.log('executing query');
-
         function promise1() {return new Promise<void>(promiseCallb)}
-
-        // function promise1() {return new Promise<void>(
-          //   (res, rej) => connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
-          //     if (error) { rej(error) } else {console.log('query executed with success');}
-          //     res();
-          //   })
-          // )}
-
-          // function promise1() {return new Promise<void>(
-          //   (res, rej) => connection.query(query2Ask, [prodYear, mileage, city, price], (error, results, fields) => {
-          //     let queryRes:QueryResult;
-          //     if (error) { console.error(error); rej(error) } 
-          //     else {
-          //       queryRes = results;
-          //       console.log('1st check query executed with success');
-          //       // console.log(Object.values(queryRes)[0]['COUNT(*)'] === 1);
-          //       if (Object.values(queryRes)[0]['COUNT(*)'] === 1) {
-          //         connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
-          //           let queryRes2:QueryResult;
-          //           if (error2) { console.error(error2); rej(error2) } 
-          //           else {
-          //             queryRes2 = results2;
-          //             console.log('Update query executed with success\n', results2);
-          //           }
-          //         })
-          //       } else {
-          //         connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
-          //           if (error) { rej(error) } else {console.log('Add query executed with success');}
-          //         })
-          //       }
-          //     }
-          //     res();
-          //   })
-          // )}
-
-        function promise2() { return Promise.reject('exams not saved') }
+        function promise2() {return Promise.reject('exams not saved')}
 
         if (prodYear) {
           return promise1()
@@ -129,7 +101,7 @@ function insert(inp:CarData):Promise<void> {
 
     function promiseCallb(res:(value: void | PromiseLike<void>) => void, rej:(reason?: any) => void):Query {
       // Make query to ask if entry exists - checks if exists entry
-      // for a given [prodYear, mileage, city, price] combination.
+      // for a given [prodYear, mileage, city] combination.
         rejectingFunc = rej 
         return connection.query(
           query2Ask, 
@@ -147,24 +119,31 @@ function insert(inp:CarData):Promise<void> {
 
     function goCheckQuery(results:QueryResult) {
       console.log('1st check query executed with success');
-      console.log('l1', Object.values(results)[0])
-      console.log('l2', Object.values(results).length/*[0]['COUNT(*)']*/ === 1)
-      // console.log(`exists ${Object.values(results)[0]['COUNT(*)']} entries`);
-      if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
-        // If only 1 exists, then
-        // update entry with new 'lastSeen' date
-          console.log('l3', `'${Object.values(results)[0]['price']}', '${price}'`);
-          console.log('l4', Object.values(results)[0]['price'] == price);
-          if (Object.values(results)[0]['price'] == price) if1()
-          else else2();
-      } else {
-        // Else,
-        // add new entry
-          else2();
-      }
+      console.log('existing entry: ', Object.values(results)[0])
+      console.log('Does exist one entry in DB?: ', Object.values(results).length/*[0]['COUNT(*)']*/ === 1)
+      // If exists the entry, then
+        // check prices. If prices are equal - update entry with new 'lastSeen' date.
+        // If prices are not equal - add new entry in prices table.
+      // If there is 0 entries existing, add new entry in prices table.
+        if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
+            console.log('Are the fetchDates equal: ', Object.values(results)[0]['fetchDate'] == fetchDate);
+            console.log("DB's entry fetchDate: ", `'${Object.values(results)[0]['fetchDate']}'`, 'Scrapped fetchDate: ', `'${fetchDate}'`);
+            console.log('Price in DB: ', `'${Object.values(results)[0]['price']}', 'Scrapped price: ', '${price}'`);
+            console.log('Are the prices equal?: ', Object.values(results)[0]['price'] == price);
+          // check if scrapped price equals price in db. If it does it overwrites lastSeen.
+          // Otherwise 
+            if (Object.values(results)[0]['price'] == price) {console.log('lastSeen in DB: ', Object.values(results)[0]['lastSeen']); if1()}
+            else else2();
+        } else {
+          // Else,
+          // add new entry if existing entry's fetchDate is not equal to scrapped fetchDate.
+            connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate])
+            else2();
+        }
     }
 
     function if1() {
+      console.log('lastSeen should be overwritten now.');
       connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
         if (error2) { console.error(error2); rejectingFunc(error2) } 
         else {
@@ -174,7 +153,8 @@ function insert(inp:CarData):Promise<void> {
     }
 
     function else2() {
-      connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (error, results, fields) => {
+      console.log('New entry should be added now.');
+      connection.query(query2, [prodYear, mileage, city, fetchDate, price], (error, results, fields) => {
         if (error) { console.log(error); rejectingFunc(error) } else {console.log('Add query executed with success');}
       })
     }

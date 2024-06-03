@@ -60,6 +60,8 @@ function run() {
 			return res[0];
 		})
 
+		// let readTitle:Promise<void> = openedPage.then((res:Page) => res.title()).then((res:string) => console.log('title: ', `'${res}'`))
+
 	// save cookies
 		// let getCookies = openedPage.then((page:Page) => {saveCookies()})
 
@@ -101,12 +103,15 @@ async function getTabToOperateOn(res: Browser):Promise<Page> {
 	let tabs:Page[] = await browser.pages();
 	let tab:Page = tabs[tabs.length-1];
 	let title:string = await tab.title();
+	console.log(`title1: '${title}'`);
 	if (title === "" || title === "Nowa karta") {
-		return getPageWithSelect();
+		return Promise.resolve(tab);
+		// return getPageWithSelect();
 	} else {
-		page = browser.newPage();
-		page.then(() => {console.log('New tab created')});
-		return page
+		return getPageWithSelect();
+		// page = browser.newPage();
+		// page.then(() => {console.log('New tab created')});
+		// return page
 	}
 }
 
