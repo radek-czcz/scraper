@@ -7,7 +7,7 @@ let timer
 
 // QUERIES' STRINGS
   let query1:string = 
-    `INSERT INTO offers IF NOT EXISTS (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
+    `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   let query2:string = 
@@ -47,10 +47,6 @@ let timer
       mileage = ? AND
       city = ? AND
       price = ?`
-
-  let insertToParent:string = `
-    INSERT INTO offers IF NOT EXISTS
-  `
 
 function insert(inp:CarData):Promise<void> {
     // console.log(arguments);
@@ -137,8 +133,11 @@ function insert(inp:CarData):Promise<void> {
         } else {
           // Else,
           // add new entry if existing entry's fetchDate is not equal to scrapped fetchDate.
-            connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate])
-            else2();
+            connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (err, res, f) => {
+              if (err) { console.log(err); rejectingFunc(err) } else {console.log('Add query to offers executed with success');
+                else2();
+              }
+            });
         }
     }
 

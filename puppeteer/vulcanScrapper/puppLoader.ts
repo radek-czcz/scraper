@@ -72,8 +72,7 @@ function loadPage(url:string):Promise<Page> {
   let pages:Promise<Page[]> = pu.pages();
   let going = pages.then((res) => res[0].goto(url, {waitUntil: 'networkidle2'}))
   .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
-  console.log  ('page opened')
-  return Promise.all([pages, going]).then(res => res[0][0])
+  return Promise.all([pages, going]).then(res => {console.log('page opened'); return res[0][0]})
 }
 
 function getPu(): Promise<Browser> {

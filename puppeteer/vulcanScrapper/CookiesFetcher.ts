@@ -25,6 +25,8 @@ function connectToExistingInstance() {
 			process.stdout.write('ended'); 
 			page.browser().disconnect();
 		})
+
+		let catcher = exitAll.catch(err => console.log(err));
 		return exitAll;
 	})
 }

@@ -12,10 +12,17 @@ import {timingFunctions} from './index'
 let browser: Browser;
 let page:Promise<Page>;
 let childProcessWriteDataToDB;
-// avensis
-	let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
-// insignia		
-	// let url1 = 'https://www.olx.pl/motoryzacja/samochody/opel/?search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+// urls fo olx pages
+	// avensis
+		let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+	// insignia		
+		// let url1 = 'https://www.olx.pl/motoryzacja/samochody/opel/?search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+// reaction to ctrl+c
+	process.on('SIGINT', function() {
+	    console.log("Caught interrupt signal");
+	    browser.disconnect();
+	    process.exit(0);
+	});
 
 function run() {
 	// some variables initializations
@@ -48,8 +55,8 @@ function run() {
 					console.log(`Process of ${name1} produced output:\n  ${data}`);
 				}
 			})
-		})
-*/
+		})*/
+
 	// go to desired page
 		// let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
 		// 	console.log('Opening page');
@@ -58,14 +65,15 @@ function run() {
 		// })
 
 	// save cookies
-		let getCookies = tab1.then((page:Page) => {saveCookies()})
+		let getCookies = tab1.then((page:Page) => saveCookies())
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
-		tab1.catch(err => console.log(err));
+		tab1.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
 		tab1.then(() => timingFunctions());
+
 }
 
 function saveCookies(res: void) {

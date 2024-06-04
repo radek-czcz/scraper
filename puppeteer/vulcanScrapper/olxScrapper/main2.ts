@@ -12,10 +12,17 @@ import {timingFunctions} from './index'
 let browser: Browser;
 let page:Promise<Page>;
 let childProcessWriteDataToDB;
-// avensis
-	// let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
-// insignia		
-	let url1 = 'https://www.olx.pl/motoryzacja/samochody/opel/?search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+// urls fo olx pages
+	// avensis
+		// let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+	// insignia		
+		let url1 = 'https://www.olx.pl/motoryzacja/samochody/opel/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+// reaction to ctrl+c
+	process.on('SIGINT', function() {
+	    console.log("Caught interrupt signal");
+	    browser.disconnect();
+	    process.exit(0);
+	});
 
 function run() {
 	// some variables initializations
@@ -35,7 +42,7 @@ function run() {
 		let tab1:Promise<Page> = brow1.then(getTabToOperateOn)
 
 	// set cookies on browser
-		/*let cookiesSet = tab1.then(() => {
+		let cookiesSet = tab1.then(() => {
 			let processToSetCookies:ChildProcess;
 			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
 			let name1 = 'Cookies setting';
@@ -50,7 +57,7 @@ function run() {
 				}
 			})
 		})
-*/
+
 		tab1.then((res) => res.title()).then((res) => console.log(res))
 
 	// go to desired page
@@ -63,7 +70,7 @@ function run() {
 		// let readTitle:Promise<void> = openedPage.then((res:Page) => res.title()).then((res:string) => console.log('title: ', `'${res}'`))
 
 	// save cookies
-		// let getCookies = openedPage.then((page:Page) => {saveCookies()})
+		let getCookies = openedPage.then((page:Page) => {saveCookies()})
 
 	// catcher
 		// openedPage.catch(err => console.log(err));
