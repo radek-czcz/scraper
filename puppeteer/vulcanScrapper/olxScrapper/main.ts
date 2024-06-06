@@ -1,7 +1,7 @@
 import { spawn, ChildProcess } from 'node:child_process';
 // import { loadPage, loadPuppeteer, getPage, attachFunc, getPu, getBrowserFromParentProcess } from './index'
 import attachFunc from '../ProcessListenersManager'
-import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess} from '../puppLoader'
+import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from '../puppLoader'
 import {Browser, Page} from 'puppeteer'
 import {timingFunctions} from './index'
 
@@ -10,13 +10,14 @@ import {timingFunctions} from './index'
 // 3. CLICK LOGIN BUTTON
 
 let browser: Browser;
-let page:Promise<Page>;
+let page:Promise<Page>[];
 let childProcessWriteDataToDB;
 // urls fo olx pages
+	let arrUrl:string[] = [];
 	// avensis
-		let url1 = 'https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+		arrUrl.push('https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
 	// insignia		
-		// let url1 = 'https://www.olx.pl/motoryzacja/samochody/opel/?search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000';
+		arrUrl.push('https://www.olx.pl/motoryzacja/samochody/opel/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
 // reaction to ctrl+c
 	process.on('SIGINT', function() {
 	    console.log("Caught interrupt signal");
@@ -30,18 +31,20 @@ function run() {
 		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 
 	// get browser from existing session 
-		let brow1:Promise<Browser> = getBrowserFromParentProcess()
+		// let brow1:Promise<Browser> = getBrowserFromParentProcess()
 		// let brow1:Promise<Browser> = getPu();
 		
 	// or start new Browser
-		// let brow1:Promise<Browser> = loadPuppeteer(false)
-		.then(res => new Promise<Browser>(res1 => {browser = res; res1(res)}))
+		let brow1:Promise<Browser> = loadPuppeteer(false)
+		.then((res:Browser) => {browser = res; return browser})
 
 	// create new tab or take existing to operate on
-		let tab1:Promise<Page> = brow1.then(getTabToOperateOn)
+		// let tab1:Promise<Page> = brow1.then(getTabToOperateOn)
+		function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => browser.newPage())};
+		let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
 
 	// set cookies on browser
-		/*let cookiesSet = tab1.then(() => {
+		let cookiesSet = tabs.then(() => {
 			let processToSetCookies:ChildProcess;
 			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
 			let name1 = 'Cookies setting';
@@ -55,7 +58,9 @@ function run() {
 					console.log(`Process of ${name1} produced output:\n  ${data}`);
 				}
 			})
-		})*/
+		})
+
+		cookiesPromise.then(() => loadPages(arrUrl))
 
 	// go to desired page
 		// let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
@@ -65,14 +70,17 @@ function run() {
 		// })
 
 	// save cookies
-		let getCookies = tab1.then((page:Page) => saveCookies())
+		// let getCookies = tab1.then((page:Page) => saveCookies())
+		// let getCookies = openedPage.then((page:Page) => saveCookies())
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
-		tab1.catch(err => {console.log(err); browser.disconnect()});
+		// tab1.catch(err => {console.log(err); browser.disconnect()});
+		// openedPage.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
-		tab1.then(() => timingFunctions());
+		// tab1.then(() => timingFunctions());
+		// openedPage.then(() => timingFunctions());
 
 }
 

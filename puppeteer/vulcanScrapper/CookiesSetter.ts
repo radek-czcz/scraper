@@ -1,4 +1,4 @@
-import { getBrowserFromParentProcess, getPage } from './puppLoader';
+import { getBrowserFromParentProcess, getPages } from './puppLoader';
 import fs from 'fs';
 import {Browser, Page} from 'puppeteer';
 // import process from 'node:process';
@@ -26,7 +26,7 @@ export function connectToExistingInstance():void {
 
 		let pathToCookies = pathArg ? pathArg : './cookies.json'
 
-		let page:Page;
+		let pages:Page[];
 		let cookies:any;
 
 		function getCookies():Promise<void> {
@@ -42,19 +42,19 @@ export function connectToExistingInstance():void {
 
 		let cokkieF:any = getCookies();
 
-		let pagePromise:Promise<Page> = getPage().then(res => {if (res) return res; else throw 'page not available'})
+		let pagePromise:Promise<Page[]> = getPages().then(res => {if (res) return res; else throw 'page not available'})
 		.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
 		let setC:Promise<void> = pagePromise
-		.then((res:Page) => {
-			page = res;
+		.then((res:Page[]) => {
+			pages = res;
 	    })
-	    .then(() => {if (page) return page.setCookie(...cookies)})
+	    .then(() => {return Promise.all(pages.map((page:Page) => page.setCookie(...cookies)))})
 	    .then(
-	    	(res:void) => {console.log('cookies have been set'); process.stdout.write('cookies set'); page.browser().disconnect();},
-	    	(rej:void) => {console.error(rej); return page.browser().disconnect()}
+	    	(res:void[]) => {console.log('cookies have been set'); process.stdout.write('cookies set'); pages[0].browser().disconnect();},
+	    	(rej:void) => {console.error(rej); return pages[0].browser().disconnect()}
 	    )
-	    .catch(err => {console.log('cookies could not been set'); page.browser().disconnect()});
+	    .catch(err => {console.log('cookies could not been set'); pages[0].browser().disconnect()});
 	})
 }
 connectToExistingInstance();

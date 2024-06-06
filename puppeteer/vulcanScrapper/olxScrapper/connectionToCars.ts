@@ -101,7 +101,7 @@ function insert(inp:CarData):Promise<void> {
         rejectingFunc = rej 
         return connection.query(
           query2Ask, 
-          [prodYear, mileage, city], 
+          [prodYear, mileage, city.slice(0,25)], 
           (error, results, fields) => {
             // If response comes without error, then check if exists only 1 entry
               if (!error) { goCheckQuery(results) } 
@@ -117,26 +117,30 @@ function insert(inp:CarData):Promise<void> {
       console.log('1st check query executed with success');
       console.log('existing entry: ', Object.values(results)[0])
       console.log('Does exist one entry in DB?: ', Object.values(results).length/*[0]['COUNT(*)']*/ === 1)
-      // If exists the entry, then
-        // check prices. If prices are equal - update entry with new 'lastSeen' date.
-        // If prices are not equal - add new entry in prices table.
-      // If there is 0 entries existing, add new entry in prices table.
+      // 1. If exists the entry, then
+      // 2. check prices. If prices are equal - update entry with new 'lastSeen' date.
+      // 3. If prices are not equal - add new entry in prices table.
+      // 4. If there is 0 entries existing, add entry in offers table, add new entry in prices table.
+        // 1.
         if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
             console.log('Are the fetchDates equal: ', Object.values(results)[0]['fetchDate'] == fetchDate);
             console.log("DB's entry fetchDate: ", `'${Object.values(results)[0]['fetchDate']}'`, 'Scrapped fetchDate: ', `'${fetchDate}'`);
             console.log('Price in DB: ', `'${Object.values(results)[0]['price']}', 'Scrapped price: ', '${price}'`);
             console.log('Are the prices equal?: ', Object.values(results)[0]['price'] == price);
-          // check if scrapped price equals price in db. If it does it overwrites lastSeen.
-          // Otherwise 
+          // 2. check if scrapped price equals price in db. If it does it overwrites lastSeen. 
             if (Object.values(results)[0]['price'] == price) {console.log('lastSeen in DB: ', Object.values(results)[0]['lastSeen']); if1()}
+          // 3.
             else else2();
         } else {
-          // Else,
-          // add new entry if existing entry's fetchDate is not equal to scrapped fetchDate.
+          // 4.
             connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (err, res, f) => {
-              if (err) { console.log(err); rejectingFunc(err) } else {console.log('Add query to offers executed with success');
-                else2();
-              }
+              if (err) { 
+                console.log(err);
+                rejectingFunc(err) } 
+                else {
+                  console.log('Add query to offers executed with success');
+                  else2();
+                }
             });
         }
     }

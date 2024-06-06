@@ -21,3 +21,7 @@ export function getThePageTab(carBrand:string):Promise<Page> {
 	return prArray
 }
 
+function setBrowser(browser1:Browser) {
+	browser = browser1;
+}
+

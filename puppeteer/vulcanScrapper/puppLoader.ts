@@ -75,6 +75,14 @@ function loadPage(url:string):Promise<Page> {
   return Promise.all([pages, going]).then(res => {console.log('page opened'); return res[0][0]})
 }
 
+function loadPages(urls:string[]):Promise<Page> {
+  let pages:Promise<Page[]> = pu.pages();
+  // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
+  let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map((page:Page, idx:number) => page.goto(urls[idx], {waitUntil: 'networkidle2'})))
+  .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
+  return Promise.all([pages, going]).then(res => {console.log('pages opened'); return res[0][0]})
+}
+
 function getPu(): Promise<Browser> {
   let brwsr:Promise<Browser> = pu ? Promise.resolve(pu) : getExistingBrowser()
   brwsr.catch(err => console.log('error in getPu'))
@@ -93,6 +101,12 @@ function getPage(): Promise<Page> {
   console.log('pEval from inner')
   return getPu().then((res:Browser) => res.pages())
   .then((res: Page[]) => res[0])
+  .catch((err:Error) => {console.log('error in getPage'); throw err})
+}
+
+function getPages(): Promise<Page[]> {
+  console.log('pEval from inner')
+  return getPu().then((res:Browser) => res.pages())
   .catch((err:Error) => {console.log('error in getPage'); throw err})
 }
 
@@ -156,4 +170,4 @@ function refreshPage():Promise<any> {
 }
 
 // module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };
-export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess, refreshPage, getPageWithSelect };
+export { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess, refreshPage, getPageWithSelect, loadPages, getPages };
