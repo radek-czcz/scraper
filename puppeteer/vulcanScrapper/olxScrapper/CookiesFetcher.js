@@ -1,1 +1,0 @@
-import { cookiesFetcher } from './index.mjs';
