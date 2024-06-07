@@ -3,7 +3,7 @@ import {getTime} from './index';
 // import {ChildProcess} from 'node:process';
 import {attachFunc} from './index';
 
-export default function startTimer():void {
+export default function startTimer(noInArrayOfTabs:number):void {
 	let now1:Date = new Date();
 	// const date1 = new Date('May 14, 2024 11:30:35');
 	const date1:Date = new Date(now1.getTime() + 1000*4);
@@ -15,7 +15,7 @@ export default function startTimer():void {
 	// let spawnWrapFunction = function() {
 	function spawnWrapFunction() {
 		let processOfFetchAndWriteInner:ChildProcess;
-		processOfFetchAndWriteInner = spawn('ts-node', ['Fetching.ts'], {shell: true})
+		processOfFetchAndWriteInner = spawn('ts-node', ['Fetching.ts', 'noInArrayOfTabs=' + noInArrayOfTabs], {shell: true})
 		let name1:string = 'fetching data & writing data';
 		processOfFetchAndWriteInner.on('uncaughtException', function(data):void {
 			console.log(data.toString());
@@ -48,4 +48,4 @@ export default function startTimer():void {
 	console.log(`it's ${waittime1/(1000*60*60)} hours left to run`)
 }
 
-// startTimer();
+// startTimer(0);

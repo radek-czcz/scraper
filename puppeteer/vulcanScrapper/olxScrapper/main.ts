@@ -71,7 +71,7 @@ function run() {
 		// openedPage.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
-		// tab1.then(() => timingFunctions());
+		goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
 		// openedPage.then(() => timingFunctions());
 
 }

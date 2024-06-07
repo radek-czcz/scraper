@@ -1,30 +1,31 @@
-import { getBrowserFromParentProcess, getPage } from './puppLoader';
-import fs from 'fs';
-import {Browser, Page} from 'puppeteer';
 // import process from 'node:process';
 import { argv } from 'node:process';
 
-let allArgs:{} = {}
+export interface InumInArgsArr {
+	"noInArrayOfTabs":string
+}
+
+let allArgs:InumInArgsArr;
 
 function initialize():void {
-	let argsOb:Function =  function():{} {
-		let ob:{[key: string]: string} = {}
+	let argsOb:Function =  function() {
+		let ob:{[key:string]: string} = {}
 		argv.forEach((inp, index) => {
+			// console.log('ob: ', index, inp);
 			if (inp.split("=").length === 2) ob[inp.split("=")[0]] = inp.split("=")[1]
 			else ob[index] = inp
 		})
+		// console.log(ob);
+
 		return ob;
 	}
-
 	allArgs = argsOb();
-
-	// let pathArg = argsOb().path
-
-	// let pathToCookies = pathArg ? pathArg : './cookies.json'
+	// console.log('noInArrayOfTabs - operator: ', allArgs['noInArrayOfTabs']);
 }
 
-export function getArg(argDescriptor:string):string {
-	return allArgs[argDescriptor];
+export function getArg(name:string):string {
+	if (!allArgs) initialize();
+	return allArgs[name as keyof InumInArgsArr];
 }
 
 initialize();

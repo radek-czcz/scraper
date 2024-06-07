@@ -75,7 +75,7 @@ function loadPage(url:string):Promise<Page> {
   return Promise.all([pages, going]).then(res => {console.log('page opened'); return res[0][0]})
 }
 
-function loadPages(urls:string[]):Promise<Page> {
+function loadPages(urls:string[]):Promise<Page[]> {
   let pages:Promise<Page[]> = pu.pages();
   // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
   let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map((page:Page, idx:number) => page.goto(urls[idx], {waitUntil: 'networkidle2'})))

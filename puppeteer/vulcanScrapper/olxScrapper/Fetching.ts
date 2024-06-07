@@ -1,5 +1,7 @@
 import { getBrowserFromParentProcess, getPage, getPu, writerDB, refreshPage } from './index';
 import {Browser, Page, ElementHandle} from 'puppeteer';
+import { argv } from 'node:process';
+import { getArg, InumInArgsArr } from '../ArgsOperator'
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
@@ -7,11 +9,14 @@ export default function connectToExistingInstance() {
 	getBrowserFromParentProcess()
 	// getPu()
 	.then((res:Browser) => {
+		// read process arg
+			let numInArrayOfTabs:number = +getArg('noInArrayOfTabs')
+
 		// variable initializations
 			browser = res;
 
 		// get page from connected browser
-			let pagePromise:Promise<Page> = browser.pages().then((allPages:Page[]) => allPages[0])
+			let pagePromise:Promise<Page> = browser.pages().then((allPages:Page[]) => allPages[numInArrayOfTabs])
 			// let pagePromise:Promise<Page> = getPageWithSelect();
 			.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
@@ -99,10 +104,5 @@ export default function connectToExistingInstance() {
 				console.log('from catcher 2');
 			})
 	})}
-
-// let refr:Promise<any> = refreshPage();
-
-// refr.then(() => console.log('refresh done'))
-// refr.then(() => connectToExistingInstance());
 
 connectToExistingInstance()
