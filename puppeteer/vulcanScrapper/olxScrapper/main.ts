@@ -31,15 +31,12 @@ function run() {
 		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 
 	// get browser from existing session 
-		// let brow1:Promise<Browser> = getBrowserFromParentProcess()
-		// let brow1:Promise<Browser> = getPu();
 		
 	// or start new Browser
 		let brow1:Promise<Browser> = loadPuppeteer(false)
 		.then((res:Browser) => {browser = res; return browser})
 
 	// create new tab or take existing to operate on
-		// let tab1:Promise<Page> = brow1.then(getTabToOperateOn)
 		function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => browser.newPage())};
 		let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
 
@@ -60,18 +57,13 @@ function run() {
 			})
 		})
 
-		cookiesPromise.then(() => loadPages(arrUrl))
 
 	// go to desired page
-		// let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
-		// 	console.log('Opening page');
-		// 	res[0].goto(url1, { waitUntil: 'domcontentloaded' });
-		// 	return res[0];
-		// })
+		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
+
 
 	// save cookies
-		// let getCookies = tab1.then((page:Page) => saveCookies())
-		// let getCookies = openedPage.then((page:Page) => saveCookies())
+		let getCookies = goToPages.then(() => saveCookies())
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))

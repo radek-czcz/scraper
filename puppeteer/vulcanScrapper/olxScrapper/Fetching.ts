@@ -11,7 +11,7 @@ export default function connectToExistingInstance() {
 			browser = res;
 
 		// get page from connected browser
-			let pagePromise:Promise<Page> = getPage()
+			let pagePromise:Promise<Page> = browser.pages().then((allPages:Page[]) => allPages[0])
 			// let pagePromise:Promise<Page> = getPageWithSelect();
 			.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 

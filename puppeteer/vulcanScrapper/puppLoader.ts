@@ -80,7 +80,7 @@ function loadPages(urls:string[]):Promise<Page> {
   // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
   let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map((page:Page, idx:number) => page.goto(urls[idx], {waitUntil: 'networkidle2'})))
   .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
-  return Promise.all([pages, going]).then(res => {console.log('pages opened'); return res[0][0]})
+  return Promise.all([pages, going]).then(res => {console.log('pages opened'); return pages})
 }
 
 function getPu(): Promise<Browser> {
