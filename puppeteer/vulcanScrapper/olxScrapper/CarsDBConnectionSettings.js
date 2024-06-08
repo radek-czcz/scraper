@@ -1,4 +1,4 @@
 export default {
 	user: 'srv59554_cars',
-	password: 'RtuK74pgQEEbNDdxrnMU',
+	password: 'FJgV6LVL6dgKcfAfp85v',
 }
