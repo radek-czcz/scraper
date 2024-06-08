@@ -42,21 +42,21 @@ function run() {
 		let tab1:Promise<Page> = brow1.then(getTabToOperateOn)
 
 	// set cookies on browser
-		let cookiesSet = tab1.then(() => {
-			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
-			let name1 = 'Cookies setting';
-			attachFunc({
-				processObject: processToSetCookies,
-				name: name1,
-				onData: function(data:string) {
-					if ( data.toString() === 'cookies set' ) {
-						resolver();
-					}
-					console.log(`Process of ${name1} produced output:\n  ${data}`);
-				}
-			})
-		})
+		// let cookiesSet = tab1.then(() => {
+		// 	let processToSetCookies:ChildProcess;
+		// 	processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
+		// 	let name1 = 'Cookies setting';
+		// 	attachFunc({
+		// 		processObject: processToSetCookies,
+		// 		name: name1,
+		// 		onData: function(data:string) {
+		// 			if ( data.toString() === 'cookies set' ) {
+		// 				resolver();
+		// 			}
+		// 			console.log(`Process of ${name1} produced output:\n  ${data}`);
+		// 		}
+		// 	})
+		// })
 
 		tab1.then((res) => res.title()).then((res) => console.log(res))
 
@@ -70,13 +70,13 @@ function run() {
 		// let readTitle:Promise<void> = openedPage.then((res:Page) => res.title()).then((res:string) => console.log('title: ', `'${res}'`))
 
 	// save cookies
-		let getCookies = openedPage.then((page:Page) => {saveCookies()})
+		let getCookies = tab1.then((page:Page) => {saveCookies()})
 
 	// catcher
 		// openedPage.catch(err => console.log(err));
 
 	// timing functions
-		openedPage.then(() => timingFunctions());
+		tab1.then(() => timingFunctions());
 }
 
 function saveCookies(res: void) {
@@ -88,22 +88,6 @@ function saveCookies(res: void) {
 			name: name1,
 		})
 }
-
-// async function getTabToOperateOn(res: Browser):Promise<Page> {
-// 	console.log('Getting tab to operate');
-// 	let tabs:Page[] = await browser.pages();
-// 	let tab:Page = tabs[tabs.length-1];
-// 	let title:string = await tab.title();
-// 	if (title === "") {
-// 		console.log('Getting existing tab');
-// 		page = Promise.resolve(tab)
-// 		return page;
-// 	} else {
-// 		page = browser.newPage();
-// 		page.then(() => {console.log('New tab created')});
-// 		return page
-// 	}
-// }
 
 async function getTabToOperateOn(res: Browser):Promise<Page> {
 	console.log('Getting tab to operate');

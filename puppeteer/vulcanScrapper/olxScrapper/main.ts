@@ -69,7 +69,7 @@ function run() {
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
-		tab1.catch(err => {console.log(err); browser.disconnect()});
+		getCookies.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
 		tab1.then(() => timingFunctions());

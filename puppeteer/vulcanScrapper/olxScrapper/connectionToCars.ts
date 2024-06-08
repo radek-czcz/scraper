@@ -1,52 +1,10 @@
 import {dateToSqlFormat, dateToClockTime, CarData} from './index';
 import settings from './CarsDBConnectionSettings.js';
-import mysql, { Pool, PoolOptions, QueryResult, Query } from 'mysql2'
+import mysql, { Pool, PoolOptions, QueryResult, Query, ResultSetHeader, QueryError, FieldPacket } from 'mysql2'
+import {queries} from './QueriesStrings'
 
 let connection:Pool;
 let timer
-
-// QUERIES' STRINGS
-  let query1:string = 
-    `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  let query2:string = 
-    `INSERT INTO prices (prodYear, mileage, city, fetchDate, price)
-    VALUES (?, ?, ?, ?, ?)`;
-
-  // let query2Ask =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ${prodYear} AND
-  //   mileage = ${mileage} AND
-  //   fetchDate = ${fetchDate}`
-
-  // let query2Ask:string =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ? AND
-  //   mileage = ? AND
-  //   city = ?`
-
-  let query2Ask:string =
-    `SELECT * FROM prices WHERE
-    prodYear = ? AND
-    mileage = ? AND
-    city = ?
-    ORDER BY fetchDate DESC
-    LIMIT 1`
-
-  // let query2Ask:string =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ? AND
-  //   mileage = ? AND
-  //   fetchDate = ?`
-
-  let updateDateQuery:string = `UPDATE prices
-    SET lastSeen = CURDATE()
-    WHERE 
-      prodYear = ? AND
-      mileage = ? AND
-      city = ? AND
-      price = ?`
 
 function insert(inp:CarData):Promise<void> {
     // console.log(arguments);
@@ -100,8 +58,8 @@ function insert(inp:CarData):Promise<void> {
       // for a given [prodYear, mileage, city] combination.
         rejectingFunc = rej 
         return connection.query(
-          query2Ask, 
-          [prodYear, mileage, city], 
+          queries.query2Ask, 
+          [prodYear, mileage, city.slice(0,25)], 
           (error, results, fields) => {
             // If response comes without error, then check if exists only 1 entry
               if (!error) { goCheckQuery(results) } 
@@ -133,8 +91,12 @@ function insert(inp:CarData):Promise<void> {
         } else {
           // Else,
           // add new entry if existing entry's fetchDate is not equal to scrapped fetchDate.
-            connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (err, res, f) => {
-              if (err) { console.log(err); rejectingFunc(err) } else {console.log('Add query to offers executed with success');
+            connection.query(queries.query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (
+              err:QueryError|null,
+              res:ResultSetHeader,
+              f:FieldPacket[]
+            ) => {
+              if (err) { console.error(err); console.log(inp); rejectingFunc(err) } else {console.log('Add query to offers executed with success');
                 else2();
               }
             });
@@ -143,18 +105,26 @@ function insert(inp:CarData):Promise<void> {
 
     function if1() {
       console.log('lastSeen should be overwritten now.');
-      connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
-        if (error2) { console.error(error2); rejectingFunc(error2) } 
+      connection.query(queries.updateDateQuery, [prodYear, mileage, city, price], (error2:QueryError|null, results2:ResultSetHeader, fields2) => {
+        let message:string;
+        if (error2) { console.error(error2); console.log(inp); rejectingFunc(error2) } 
         else {
-          console.log('Update query executed with success\n', results2);
+          if (results2.affectedRows === 1 && results2.changedRows === 1) {message = "row has changed"}
+            else if (results2.affectedRows === 1 && results2.changedRows === 0) {message = "row has not changed"}
+            else message = '';
+          console.log('Update query executed with success, ', message);
         }
       })
     }
 
     function else2() {
       console.log('New entry should be added now.');
-      connection.query(query2, [prodYear, mileage, city, fetchDate, price], (error, results, fields) => {
-        if (error) { console.log(error); rejectingFunc(error) } else {console.log('Add query executed with success');}
+      connection.query(queries.query2, [prodYear, mileage, city, fetchDate, price], (error:QueryError|null, results:ResultSetHeader, fields) => {
+        if (error) { 
+          console.error(error);
+          console.log(inp);
+          rejectingFunc(error) }
+        else {console.log('Add query executed with success')}
       })
     }
 
