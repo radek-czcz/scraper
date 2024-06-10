@@ -70,13 +70,13 @@ function run() {
 		// let readTitle:Promise<void> = openedPage.then((res:Page) => res.title()).then((res:string) => console.log('title: ', `'${res}'`))
 
 	// save cookies
-		let getCookies = tab1.then((page:Page) => {saveCookies()})
+		let getCookies = openedPage.then((page:Page) => {saveCookies()})
 
 	// catcher
-		// openedPage.catch(err => console.log(err));
+		openedPage.catch(err => console.log(err));
 
 	// timing functions
-		tab1.then(() => timingFunctions());
+		openedPage.then(() => timingFunctions());
 }
 
 function saveCookies(res: void) {

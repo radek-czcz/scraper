@@ -1,13 +1,21 @@
 import Hapi from '@hapi/hapi';
 import Inert from '@hapi/inert';
+import {getOffers} from './routesCars'
 
 let server;
 
 // DEFINICJA I KONFIGURACJA SERWERA HAPI
   const start = async () => {
     server = Hapi.server({
-      port:3000,
+      port:3091,
       host: /*'188.210.222.87'*/ 'localhost',
+      "routes": {
+        "cors": {
+          "origin": ["*"],
+          "headers": ["Accept", "Content-Type"],
+          "additionalHeaders": ["X-Requested-With"]
+        }
+      }
     });
 
   // DEFINICJA ROUTE'ÓW    
@@ -16,9 +24,11 @@ let server;
         method: 'GET',
         path: '/index',
         handler: (req, h) => {
-          return h.file('../react/appno2/index.html');
+          return h.file('../react/appno2/my-app2/package.json');
         }
     })
+
+    server.route(getOffers);
 
     //db.connect();
     await server.register(Inert);

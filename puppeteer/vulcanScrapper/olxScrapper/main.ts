@@ -58,21 +58,21 @@ function run() {
 		})*/
 
 	// go to desired page
-		// let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
-		// 	console.log('Opening page');
-		// 	res[0].goto(url1, { waitUntil: 'domcontentloaded' });
-		// 	return res[0];
-		// })
+		let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
+			console.log('Opening page');
+			res[0].goto(url1, { waitUntil: 'domcontentloaded' });
+			return res[0];
+		})
 
 	// save cookies
-		let getCookies = tab1.then((page:Page) => saveCookies())
+		let getCookies = openedPage.then((page:Page) => saveCookies())
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
-		getCookies.catch(err => {console.log(err); browser.disconnect()});
+		openedPage.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
-		tab1.then(() => timingFunctions());
+		openedPage.then(() => timingFunctions());
 
 }
 

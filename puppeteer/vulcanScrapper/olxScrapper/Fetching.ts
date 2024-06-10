@@ -1,5 +1,6 @@
 import { getBrowserFromParentProcess, getPage, getPu, writerDB, refreshPage } from './index';
 import {Browser, Page, ElementHandle} from 'puppeteer';
+import {copyFile} from 'fs'
 
 // 1. GET PLAN DETAILS AS HTML OUTER ELEMENT
 export default function connectToExistingInstance() {
@@ -41,6 +42,11 @@ export default function connectToExistingInstance() {
 						function getBrand():string|null { return getDescription().toLowerCase().includes('toyota') ? 'Toyota' : null}
 						function getModel():string|null { return getDescription().toLowerCase().includes('avensis') ? 'Avensis' : null}
 						function GFG_Fun():string { let date = new Date(); return date.toISOString().slice(0, 19).replace('T', ' ') }
+
+						function getImage() {
+							let image:string = inp.querySelector('img.css-8wsg1m');
+						}
+
 						return {
 							price: getPrice(),
 							prodYear: getYear(),
