@@ -61,22 +61,22 @@ function run() {
 		tab1.then((res) => res.title()).then((res) => console.log(res))
 
 	// go to desired page
-		let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
-			console.log('Opening page');
-			res[0].goto(url1, { waitUntil: 'domcontentloaded' });
-			return res[0];
-		})
+		// let openedPage:Promise<Page> = Promise.all([tab1/*, cookiesSet, cookiesPromise*/]).then(res => {
+		// 	console.log('Opening page');
+		// 	res[0].goto(url1, { waitUntil: 'domcontentloaded' });
+		// 	return res[0];
+		// })
 
 		// let readTitle:Promise<void> = openedPage.then((res:Page) => res.title()).then((res:string) => console.log('title: ', `'${res}'`))
 
 	// save cookies
-		let getCookies = openedPage.then((page:Page) => {saveCookies()})
+		let getCookies = tab1.then((page:Page) => {saveCookies()})
 
 	// catcher
-		openedPage.catch(err => console.log(err));
+		tab1.catch(err => console.log(err));
 
 	// timing functions
-		openedPage.then(() => timingFunctions());
+		tab1.then(() => timingFunctions());
 }
 
 function saveCookies(res: void) {

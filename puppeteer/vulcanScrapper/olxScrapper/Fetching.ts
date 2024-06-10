@@ -42,10 +42,10 @@ export default function connectToExistingInstance() {
 						function getBrand():string|null { return getDescription().toLowerCase().includes('toyota') ? 'Toyota' : null}
 						function getModel():string|null { return getDescription().toLowerCase().includes('avensis') ? 'Avensis' : null}
 						function GFG_Fun():string { let date = new Date(); return date.toISOString().slice(0, 19).replace('T', ' ') }
-
-						function getImage() {
-							let image:string = inp.querySelector('img.css-8wsg1m');
-						}
+		 				// function getImageSrc():string {
+		 				// 	let selectorNo1:HTMLImageElement = <HTMLImageElement>inp.querySelector('img.css-8wsg1m');
+		 				// 	return selectorNo1 ? selectorNo1.src : null;
+		 				// }
 
 						return {
 							price: getPrice(),
@@ -56,7 +56,8 @@ export default function connectToExistingInstance() {
 							descr: getDescription(),
 							brand: getBrand(),
 							model: getModel(),
-							fetchDate: GFG_Fun()
+							fetchDate: GFG_Fun(),
+							// imgUrl: getImageSrc()
 						}
 					}))
 					.catch((err:Error) => {
