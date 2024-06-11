@@ -29,10 +29,10 @@ export default function connectToExistingInstance() {
 				if (selectorNo1) {
 					console.log('getting offers');
 					let examsPromise:Promise<any> = res.$$eval('div.css-1venxj6', divs => divs.map(function(inp) {
-						function getPrice():string { let str:string = inp.querySelector('p.css-tyui9s.er34gjf0').textContent; 
+						function getPrice():string { let str:string = inp.querySelector('p.css-tyui9s.er34gjf0')!.textContent; 
 							str = str.replace(' ', '').replace(' zł', '')
 							return str.endsWith('do negocjacji') ? str.replace('do negocjacji', '') : str };
-						function getYearAndMileage():string { return inp.querySelector('span.css-efx9z5').textContent }
+						function getYearAndMileage():string { return inp.querySelector('span.css-efx9z5')!.textContent }
 						function getYear():string { return getYearAndMileage().split(' - ')[0] }
 						function getMileage():number { return parseInt(getYearAndMileage().split(' - ')[1].replace(' km', '')) }
 						function getCityAndDate():string { return inp.querySelector('p.css-1a4brun.er34gjf0').textContent }
