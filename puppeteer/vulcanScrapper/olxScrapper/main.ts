@@ -49,7 +49,8 @@ function run() {
 				processObject: processToSetCookies,
 				name: name1,
 				onData: function(data:string) {
-					if ( data.toString() === 'cookies set' ) {
+					if ( data.toString().includes('cookies set') ) {
+						console.log('resolving');
 						resolver();
 					}
 					console.log(`Process of ${name1} produced output:\n  ${data}`);
@@ -61,9 +62,8 @@ function run() {
 	// go to desired page
 		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
 
-
 	// save cookies
-		let getCookies = goToPages.then(() => saveCookies())
+		let getCookies = goToPages.then(() => setTimeout(() => saveCookies(), 10000)
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
@@ -71,7 +71,7 @@ function run() {
 		// openedPage.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
-		goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
+		// goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
 		// openedPage.then(() => timingFunctions());
 
 }

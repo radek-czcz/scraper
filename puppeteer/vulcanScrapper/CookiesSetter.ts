@@ -49,9 +49,9 @@ export function connectToExistingInstance():void {
 		.then((res:Page[]) => {
 			pages = res;
 	    })
-	    .then(() => {return Promise.all(pages.map((page:Page) => page.setCookie(...cookies)))})
+	    .then(() => {return Promise.all(pages.map((page:Page, idx:number) => page.setCookie(...cookies).then(() => console.log(`cookie on page ${idx} set`))))})
 	    .then(
-	    	(res:void[]) => {console.log('cookies have been set'); process.stdout.write('cookies set'); pages[0].browser().disconnect();},
+	    	(res:void[]) => {/*console.log('cookies have been set');*/ process.stdout.write('cookies set'); pages[0].browser().disconnect()},
 	    	(rej:void) => {console.error(rej); return pages[0].browser().disconnect()}
 	    )
 	    .catch(err => {console.log('cookies could not been set'); pages[0].browser().disconnect()});

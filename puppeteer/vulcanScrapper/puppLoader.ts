@@ -76,9 +76,17 @@ function loadPage(url:string):Promise<Page> {
 }
 
 function loadPages(urls:string[]):Promise<Page[]> {
+  console.log('loading');
   let pages:Promise<Page[]> = pu.pages();
   // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
-  let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map((page:Page, idx:number) => page.goto(urls[idx], {waitUntil: 'networkidle2'})))
+  let tout = 0;
+
+  function innFunc(page:Page, idx:number) {return new Promise<void>(resolve => {
+    setTimeout(() => page.goto(urls[idx], {waitUntil: 'networkidle2'}).then(() => resolve()), tout)
+    tout = tout + 5000;
+  })}
+  
+  let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map(innFunc))
   .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
   return Promise.all([pages, going]).then(res => {console.log('pages opened'); return pages})
 }
