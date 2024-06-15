@@ -43,7 +43,7 @@ function run() {
 	// set cookies on browser
 		let cookiesSet = tabs.then(() => {
 			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
+			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookiesa.json'],{shell: true});
 			let name1 = 'Cookies setting';
 			attachFunc({
 				processObject: processToSetCookies,
@@ -60,15 +60,15 @@ function run() {
 
 
 	// go to desired page
-		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
+		// let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
 
 	// save cookies
-		let getCookies = goToPages.then(() => setTimeout(() => saveCookies(), 10000)
+		// let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
-		// openedPage.catch(err => {console.log(err); browser.disconnect()});
+		// getCookies.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
 		// goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
@@ -76,7 +76,7 @@ function run() {
 
 }
 
-function saveCookies(res: void) {
+function saveCookies(res: void):void {
 		let processOfSavingCookies;
 		processOfSavingCookies = spawn('ts-node', ['../CookiesFetcher.ts'], {shell: true})
 		let name1 = 'fetching cookies';

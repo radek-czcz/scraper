@@ -81,7 +81,7 @@ function loadPages(urls:string[]):Promise<Page[]> {
   // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
   let tout = 0;
 
-  function innFunc(page:Page, idx:number) {return new Promise<void>(resolve => {
+  function innFunc(page:Page, idx:number):Promise<void> {return new Promise<void>((resolve:Function) => {
     setTimeout(() => page.goto(urls[idx], {waitUntil: 'networkidle2'}).then(() => resolve()), tout)
     tout = tout + 5000;
   })}
