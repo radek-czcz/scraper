@@ -40,18 +40,21 @@ export function connectToExistingInstance():void {
 			}))
 		}
 
-		let cokkieF:any = getCookies();
+		let cokkieF:Promise<void> = getCookies();
 
 		let pagePromise:Promise<Page[]> = getPages().then(res => {if (res) return res; else throw 'page not available'})
 		.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
-		let setC:Promise<void> = pagePromise
-		.then((res:Page[]) => {
-			pages = res;
-	    })
-	    .then(() => {return Promise.all(pages.map((page:Page, idx:number) => page.setCookie(...cookies).then(() => console.log(`cookie on page ${idx} set`))))})
+		let setC:Promise<void> = pagePromise.then((res:Page[]) => {pages = res})
+
+		let mapAndSet:Promise<void> = Promise.all([setC, cokkieF])
+	    .then(() => {
+	    	let ind:number;
+	    	return Promise.all(pages.map((page:Page, idx:number) => {ind = idx; return page.setCookie(...cookies)}))
+	    	.then((res:void[]) => console.log(`cookies on all pages set`))
+		})
 	    .then(
-	    	(res:void[]) => {/*console.log('cookies have been set');*/ process.stdout.write('cookies set'); pages[0].browser().disconnect()},
+	    	(res:void) => {/*console.log('cookies have been set');*/ process.stdout.write('cookies set'); pages[0].browser().disconnect()},
 	    	(rej:void) => {console.error(rej); return pages[0].browser().disconnect()}
 	    )
 	    .catch(err => {console.log('cookies could not been set'); pages[0].browser().disconnect()});

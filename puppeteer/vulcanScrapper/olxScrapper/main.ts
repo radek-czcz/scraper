@@ -43,7 +43,7 @@ function run() {
 	// set cookies on browser
 		let cookiesSet = tabs.then(() => {
 			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookiesa.json'],{shell: true});
+			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
 			let name1 = 'Cookies setting';
 			attachFunc({
 				processObject: processToSetCookies,
