@@ -1,5 +1,5 @@
 import { spawn, ChildProcess } from 'node:child_process';
-import {getTime} from './index';
+import {getTime, refreshPage} from './index';
 // import {ChildProcess} from 'node:process';
 import {attachFunc} from './index';
 
@@ -25,8 +25,8 @@ export default function startTimer(noInArrayOfTabs:number):void {
 			name: name1,
 			onClose: function(code:number):void {
 				console.log(`Process of ${name1} has ended with code:${code}`);
-				let time = getTime(1/1.7, (1/6))
-				setTimeout(spawnWrapFunction, time)
+				let time = getTime(1/50, (0))
+				setTimeout(() => refreshPage().then(spawnWrapFunction), time)
 				console.log(`next fetch in ${time*(1/60)*(1*60)*(1/1000)} seconds`)
 				console.log(`next fetch in ${time*(1/60)*(1/1000)} minutes`)
 			},

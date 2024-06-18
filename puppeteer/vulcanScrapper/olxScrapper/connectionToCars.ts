@@ -1,52 +1,10 @@
 import {dateToSqlFormat, dateToClockTime, CarData} from './index';
 import settings from './CarsDBConnectionSettings.js';
-import mysql, { Pool, PoolOptions, QueryResult, Query } from 'mysql2'
+import mysql, { Pool, PoolOptions, QueryResult, Query, ResultSetHeader, QueryError, FieldPacket } from 'mysql2'
+import {queries} from './QueriesStrings'
 
 let connection:Pool;
 let timer
-
-// QUERIES' STRINGS
-  let query1:string = 
-    `INSERT INTO offers (idNum, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-  let query2:string = 
-    `INSERT INTO prices (prodYear, mileage, city, fetchDate, price)
-    VALUES (?, ?, ?, ?, ?)`;
-
-  // let query2Ask =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ${prodYear} AND
-  //   mileage = ${mileage} AND
-  //   fetchDate = ${fetchDate}`
-
-  // let query2Ask:string =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ? AND
-  //   mileage = ? AND
-  //   city = ?`
-
-  let query2Ask:string =
-    `SELECT * FROM prices WHERE
-    prodYear = ? AND
-    mileage = ? AND
-    city = ?
-    ORDER BY fetchDate DESC
-    LIMIT 1`
-
-  // let query2Ask:string =
-  //   `SELECT * FROM offers WHERE
-  //   prodYear = ? AND
-  //   mileage = ? AND
-  //   fetchDate = ?`
-
-  let updateDateQuery:string = `UPDATE prices
-    SET lastSeen = CURDATE()
-    WHERE 
-      prodYear = ? AND
-      mileage = ? AND
-      city = ? AND
-      price = ?`
 
 function insert(inp:CarData):Promise<void> {
     // console.log(arguments);
@@ -71,7 +29,7 @@ function insert(inp:CarData):Promise<void> {
 
   // DATA DECONSTRUCTION
     let {prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate} = inp;
-    console.log(inp);
+    // console.log(inp);
 
   // DATES AND TIME OF INSERTS
     let dateNow0:Date = new Date();
@@ -80,7 +38,6 @@ function insert(inp:CarData):Promise<void> {
 
   // PROMISIFIED QUERY FUNCTION
     function queryFunction():Promise<void> {
-        console.log('executing query');
         function promise1() {return new Promise<void>(promiseCallb)}
         function promise2() {return Promise.reject('exams not saved')}
 
@@ -100,11 +57,12 @@ function insert(inp:CarData):Promise<void> {
       // for a given [prodYear, mileage, city] combination.
         rejectingFunc = rej 
         return connection.query(
-          query2Ask, 
+          queries.query2Ask, 
           [prodYear, mileage, city.slice(0,25)], 
           (error, results, fields) => {
             // If response comes without error, then check if exists only 1 entry
-              if (!error) { goCheckQuery(results) } 
+              console.log(inp);
+              if (!error) { process.stdout.write('1st check OK. '); goCheckQuery(results) } 
               else {
                 console.error(error); rej(error)
               }
@@ -114,63 +72,76 @@ function insert(inp:CarData):Promise<void> {
     }
 
     function goCheckQuery(results:QueryResult) {
-      console.log('1st check query executed with success');
-      console.log('existing entry: ', Object.values(results)[0])
-      console.log('Does exist one entry in DB?: ', Object.values(results).length/*[0]['COUNT(*)']*/ === 1)
-      // 1. If exists the entry, then
-      // 2. check prices. If prices are equal - update entry with new 'lastSeen' date.
-      // 3. If prices are not equal - add new entry in prices table.
-      // 4. If there is 0 entries existing, add entry in offers table, add new entry in prices table.
-        // 1.
-        if (Object.values(results).length/*[0]['COUNT(*)']*/ === 1) {
-            console.log('Are the fetchDates equal: ', Object.values(results)[0]['fetchDate'] == fetchDate);
-            console.log("DB's entry fetchDate: ", `'${Object.values(results)[0]['fetchDate']}'`, 'Scrapped fetchDate: ', `'${fetchDate}'`);
-            console.log('Price in DB: ', `'${Object.values(results)[0]['price']}', 'Scrapped price: ', '${price}'`);
-            console.log('Are the prices equal?: ', Object.values(results)[0]['price'] == price);
-          // 2. check if scrapped price equals price in db. If it does it overwrites lastSeen. 
-            if (Object.values(results)[0]['price'] == price) {console.log('lastSeen in DB: ', Object.values(results)[0]['lastSeen']); if1()}
-          // 3.
+      // console.log('existing entry: ', Object.values(results)[0])
+      let chcekIfExists = Object.values(results).length/*[0]['COUNT(*)']*/ === 1;
+      // console.log('Does exist one entry in DB?: ', chcekIfExists)
+      process.stdout.write(`Entry ${chcekIfExists ? 'exists. ' : 'does not exist. '}`)
+      // If exists the entry, then
+        // check prices. If prices are equal - update entry with new 'lastSeen' date.
+        // If prices are not equal - add new entry in prices table.
+      // If there is 0 entries existing, add new entry in prices table.
+        if (chcekIfExists) {
+            let ifFDatesEqual:boolean = Object.values(results)[0]['fetchDate'] == fetchDate
+            let ifPricesEqual:boolean = Object.values(results)[0]['price'] == price
+            // console.log('Are the fetchDates equal: ', ifFDatesEqual);
+            process.stdout.write(`Fetch dates are ${ifFDatesEqual ? '' : 'not'} equal. `)
+            // console.log("DB's entry fetchDate: ", `'${Object.values(results)[0]['fetchDate']}'`, 'Scrapped fetchDate: ', `'${fetchDate}'`);
+            // console.log('Price in DB: ', `'${Object.values(results)[0]['price']}', 'Scrapped price: ', '${price}'`);
+            process.stdout.write(`Prices are${ifPricesEqual ? '' : ' not'} equal. `)
+            // console.log('Are the prices equal?: ', Object.values(results)[0]['price'] == price);
+          // check if scrapped price equals price in db. If it does it overwrites lastSeen.
+          // Otherwise 
+            if (ifPricesEqual) if1()
             else else2();
         } else {
-          // 4.
-            connection.query(query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (err, res, f) => {
-              if (err) { 
-                console.log(err);
-                rejectingFunc(err) } 
-                else {
-                  console.log('Add query to offers executed with success');
-                  else2();
-                }
+          // Else,
+          // add new entry if existing entry's fetchDate is not equal to scrapped fetchDate.
+            connection.query(queries.query1, [0, prodYear, mileage, price, city, descr, offerDate, brand, model, fetchDate], (
+              err:QueryError|null,
+              res:ResultSetHeader,
+              f:FieldPacket[]
+            ) => {
+              if (err) { console.error(err); console.log(inp); rejectingFunc(err) } else {console.log('Add query to offers executed with success');
+                else2();
+              }
             });
         }
     }
 
     function if1() {
-      console.log('lastSeen should be overwritten now.');
-      connection.query(updateDateQuery, [prodYear, mileage, city, price], (error2, results2, fields2) => {
-        if (error2) { console.error(error2); rejectingFunc(error2) } 
+      process.stdout.write('Overwriting lastSeen. ');
+      connection.query(queries.updateDateQuery, [prodYear, mileage, city, price], (error2:QueryError|null, results2:ResultSetHeader, fields2) => {
+        let message:string;
+        if (error2) { console.error(error2); console.log(inp); rejectingFunc(error2) } 
         else {
-          console.log('Update query executed with success\n', results2);
+          if (results2.affectedRows === 1 && results2.changedRows === 1) {message = "Row has changed"}
+            else if (results2.affectedRows === 1 && results2.changedRows === 0) {message = "Row has not changed"}
+            else message = '';
+          console.log('Update query: Success. ', message);
         }
       })
     }
 
     function else2() {
-      console.log('New entry should be added now.');
-      connection.query(query2, [prodYear, mileage, city, fetchDate, price], (error, results, fields) => {
-        if (error) { console.log(error); rejectingFunc(error) } else {console.log('Add query executed with success');}
+      console.log('Adding new entry. ');
+      connection.query(queries.query2, [prodYear, mileage, city, fetchDate, price], (error:QueryError|null, results:ResultSetHeader, fields) => {
+        if (error) { 
+          console.error(error);
+          console.log(inp);
+          rejectingFunc(error) }
+        else {console.log('Add query: success. ')}
       })
     }
 
   // CATCHER
       return queryFunction().catch(err => {
         if (err.errno === 1062) {
-          console.log('duplcate occured - skipped');
+          console.log('Duplcate occured - skipped');
           console.dir(err, {depth:0})
           return
         }
         else {
-          console.log('not all data has been saved');
+          console.log('Not all data has been saved');
           console.dir(err, {depth: 1});
         }
       })

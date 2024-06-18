@@ -34,6 +34,6 @@ function connectToExistingInstance() {
 	})
 }
 
-connectToExistingInstance();
+// connectToExistingInstance();
 
 export default connectToExistingInstance

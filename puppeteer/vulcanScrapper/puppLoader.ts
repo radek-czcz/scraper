@@ -78,17 +78,19 @@ function loadPage(url:string):Promise<Page> {
 function loadPages(urls:string[]):Promise<Page[]> {
   console.log('loading');
   let pages:Promise<Page[]> = pu.pages();
-  // let going = pages.then((res) => res[0].goto(urls, {waitUntil: 'networkidle2'}))
   let tout = 0;
 
   function innFunc(page:Page, idx:number):Promise<void> {return new Promise<void>((resolve:Function) => {
-    setTimeout(() => page.goto(urls[idx], {waitUntil: 'networkidle2'}).then(() => resolve()), tout)
+    console.dir(page, {depth:0});
+    console.log(idx);
+    setTimeout(() => page.goto(urls[idx], {waitUntil: "domcontentloaded"}).then(() => resolve(), rej => console.log(rej)), tout)
     tout = tout + 5000;
   })}
   
-  let going:Promise<void | Promise<any>[]> = pages.then((res:Page[]) => res.map(innFunc))
+  let going:Promise<Promise<void>[]> = pages.then((res:Page[]) => res.map(innFunc))
+  let going2:Promise<void|void[]> = going.then((res:Promise<void>[]) => Promise.all(res))
   .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
-  return Promise.all([pages, going]).then(res => {console.log('pages opened'); return pages})
+  return Promise.all([pages, going2.then(res => res)]).then(res => {console.log('pages opened'); return pages})
 }
 
 function getPu(): Promise<Browser> {
@@ -174,7 +176,10 @@ function getBrowserFromParentProcess():Promise<Browser> {
 }
 
 function refreshPage():Promise<any> {
-  return getBrowserFromParentProcess().then((res:Browser) => res.pages()).then((res:Page[]) => res[0].reload({ waitUntil: 'domcontentloaded'/*'networkidle2'*/ }));
+  return getBrowserFromParentProcess()
+  .then((res:Browser) => res.pages())
+  .then((res:Page[]) => res.map((page:Page) => page.reload({ waitUntil: 'domcontentloaded'/*'networkidle2'*/ }))
+  .then((res:Promise<any>[]) => Promise.all(res));
 }
 
 // module.exports = { loadPuppeteer, loadPage, getPu, getPage, getExistingPage, getBrowserFromParentProcess };

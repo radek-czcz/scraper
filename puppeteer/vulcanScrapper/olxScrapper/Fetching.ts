@@ -75,7 +75,6 @@ export default function connectToExistingInstance() {
 				let resolver:any;
 
 				let promiseCounter = function() {
-					console.log('from counter');
 					counter + 1 === res.length ? resolver() : counter++;
 				}
 
@@ -83,7 +82,7 @@ export default function connectToExistingInstance() {
 					resolver = resolve;
 				})
 
-				for (let nth=0; nth<=res.length-1; nth++) {
+				for (let nth=0; nth<=10/*res.length-1*/; nth++) {
 					/*try {*/
 						writerDB(res[nth]).then(promiseCounter)
 						.catch(err => console.log('error in writing'))
