@@ -1,16 +1,27 @@
 import Hapi from '@hapi/hapi';
 import Inert from '@hapi/inert';
+import routes from './routesCars'
 
 let server;
 
 // DEFINICJA I KONFIGURACJA SERWERA HAPI
   const start = async () => {
     server = Hapi.server({
-      port:3000,
+      port:3091,
       host: /*'188.210.222.87'*/ 'localhost',
+      "routes": {
+        "cors": {
+          "origin": ["*"],
+          "headers": ["Accept", "Content-Type"],
+          "additionalHeaders": ["X-Requested-With"]
+        }
+      }
     });
 
-  // DEFINICJA ROUTE'ÓW    
+  // DEFINICJA ROUTE'ÓW  
+
+    // REGISTER ALL ROUTES
+    routes.forEach(route => server.route(route));  
 
     server.route({
         method: 'GET',

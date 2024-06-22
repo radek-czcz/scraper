@@ -178,7 +178,7 @@ function getBrowserFromParentProcess():Promise<Browser> {
 function refreshPage():Promise<any> {
   return getBrowserFromParentProcess()
   .then((res:Browser) => res.pages())
-  .then((res:Page[]) => res.map((page:Page) => page.reload({ waitUntil: 'domcontentloaded'/*'networkidle2'*/ }))
+  .then((res:Page[]) => res.map((page:Page) => page.reload({ waitUntil: 'domcontentloaded'/*'networkidle2'*/ })))
   .then((res:Promise<any>[]) => Promise.all(res));
 }
 
