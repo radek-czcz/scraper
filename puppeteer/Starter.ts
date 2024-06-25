@@ -1,9 +1,8 @@
 import { spawn, ChildProcess } from 'node:child_process';
-// import { loadPage, loadPuppeteer, getPage, attachFunc, getPu, getBrowserFromParentProcess } from './index'
-import attachFunc from '../ProcessListenersManager'
-import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from '../puppLoader'
-import {Browser, Page} from 'puppeteer'
-import {timingFunctions} from './index'
+import attachFunc from './vulcanScrapper/ProcessListenersManager';
+import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from './vulcanScrapper/puppLoader';
+import {Browser, Page} from 'puppeteer';
+import cookiesConfig from './CookiesConfig';
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -14,12 +13,8 @@ let page:Promise<Page>[];
 let childProcessWriteDataToDB;
 // urls fo olx pages
 	let arrUrl:string[] = [];
-	// avensis
-		// arrUrl.push('https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
-	// insignia		
-		// arrUrl.push('https://www.olx.pl/motoryzacja/samochody/opel/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
 	// media expert
-		arrUrl.push('https://www.mediaexpert.pl/agd/lodowki-i-zamrazarki/chlodziarki/whirlpool.electrolux/cena_1200.0?sort=price_asc&limit=50');
+		arrUrl.push('https://www.mediaexpert.pl/komputery-i-tablety/dyski-i-pamieci/pamieci-flash-pendrive/interfejs_usb-3-1?limit=15&sort=price_asc');
 
 // reaction to ctrl+c
 	process.on('SIGINT', function() {
@@ -44,7 +39,7 @@ function run() {
 	// set cookies on browser
 		let cookiesSet = tabs.then(() => {
 			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', ['../CookiesSetter.ts', 'path=./cookies.json'],{shell: true});
+			processToSetCookies = spawn('ts-node', [cookiesConfig.setterRelativePath, cookiesConfig.pathToCookies],{shell: true});
 			let name1 = 'Cookies setting';
 			attachFunc({
 				processObject: processToSetCookies,
@@ -69,16 +64,15 @@ function run() {
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
-		// getCookies.catch(err => {console.log(err); browser.disconnect()});
+		getCookies.catch(err => {console.log(err); browser.disconnect()});
 
 	// timing functions
-		goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
-		// goToPages.then((pages2:Page[]) => timingFunctions(0));
+		// goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
 }
 
 function saveCookies(res: void):void {
 		let processOfSavingCookies;
-		processOfSavingCookies = spawn('ts-node', ['../CookiesFetcherRunner.ts'], {shell: true})
+		processOfSavingCookies = spawn('ts-node', [cookiesConfig.fetcherRelativePath, 'cookiesPath='+cookiesConfig.pathToCookies], {shell: true})
 		let name1 = 'fetching cookies';
 		attachFunc({
 			processObject: processOfSavingCookies,

@@ -4,10 +4,10 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import net, {Server, Socket} from 'net';
 
-let pu: Browser;
-let exBr: Browser;
-let endpoint: string;
-let server: Server;
+let pu:Browser;
+let exBr:Browser;
+let endpoint:string;
+let server:Server;
 
 puppeteer.use(StealthPlugin());
 
@@ -21,10 +21,8 @@ function loadPuppeteer(headless:boolean): Promise<Browser> {
       //args: ['--no-sandbox', '--incognito']
   })
   .then((res:Browser) => {
-    console.dir(res, {depth: 0})
     pu = res;
     endpoint = pu.wsEndpoint();
-
     server = net.createServer(function(connection) {
       console.log('net.server says: client connected');
 
@@ -43,12 +41,9 @@ function loadPuppeteer(headless:boolean): Promise<Browser> {
       connection.write(endpoint);
       connection.pipe(connection);
     });
-
     server.listen(8088, function() { 
       console.log('server is listening');
     });
-
-    console.log('endpoint in loader: ', endpoint);
     return res;
   })
 }

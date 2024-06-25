@@ -1,12 +1,13 @@
 import { getBrowserFromParentProcess, getPage } from './puppLoader';
 import { writeFile } from 'node:fs/promises';
 import {Browser, Page} from 'puppeteer';
+import {getArg} from './ArgsOperator'
 
 function connectToExistingInstance() {
 	getBrowserFromParentProcess()
 	.then((brwsr:Browser) => {
 		let cookies:any[];
-		function fetchFunc1():Promise<void> {return writeFile('./cookies.json', JSON.stringify(cookies, null, 2))}
+		function fetchFunc1():Promise<void> {return writeFile(getArg('cookiesPath')/*'./cookies.json'*/, JSON.stringify(cookies, null, 2))}
 		function fetchFunc2():void {console.log(cookies)}
 
 		let pages:Promise<Page[]> = brwsr.pages()

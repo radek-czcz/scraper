@@ -20,7 +20,6 @@ function initialize():void {
 		return ob;
 	}
 	allArgs = argsOb();
-	// console.log('noInArrayOfTabs - operator: ', allArgs['noInArrayOfTabs']);
 }
 
 export function getArg(name:string):string {
