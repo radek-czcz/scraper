@@ -3,6 +3,9 @@ import attachFunc from './vulcanScrapper/ProcessListenersManager';
 import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from './vulcanScrapper/puppLoader';
 import {Browser, Page} from 'puppeteer';
 import cookiesConfig from './CookiesConfig';
+import {urlArr, ISitesAndCategories} from './categories'
+import scroll from './puppScroller'
+import {connectToExistingInstance as collectTheData} from './DataCollector'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -14,7 +17,9 @@ let childProcessWriteDataToDB;
 // urls fo olx pages
 	let arrUrl:string[] = [];
 	// media expert
-		arrUrl.push('https://www.mediaexpert.pl/komputery-i-tablety/dyski-i-pamieci/pamieci-flash-pendrive/interfejs_usb-3-1?limit=15&sort=price_asc');
+		console.log(urlArr);
+		// urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));
+		arrUrl.push(urlArr[2].url)
 
 // reaction to ctrl+c
 	process.on('SIGINT', function() {
@@ -54,20 +59,28 @@ function run() {
 			})
 		})
 
-
 	// go to desired page
 		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
 
-	// save cookies
-		let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
+	// save cookies 
+		// let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
-		getCookies.catch(err => {console.log(err); browser.disconnect()});
+		// getCookies.catch(err => {console.log(err); browser.disconnect()});
 
-	// timing functions
-		// goToPages.then((pages2:Page[]) => pages2.forEach((page:Page, idx:number) => timingFunctions(idx)));
+	// scroll-reduction function
+		// function scrollReduction(page1:Promise<void>, page2:Page):Promise<void> {
+		// 	return page1.then(() => scroll(page2))/*, Promise.resolve()*/;
+		// }
+
+	// scrolling (puppScroller)
+		// let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
+
+	// collect data (DataCollector)
+		// let dataCollect = scrollAll.then(() => collectTheData())
+
 }
 
 function saveCookies(res: void):void {
