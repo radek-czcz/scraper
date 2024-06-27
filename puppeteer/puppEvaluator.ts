@@ -6,9 +6,7 @@ let pricesAll:string[];
 
 async function main(inpPage:Page) {
 
-   let page:Promise<Page[]> = getPages();
-   return page.then(async (res:Page[]) => {
-      const dataExtract = await /*ppage.getPage()*//*res[0]*/inpPage.evaluate(() => {
+      const dataExtract = await inpPage.evaluate(() => {
 
          // SELECTORS' STRINGS
             var str:string[] = [
@@ -36,69 +34,78 @@ async function main(inpPage:Page) {
             .filter(inp => !inp.querySelector(filterString[1]));
 
          // MAPPED (TO PRODUCTS NAMES UNTRIMMED)
+            // function select(inp:Element):Element {
+            //    let elem:Element|null = inp.querySelector(str[2]); 
+            //    if (elem) return elem 
+            //    else throw "Empty selector"
+            // }
             function select(inp:Element):Element {
                let elem:Element|null = inp.querySelector(str[2]); 
-               if (elem) return elem 
-               else throw "Empty selector"
+               return elem!
             }
             const namesUntrimmed:(Element)[] = productBoxes.map(select);
 
          // TRIMMED PRODUCT'S NAMES
+            // function mapToText(element:Element):string {
+            //    let mappedText:string;
+            //    if (element && element.textContent) {
+            //       mappedText = element.textContent
+            //       return mappedText.trim()
+            //    } else throw "Empty textContent"
+            // }
             function mapToText(element:Element):string {
                let mappedText:string;
-               if (element && element.textContent) {
-                  mappedText = element.textContent
+                  mappedText = element!.textContent!
                   return mappedText.trim()
-               } else throw "Empty textContent"
             }
 
             const names:string[] = namesUntrimmed.map(mapToText);
             namesAll = names;
 
          // PRICE EXTRACT
-            const pricesSelection = productBoxes.map(function(inp) {
-               const promoPrice = inp.querySelector(str[4]);
+            // const pricesSelection:Element[] = productBoxes.map(function(inp:Element) {
+            //    const promoPrice:Element|null = inp.querySelector(str[4]);
+            //    // CHECK IF PROMO-PRICE
+            //    if (promoPrice) {
+            //       return promoPrice.querySelector('span.whole');
+            //    } else {
+            //       let select1:Element|null = inp.querySelector(str[3]);
+            //       if (select1) return select1
+            //       else throw "Price not found"
+            //    }
+            // });
+            const pricesSelection:Element[] = productBoxes.map(function(inp:Element) {
+               const promoPrice:Element|null = inp.querySelector(str[4]);
                // CHECK IF PROMO-PRICE
                if (promoPrice) {
-                  return promoPrice.querySelector('span.whole');
+                  return promoPrice.querySelector('span.whole')!;
                } else {
-                  return inp.querySelector(str[3]);
+                  let select1:Element = inp.querySelector(str[3])!;
+                  return select1;
                }
             });
 
          // GET DATE OF EXTRACT, CREATE ARRAY OF DATES
-            let date = new Date();
-            let dates = Array(pricesSelection.length).fill(date);
+            let date:Date = new Date();
+            let dates:string[] = Array(pricesSelection.length).fill(date);
 
          // PRICE PADDING AND NULL-CHECK (PRICE)
-            const pricesPadded = pricesSelection.map(function(inp) {
+            const pricesPadded:string[] = pricesSelection.map(function(inp:Element) {
                if (inp === null || inp.textContent === null)
                return "----";
-               else return inp.textContent?.replace(/[^0-9^.]/g,'')/*.padStart(4,' ')*/;
+               else return inp.textContent.replace(/[^0-9^.]/g,'')/*.padStart(4,' ')*/;
             });
             pricesAll = pricesPadded;
 
-         // TRANSFORM OUTPUT ARRAY
-            let newOutput = [];
-            names.forEach((item, i) => {
-               newOutput.push([item, pricesAll[i], dates[i]]);
-            });
-
-            // LOG AND RETURN
+         // LOG AND RETURN
             console.log([names, pricesPadded, dates]);
             return[names, pricesPadded, dates];
-
       });
 
       console.log('ending evaluate')
-      namesAll = dataExtract[0];
-      console.log('names are: ' + namesAll)
-      pricesAll = dataExtract[1];
-      console.log('prices are: ' + pricesAll)
       console.log(dataExtract);
       return dataExtract;
-   })
 }
 
 
-export {main, namesAll, pricesAll}
+export {main}

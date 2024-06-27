@@ -25,6 +25,7 @@ export function connectToExistingInstance():void {
 		let pathArg = argsOb().path
 
 		let pathToCookies = pathArg ? pathArg : './cookies.json'
+		console.log('pathc: ', pathToCookies);
 
 		let pages:Page[];
 		let cookies:any;

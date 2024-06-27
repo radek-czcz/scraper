@@ -19,22 +19,22 @@ function connectToExistingInstance() {
 		let pageUrl:string;
 
 	// connect the puppeteer to existing browser session or get the browser
-		let pages:Promise<Page[]> = getPu().then(res => {browser = res; return res.pages()});
-		// let pages:Promise<Page[]> = getBrowserFromParentProcess().then((res:Browser) => {browser = res; return res.pages()})
+		// let pages:Promise<Page[]> = getPu().then(res => {browser = res; return res.pages()});
+		let pages:Promise<Page[]> = getBrowserFromParentProcess().then((res:Browser) => {browser = res; return res.pages()})
 	
 	// get data
 		let dataGet:Promise<void> = pages.then((res:Page[]) => {
 			pageUrl = res[0].url();
-			return res.map(page => main(page))
+			return res.map((page:Page) => main(page))
 		})
 
 	// write data to DB
 	  	.then(res => {
 	  		// browser.disconnect();
 	  		console.log('site: ', urlParser(pageUrl).host);
-		    // res.map(data => 
-		    // 	data.then(data2 => pWriter(data2[0] as string, data2[1] as string, urlParser(pageUrl).host))
-		    // )
+		    res.map(data => 
+		    	data.then(data2 => pWriter(data2[0] as string[], data2[1] as string[], urlParser(pageUrl).host))
+		    )
 		})
 
 	// error catcher
@@ -45,6 +45,6 @@ function getBrowser() {
 	return browser;
 }
 
-// connectToExistingInstance();
+connectToExistingInstance();
 
 export {connectToExistingInstance};
