@@ -2,6 +2,7 @@ import { spawn, ChildProcess } from 'node:child_process';
 import attachFunc from './vulcanScrapper/ProcessListenersManager';
 import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from './vulcanScrapper/puppLoader';
 import {Browser, Page} from 'puppeteer';
+// import {ConfigForSeller} from './ConfigFiles/CookiesConfig'
 import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'
 import scroll from './puppScroller'
@@ -10,6 +11,8 @@ import {connectToExistingInstance as collectTheData} from './DataCollector'
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
 // 3. CLICK LOGIN BUTTON
+
+let config = cookiesConfig();
 
 let browser: Browser;
 let page:Promise<Page>[];
@@ -40,9 +43,10 @@ function run() {
 		let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
 
 	// set cookies on browser
-		let cookiesSet = tabs.then(() => {
+		let cookiesSet = tabs.then(async () => {
+			let config = await cookiesConfig();
 			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', [cookiesConfig.setterRelativePath, 'path='+cookiesConfig.pathToCookies],{shell: true});
+			processToSetCookies = spawn('ts-node', [config.setterRelativePath/*cookiesConfig().setterRelativePath, 'path='+cookiesConfig().pathToCookies*/, config.pathToCookies],{shell: true});
 			let name1 = 'Cookies setting';
 			attachFunc({
 				processObject: processToSetCookies,
@@ -82,17 +86,19 @@ function run() {
 }
 
 function saveCookies(res: void):void {
-	let processOfSavingCookies;
-	processOfSavingCookies = spawn('ts-node', [
-		// Relative path to fetcher's module's file
-		cookiesConfig.fetcherRelativePath, 
-		'cookiesPath='+cookiesConfig.pathToCookies
-	], {shell: true})
-	let name1 = 'fetching cookies';
-	attachFunc({
-		processObject: processOfSavingCookies,
-		name: name1,
-	})
+	config.then(conf => {
+		let processOfSavingCookies;
+		processOfSavingCookies = spawn('ts-node', [
+			// Relative path to fetcher's module's file
+			/*cookiesConfig()*/conf.fetcherRelativePath, 
+			'cookiesPath='+/*cookiesConfig()*/conf.pathToCookies
+		], {shell: true})
+		let name1 = 'fetching cookies';
+		attachFunc({
+			processObject: processOfSavingCookies,
+			name: name1,
+		})
+	});
 }
 
 async function getTabToOperateOn(res: Browser):Promise<Page> {
