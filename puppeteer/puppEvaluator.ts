@@ -2,7 +2,6 @@ import {getPages} from './vulcanScrapper/puppLoader'
 import {Browser, Page} from 'puppeteer'
 
 let namesAll:string[];
-let pricesAll:string[];
 
 async function main(inpPage:Page) {
 
@@ -95,7 +94,6 @@ async function main(inpPage:Page) {
                return "----";
                else return inp.textContent.replace(/[^0-9^.]/g,'')/*.padStart(4,' ')*/;
             });
-            pricesAll = pricesPadded;
 
          // LOG AND RETURN
             console.log([names, pricesPadded, dates]);

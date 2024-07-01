@@ -11,8 +11,6 @@ export function connectToExistingInstance():void {
 	getBrowserFromParentProcess()
 	.then(() => {
 
-		argv.forEach(inp => console.log(inp))
-
 		let argsOb:Function =  function():{} {
 			let ob:{[key: string]: string} = {}
 			argv.forEach((inp, index) => {
@@ -25,7 +23,6 @@ export function connectToExistingInstance():void {
 		let pathArg = argsOb().path
 
 		let pathToCookies = pathArg ? pathArg : './cookies.json'
-		console.log('pathc: ', pathToCookies);
 
 		let pages:Page[];
 		let cookies:any;
@@ -51,7 +48,14 @@ export function connectToExistingInstance():void {
 		let mapAndSet:Promise<void> = Promise.all([setC, cokkieF])
 	    .then(() => {
 	    	let ind:number;
-	    	return Promise.all(pages.map((page:Page, idx:number) => {ind = idx; return page.setCookie(...cookies)}))
+	    	return Promise.all(pages.map((page:Page, idx:number) => 
+	    		{
+	    			ind = idx;
+	    			let returned = page.setCookie(...cookies);
+	    			/*returned.then(() => console.log('cookie on page set'));*/
+	    			return returned
+	    		}
+	    	))
 	    	.then((res:void[]) => console.log(`cookies on all pages set`))
 		})
 	    .then(
