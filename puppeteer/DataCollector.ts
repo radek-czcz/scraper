@@ -45,6 +45,6 @@ function getBrowser() {
 	return browser;
 }
 
-connectToExistingInstance();
+// connectToExistingInstance();
 
 export {connectToExistingInstance};

@@ -81,7 +81,7 @@ function run() {
 		let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
 
 	// collect data (DataCollector)
-		// let dataCollect = scrollAll.then(() => collectTheData())
+		let dataCollect = scrollAll.then(() => collectTheData())
 
 }
 

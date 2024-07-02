@@ -16,13 +16,6 @@ function insert(names, prices, seller) {
       database: 'srv59554_mojeprodukty',
       user: 'srv59554_mojeprodukty',
       password: 'XasR1Mh&dcAq8G',
-
-      /*host:'localhost',
-      port:3306,
-      database:'store',
-      user:'root',
-      password:'asd2%yhfA'*/
-      
     })
 
   // SELLER NAME PARSING FROM DB
