@@ -11,7 +11,7 @@ async function main(inpPage:Page) {
             var str:string[] = [
                'div.list-items',
                'div.offer-box',
-               'a.is-animate.spark-link',
+               'a.is-animate.ui-link',
                'div.main-price.is-big span.whole',
                'div.price-with-code-emblem'
             ]
