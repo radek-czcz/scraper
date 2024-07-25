@@ -7,6 +7,7 @@ import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'
 import scroll from './puppScroller'
 import {connectToExistingInstance as collectTheData} from './DataCollector'
+import getBrowser from './BrowserGenerator';
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -16,10 +17,9 @@ let config = cookiesConfig/*()*/;
 
 let browser: Browser;
 let page:Promise<Page>[];
-let childProcessWriteDataToDB;
-// urls fo olx pages
+// urls to olx pages
 	let arrUrl:string[] = [];
-	urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));
+	urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));;
 	// arrUrl.push(urlArr[0].url)
 
 // reaction to ctrl+c
@@ -34,12 +34,13 @@ function run() {
 		let resolver:Function;
 		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 		
-	// or start new Browser
-		let brow1:Promise<Browser> = loadPuppeteer(false)
-		.then((res:Browser) => {browser = res; return browser})
+	// get existing or start new Browser
+		let brow1:Promise<Browser> = getBrowser(browser);
+		// let brow1:Promise<Browser> = loadPuppeteer(false)
+		// .then((res:Browser) => {browser = res; return browser})
 
 	// create new tab or take existing to operate on
-		function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => browser.newPage())};
+		function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => brow1.then((res:Browser) => res.newPage()))};
 		let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
 
 	// set cookies on browser
@@ -82,17 +83,18 @@ function run() {
 
 	// collect data (DataCollector)
 		let dataCollect = scrollAll.then(() => collectTheData())
-
 }
 
 function saveCookies(res: void):void {
 		let processOfSavingCookies;
+
 		processOfSavingCookies = spawn('ts-node', [
 			// Relative path to fetcher's module's file
 			/*cookiesConfig()*/config.fetcherRelativePath, 
 			'cookiesPath='+/*cookiesConfig()*/config.pathToCookies
 		], {shell: true})
 		let name1 = 'fetching cookies';
+
 		attachFunc({
 			processObject: processOfSavingCookies,
 			name: name1,

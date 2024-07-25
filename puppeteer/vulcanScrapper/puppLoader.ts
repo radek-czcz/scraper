@@ -44,6 +44,7 @@ function loadPuppeteer(headless:boolean): Promise<Browser> {
     server.listen(8088, function() { 
       console.log('server is listening');
     });
+
     return res;
   })
 }
@@ -155,6 +156,10 @@ function getBrowserFromParentProcess():Promise<Browser> {
     client.on('end', function() { 
       console.log('net.child says: disconnected from server');
     });
+
+    client.on('error', function() {
+      rejFunc();
+    })
   })
 
   // console.log('endpoint from getBrowserFromParentProcess(): ', endpoint)
