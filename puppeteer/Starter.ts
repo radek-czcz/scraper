@@ -7,7 +7,9 @@ import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'
 import scroll from './puppScroller'
 import {connectToExistingInstance as collectTheData} from './DataCollector'
-import getBrowser from './BrowserGenerator';
+// import getBrowser from './BrowserGenerator';
+import allTabs from './BrowserTab'
+import {setCookies} from './BrowserTab'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -19,7 +21,7 @@ let browser: Browser;
 let page:Promise<Page>[];
 // urls to olx pages
 	let arrUrl:string[] = [];
-	urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));;
+	urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));
 	// arrUrl.push(urlArr[0].url)
 
 // reaction to ctrl+c
@@ -35,32 +37,35 @@ function run() {
 		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 		
 	// get existing or start new Browser
-		let brow1:Promise<Browser> = getBrowser(browser);
+		// let brow1:Promise<Browser> = getBrowser(browser);
 		// let brow1:Promise<Browser> = loadPuppeteer(false)
 		// .then((res:Browser) => {browser = res; return browser})
 
 	// create new tab or take existing to operate on
-		function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => brow1.then((res:Browser) => res.newPage()))};
-		let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
+		// function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => brow1.then((res:Browser) => res.newPage()))};
+		// let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
+		let tabs = allTabs;
 
 	// set cookies on browser
-		let cookiesSet = tabs.then(async () => {
-			let config = await cookiesConfig/*()*/;
-			let processToSetCookies:ChildProcess;
-			processToSetCookies = spawn('ts-node', [config.setterRelativePath/*cookiesConfig().setterRelativePath, 'path='+cookiesConfig().pathToCookies*/, 'path='+config.pathToCookies],{shell: true});
-			let name1 = 'Cookies setting';
-			attachFunc({
-				processObject: processToSetCookies,
-				name: name1,
-				onData: function(data:string) {
-					if ( data.toString().includes('cookies set') ) {
-						console.log('resolving');
-						resolver();
-					}
-					console.log(`Process of ${name1} produced output:\n  ${data}`);
-				}
-			})
-		})
+		// let cookiesSet = tabs.then(async () => {
+		// 	let config = await cookiesConfig/*()*/;
+		// 	let processToSetCookies:ChildProcess;
+		// 	processToSetCookies = spawn('ts-node', [config.setterRelativePath/*cookiesConfig().setterRelativePath, 'path='+cookiesConfig().pathToCookies*/, 'path='+config.pathToCookies],{shell: true});
+		// 	let name1 = 'Cookies setting';
+		// 	attachFunc({
+		// 		processObject: processToSetCookies,
+		// 		name: name1,
+		// 		onData: function(data:string) {
+		// 			if ( data.toString().includes('cookies set') ) {
+		// 				console.log('resolving');
+		// 				resolver();
+		// 			}
+		// 			console.log(`Process of ${name1} produced output:\n  ${data}`);
+		// 		}
+		// 	})
+		// })
+
+		setCookies()
 
 	// go to desired page
 		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
