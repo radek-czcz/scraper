@@ -9,7 +9,7 @@ import scroll from './puppScroller'
 import {connectToExistingInstance as collectTheData} from './DataCollector'
 // import getBrowser from './BrowserGenerator';
 import allTabs from './BrowserTab'
-import {setCookies} from './BrowserTab'
+import {setCookies, saveCookies} from './BrowserTab'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -64,47 +64,46 @@ function run() {
 		// 		}
 		// 	})
 		// })
-
-		setCookies()
+		tabs.then(() => setCookies(resolver))
 
 	// go to desired page
 		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
 
 	// save cookies 
-		// let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
+		let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
 
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
-		// getCookies.catch(err => {console.log(err); browser.disconnect()});
+		goToPages.catch(err => {console.log(err); browser.disconnect()});
 
 	// scroll-reduction function
 		function scrollReduction(page1:Promise<void>, page2:Page):Promise<void> {
-			return page1.then(() => scroll(page2))/*, Promise.resolve()*/;
+			return page1.then(() => scroll(page2))
 		}
 
 	// scrolling (puppScroller)
-		let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
+		// let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
 
 	// collect data (DataCollector)
-		let dataCollect = scrollAll.then(() => collectTheData())
+		// let dataCollect = scrollAll.then(() => collectTheData())
 }
 
-function saveCookies(res: void):void {
-		let processOfSavingCookies;
+// function saveCookies(res: void):void {
+// 		let processOfSavingCookies;
 
-		processOfSavingCookies = spawn('ts-node', [
-			// Relative path to fetcher's module's file
-			/*cookiesConfig()*/config.fetcherRelativePath, 
-			'cookiesPath='+/*cookiesConfig()*/config.pathToCookies
-		], {shell: true})
-		let name1 = 'fetching cookies';
+// 		processOfSavingCookies = spawn('ts-node', [
+// 			// Relative path to fetcher's module's file
+// 			/*cookiesConfig()*/config.fetcherRelativePath, 
+// 			'cookiesPath='+/*cookiesConfig()*/config.pathToCookies
+// 		], {shell: true})
+// 		let name1 = 'fetching cookies';
 
-		attachFunc({
-			processObject: processOfSavingCookies,
-			name: name1,
-		})
-}
+// 		attachFunc({
+// 			processObject: processOfSavingCookies,
+// 			name: name1,
+// 		})
+// }
 
 async function getTabToOperateOn(res: Browser):Promise<Page> {
 	// console.log('Getting tab to operate');
