@@ -1,2 +1,5 @@
-import processResults from './ProcFunc1'
-export default processResults
+import joinWithCommas from './ProcFunc1'
+import logResult from './ProcFunc2'
+import arrayOfColNames from './ProcFunc3'
+
+export {joinWithCommas, logResult, arrayOfColNames}
