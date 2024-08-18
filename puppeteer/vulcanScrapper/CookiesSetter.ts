@@ -8,9 +8,8 @@ import { argv } from 'node:process';
 // 2. CLICK SUBMIT BUTTON
 export function connectToExistingInstance():void {
 
-	getBrowserFromParentProcess()
+	getBrowserFromParentProcess().catch((err:Error) => console.log(err))
 	.then(() => {
-
 		let argsOb:Function =  function():{} {
 			let ob:{[key: string]: string} = {}
 			argv.forEach((inp, index) => {

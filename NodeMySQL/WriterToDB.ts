@@ -1,25 +1,26 @@
-import dateToSqlFormat from '../dates/date.cjs';
-import urlArr from '../puppeteer/ConfigFiles/categories';
+import {dateToSqlFormat} from '../dates/date.cjs';
+import {urlArr} from '../puppeteer/ConfigFiles/categories';
 import getArrayOfColumnNamesToString from './DbReader/ColumnsReader';
 import connection from './Connection/connection2';
+import {Connection} from 'mysql2/promise';
 
-function insert(names, prices, seller) {
+export default function insert(names:string[], prices:string[], seller:string):void {
   // let arrayOfData = []
-  let query1 = 'INSERT INTO mojeprodukty '
-  let dateNow = dates.dateToSqlFormat(new Date());
+  let query1:string = 'INSERT INTO mojeprodukty '
+  let dateNow = dateToSqlFormat(new Date());
 
   // SELLER NAME PARSING FROM DB
     function query3() {
       return new Promise((reso, rej) => {
-        connection.query(
+        connection.then((conn:Connection) => conn.query(
           /*`SELECT sellerName FROM srv59554_mojeprodukty.sprzedawcy
           WHERE sellerWebUrl = `*/
           `SELECT sellerName FROM sprzedawcy
-          WHERE sellerWebUrl = ` + `'` + seller + `'`  + ' LIMIT 1', (err, res, f) => {
+          WHERE sellerWebUrl = ` + `'` + seller + `'`  + ' LIMIT 1'/*, (err:Error, res, f) => {
             if (err) {console.log('error by parsing seller name')};
             reso(res[0].sellerName);
-          }
-        )
+          }*/
+        ))
       })
     }
 
@@ -69,4 +70,4 @@ function insert(names, prices, seller) {
     })
 }
 
-module.exports = { insert, getArrayOfColumnNamesToString };
+export { getArrayOfColumnNamesToString };

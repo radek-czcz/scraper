@@ -100,8 +100,7 @@ function getArrayOfColumnNamesToString(inpName = 'mojeprodukty') {
       password: 'XXX',
     })*/
 
-    console.log('start columns');
-    const query1 =   'SHOW COLUMNS FROM ' + inpName;
+    const query1 = 'SHOW COLUMNS FROM ' + inpName;
     let queryRes;
 
     let queryForColumnsNames = new Promise((reject, resolve) => {

@@ -1,7 +1,7 @@
-const pWriter = require('../NodeMySQL/connection.cjs');
+import pWriter from '../NodeMySQL/WriterToDB';
 
-async function main(names, prices, seller):void {
-  pWriter.insert(names, prices, seller);
+async function main(names:string[], prices:string[], seller:string):Promise<void> {
+  pWriter(names, prices, seller);
 }
 
-module.exports = {main};
+export {main};

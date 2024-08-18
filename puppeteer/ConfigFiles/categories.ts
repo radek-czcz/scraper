@@ -2,13 +2,13 @@ import {seller} from './index'
 
 let urlArr = [
 
-    {url: 'https://www.mediaexpert.pl/foto-i-kamery/akcesoria-do-aparatow-i-kamer/karty-pamieci/kioxia/pojemnosc-gb_16.32.64?limit=10&sort=price_asc',
-    category: 'Karty pamięci',
-    seller: 'www.mediaexpert.pl'},
-
-    // {url: 'https://www.mediaexpert.pl/agd/lodowki-i-zamrazarki/chlodziarki/whirlpool.electrolux/cena_1200.0?sort=price_asc&limit=50',
-    // category: 'Lodówki',
+    // {url: 'https://www.mediaexpert.pl/foto-i-kamery/akcesoria-do-aparatow-i-kamer/karty-pamieci/kioxia/pojemnosc-gb_16.32.64?limit=10&sort=price_asc',
+    // category: 'Karty pamięci',
     // seller: 'www.mediaexpert.pl'},
+
+    {url: 'https://www.mediaexpert.pl/agd/lodowki-i-zamrazarki/chlodziarki/whirlpool.electrolux/cena_1200.0?sort=price_asc&limit=50',
+    category: 'Lodówki',
+    seller: 'www.mediaexpert.pl'},
 
     // {url: 'https://www.mediaexpert.pl/agd/zmywarki-i-akcesoria/zmywarki-60-cm/whirlpool.bosch.samsung.electrolux/pojemnosc-kpl_od-13-do-14/poziom-emisji-halasu-db_od-46-do-47.od-44-do-45.do-43/zuzycie-wody-na-cykl-w-programie-eko-l_do-9.od-9-1-do-11/cena_1000.0?limit=50&sort=price_asc',
     // category: 'Zmywarki',

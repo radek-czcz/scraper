@@ -45,6 +45,8 @@ function loadPuppeteer(headless:boolean): Promise<Browser> {
       console.log('server is listening');
     });
 
+    // server.close()
+
     return res;
   })
 }

@@ -2,12 +2,11 @@ import { spawn, ChildProcess } from 'node:child_process';
 import attachFunc from './vulcanScrapper/ProcessListenersManager';
 import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from './vulcanScrapper/puppLoader';
 import {Browser, Page} from 'puppeteer';
-// import {ConfigForSeller} from './ConfigFiles/CookiesConfig'
 import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'
 import scroll from './puppScroller'
 import {connectToExistingInstance as collectTheData} from './DataCollector'
-// import getBrowser from './BrowserGenerator';
+import getBrowser from './BrowserGenerator';
 import allTabs from './BrowserTab'
 import {setCookies, saveCookies} from './BrowserTab'
 
@@ -27,7 +26,8 @@ let page:Promise<Page>[];
 // reaction to ctrl+c
 	process.on('SIGINT', function() {
 	    console.log("Caught interrupt signal");
-	    browser.disconnect();
+	    allTabs.then((res:Page[]) => res[0].browser().disconnect())
+	    // browser.disconnect();
 	    process.exit(0);
 	});
 
@@ -64,6 +64,7 @@ function run() {
 		// 		}
 		// 	})
 		// })
+
 		tabs.then(() => setCookies(resolver))
 
 	// go to desired page
@@ -75,7 +76,7 @@ function run() {
 	// catcher
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
-		goToPages.catch(err => {console.log(err); browser.disconnect()});
+		// goToPages.catch(err => {console.log(err); browser.disconnect()});
 
 	// scroll-reduction function
 		function scrollReduction(page1:Promise<void>, page2:Page):Promise<void> {
@@ -83,47 +84,10 @@ function run() {
 		}
 
 	// scrolling (puppScroller)
-		// let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
+		let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
 
 	// collect data (DataCollector)
-		// let dataCollect = scrollAll.then(() => collectTheData())
-}
-
-// function saveCookies(res: void):void {
-// 		let processOfSavingCookies;
-
-// 		processOfSavingCookies = spawn('ts-node', [
-// 			// Relative path to fetcher's module's file
-// 			/*cookiesConfig()*/config.fetcherRelativePath, 
-// 			'cookiesPath='+/*cookiesConfig()*/config.pathToCookies
-// 		], {shell: true})
-// 		let name1 = 'fetching cookies';
-
-// 		attachFunc({
-// 			processObject: processOfSavingCookies,
-// 			name: name1,
-// 		})
-// }
-
-async function getTabToOperateOn(res: Browser):Promise<Page> {
-	// console.log('Getting tab to operate');
-	// let tabs:Page[] = await browser.pages();
-	// let tab:Page = tabs[tabs.length-1];
-	// let title:string = await tab.title();
-	// if (title === "") {
-	// 	console.log('Getting existing tab');
-	// 	page = Promise.resolve(tab)
-	// 	return page;
-	// } else {
-	// 	page = browser.newPage();
-	// 	page.then(() => {console.log('New tab created')});
-	// 	return page
-	// }
-
-	// take opened olx page
-		console.log('Getting tab to operate');
-		let tabs:Page[] = await browser.pages();
-		return Promise.resolve(tabs[tabs.length-1]);
+		let dataCollect = scrollAll.then(() => collectTheData())
 }
 
 run();

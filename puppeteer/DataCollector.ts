@@ -5,7 +5,7 @@ import {main} from './puppEvaluator';
 // const urlParser = require('url-parse');
 import urlParser from 'url-parse';
 // const pWriter = require('./puppWriterDB.cjs');
-import {main as pWriter} from './puppWriterDB.cjs'
+import {main as pWriter} from './puppWriterDB'
 import {Browser, Page} from 'puppeteer'
 
 // temp import
