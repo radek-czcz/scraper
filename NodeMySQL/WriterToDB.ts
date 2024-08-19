@@ -26,7 +26,7 @@ export default function insert(names:string[], prices:string[], seller:string):v
 
   // GET ARRAY OF COLUMN NAMES FROM DB
     getArrayOfColumnNamesToString()
-    .catch(err => {console.log('error by promiseArrayOfColNames' + err)
+    .catch(err => {console.log(`error by promiseArrayOfColNames \n` + err)
       return err;
     })
 
@@ -47,9 +47,10 @@ export default function insert(names:string[], prices:string[], seller:string):v
         // console.log(arrayOfData);
         for (var nth = 0; nth < names.length; nth++) {
           // console.log(parseFloat(prices[nth]));
-          connection.query(query2, 
+          connection.then((conn:Connection) => conn.query(
+          query2, 
             [names[nth], prices[nth], resu, urlArr[0].category/*"Pendrive"*/, ,  dateNow],
-            (err, res, fields) => {
+            /*(err, res, fields) => {
               if (err) {console.log('error by insert');
                 switch (err.code) {
                   case 'ER_DUP_ENTRY': {
@@ -63,8 +64,8 @@ export default function insert(names:string[], prices:string[], seller:string):v
                 console.dir('    ', names[nth]);
               }
               connection.end(() => console.log('connection ended'));
-            } 
-          );
+            } */
+          ));
         }
       })
     })
