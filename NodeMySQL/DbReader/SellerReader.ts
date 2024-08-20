@@ -4,16 +4,12 @@ import getQuery from './QueriesStrings/SellerNameQueryString'
 import {QuerySender2} from './QuerySender'
 import {logResult as processResult} from './ProcessFunction'
 
-let seller = 'www.mediaexpert.pl'
-
 // SELLER NAME QUERYING FROM DB
-export default function readSellerName():Promise<string> {
-	let sender:QuerySender2 = new QuerySender2(getQuery())
-	const query:Promise<[any, FieldPacket[]]> = connection.then(sender.sendQuery());
-	const myProcess:Promise<string> = query.then(processResult);
-	myProcess.then((res:string) => {console.log(res); closeConnection()});
-	return myProcess;
-}
-
-readSellerName()
+	export default function readSellerName():Promise<string> {
+		let sender:QuerySender2 = new QuerySender2(getQuery())
+		const query:Promise<[any, FieldPacket[]]> = connection.then(sender.sendQuery());
+		const myProcess:Promise<string> = query.then(processResult);
+		myProcess.then((res:string) => {console.log(res); closeConnection()});
+		return myProcess;
+	}
 

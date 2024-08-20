@@ -31,7 +31,6 @@ function connectToExistingInstance() {
 	// write data to DB
 	  	.then(res => {
 	  		// browser.disconnect();
-	  		console.log('site: ', urlParser(pageUrl).host);
 		    res.map(data => 
 		    	data.then(data2 => pWriter(data2[0] as string[], data2[1] as string[], urlParser(pageUrl).host))
 		    )

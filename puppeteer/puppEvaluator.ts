@@ -96,12 +96,9 @@ async function main(inpPage:Page) {
             });
 
          // LOG AND RETURN
-            console.log([names, pricesPadded, dates]);
             return[names, pricesPadded, dates];
       });
 
-      console.log('ending evaluate')
-      console.log(dataExtract);
       return dataExtract;
 }
 
