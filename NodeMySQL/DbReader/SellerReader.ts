@@ -9,7 +9,6 @@ import {logResult as processResult} from './ProcessFunction'
 		let sender:QuerySender2 = new QuerySender2(getQuery())
 		const query:Promise<[any, FieldPacket[]]> = connection.then(sender.sendQuery());
 		const myProcess:Promise<string> = query.then(processResult);
-		myProcess.then((res:string) => {console.log(res); closeConnection()});
 		return myProcess;
 	}
 

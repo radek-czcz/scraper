@@ -5,7 +5,7 @@ import getQuery from './QueriesStrings/ColumnsQueryFunction'
 import sendQuery from './QuerySender'
 import {QuerySender2} from './QuerySender'
 
-export default function main(tableName:string = 'mojeprodukty') {
+export default function main(tableName:string = 'mojeprodukty'):Promise<string> {
   let sender:QuerySender2 = new QuerySender2(getQuery())
   const query:Promise<[any, FieldPacket[]]> = connection.then(sender.sendQuery());
   const myProcess:Promise<string> = query.then(processResults);

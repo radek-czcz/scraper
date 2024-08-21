@@ -1,4 +1,4 @@
-import {dateToSqlFormat} from '../dates/date.cjs';
+import {dateToSqlFormat} from '../dates/date';
 import {urlArr} from '../puppeteer/ConfigFiles/categories';
 import getArrayOfColumnNamesToString from './DbReader/ColumnsReader';
 import connection from './Connection/connection2';
@@ -20,16 +20,19 @@ export default function insert(names:string[], prices:string[], seller:string):v
     .then(res => {
       let query2 = query1 + res;
 
-    // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
-      getSeller().then((seller1:string) => {
-        for (let nth:number = 0; nth < names.length; nth++) {
-          connection.then((conn:Connection) => {
-            return conn.query(query2, 
-              [names[nth], prices[nth], seller1, urlArr[0].category,, dateNow],
-          )})
-          .then(() => console.log('inserted: ', names[nth]), (err:QueryError) => console.log(`error occured, "${names[nth].toUpperCase()}" not inserted`));
-        }
-      })
+      // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
+        getSeller().then((seller1:string) => {
+          for (let nth:number = 0; nth < names.length; nth++) {
+            connection.then((conn:Connection) => {
+              return conn.query(query2, 
+                [names[nth], prices[nth], seller1, urlArr[0].category,, dateNow],
+            )})
+            .then(
+              () => console.log('inserted: ', names[nth]),
+              (err:QueryError) => console.log(`error occured, "${names[nth].toUpperCase()}" not inserted`+`\n`+err)
+            );
+          }
+        })
     })
 }
 
