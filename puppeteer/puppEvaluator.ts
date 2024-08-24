@@ -3,9 +3,9 @@ import {Browser, Page} from 'puppeteer'
 
 let namesAll:string[];
 
-async function main(inpPage:Page) {
+function main(inpPage:Page):Promise<[string[], string[], string[]]> {
 
-      const dataExtract = await inpPage.evaluate(() => {
+      return inpPage.evaluate(() => {
 
          // SELECTORS' STRINGS
             var str:string[] = [
@@ -33,11 +33,6 @@ async function main(inpPage:Page) {
             .filter(inp => !inp.querySelector(filterString[1]));
 
          // MAPPED (TO PRODUCTS NAMES UNTRIMMED)
-            // function select(inp:Element):Element {
-            //    let elem:Element|null = inp.querySelector(str[2]); 
-            //    if (elem) return elem 
-            //    else throw "Empty selector"
-            // }
             function select(inp:Element):Element {
                let elem:Element|null = inp.querySelector(str[2]); 
                return elem!
@@ -45,13 +40,6 @@ async function main(inpPage:Page) {
             const namesUntrimmed:(Element)[] = productBoxes.map(select);
 
          // TRIMMED PRODUCT'S NAMES
-            // function mapToText(element:Element):string {
-            //    let mappedText:string;
-            //    if (element && element.textContent) {
-            //       mappedText = element.textContent
-            //       return mappedText.trim()
-            //    } else throw "Empty textContent"
-            // }
             function mapToText(element:Element):string {
                let mappedText:string;
                   mappedText = element!.textContent!
@@ -62,17 +50,6 @@ async function main(inpPage:Page) {
             namesAll = names;
 
          // PRICE EXTRACT
-            // const pricesSelection:Element[] = productBoxes.map(function(inp:Element) {
-            //    const promoPrice:Element|null = inp.querySelector(str[4]);
-            //    // CHECK IF PROMO-PRICE
-            //    if (promoPrice) {
-            //       return promoPrice.querySelector('span.whole');
-            //    } else {
-            //       let select1:Element|null = inp.querySelector(str[3]);
-            //       if (select1) return select1
-            //       else throw "Price not found"
-            //    }
-            // });
             const pricesSelection:Element[] = productBoxes.map(function(inp:Element) {
                const promoPrice:Element|null = inp.querySelector(str[4]);
                // CHECK IF PROMO-PRICE
@@ -96,11 +73,10 @@ async function main(inpPage:Page) {
             });
 
          // LOG AND RETURN
-            return[names, pricesPadded, dates];
+            let retVal:[string[], string[], string[]] = [names, pricesPadded, dates];
+            return retVal;
+            // return [names, pricesPadded, dates];
       });
-
-      return dataExtract;
 }
-
 
 export {main}

@@ -1,29 +1,27 @@
-import { spawn, ChildProcess } from 'node:child_process';
-import attachFunc from './vulcanScrapper/ProcessListenersManager';
-import {loadPage, loadPuppeteer, getPage, getPu, getBrowserFromParentProcess, loadPages} from './vulcanScrapper/puppLoader';
+import {loadPage, /*loadPuppeteer,*/ loadPages} from './vulcanScrapper/puppLoader';
 import {Browser, Page} from 'puppeteer';
 import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'
 import scroll from './puppScroller'
 import {connectToExistingInstance as collectTheData} from './DataCollector'
-import getBrowser from './BrowserGenerator';
 import allTabs from './BrowserTab'
 import {setCookies, saveCookies} from './BrowserTab'
+// import getBrowser from './BrowserGenerator';
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
 // 3. CLICK LOGIN BUTTON
 
-let config = cookiesConfig/*()*/;
+let config = cookiesConfig;
 
 let browser: Browser;
 let page:Promise<Page>[];
-// urls to olx pages
+// URLS TO OLX PAGES
 	let arrUrl:string[] = [];
 	urlArr.forEach((inp:ISitesAndCategories) => arrUrl.push(inp.url));
 	// arrUrl.push(urlArr[0].url)
 
-// reaction to ctrl+c
+// REACTION TO CTRL+C
 	process.on('SIGINT', function() {
 	    console.log("Caught interrupt signal");
 	    allTabs.then((res:Page[]) => res[0].browser().disconnect())
@@ -32,61 +30,43 @@ let page:Promise<Page>[];
 	});
 
 function run() {
-	// some variables initializations
+	// SOME VARIABLES INITIALIZATIONS
 		let resolver:Function;
 		let cookiesPromise: Promise<void> = new Promise(res => {resolver = res});
 		
-	// get existing or start new Browser
+	// GET EXISTING OR START NEW BROWSER
 		// let brow1:Promise<Browser> = getBrowser(browser);
 		// let brow1:Promise<Browser> = loadPuppeteer(false)
 		// .then((res:Browser) => {browser = res; return browser})
 
-	// create new tab or take existing to operate on
+	// CREATE NEW TAB OR TAKE EXISTING TO OPERATE ON
 		// function newTabs():Promise<Page>[] {return arrUrl.slice(0, arrUrl.length - 1).map((url:string) => brow1.then((res:Browser) => res.newPage()))};
 		// let tabs:Promise<Page[]> = brow1.then(() => Promise.all([...newTabs()]))
 		let tabs = allTabs;
 
-	// set cookies on browser
-		// let cookiesSet = tabs.then(async () => {
-		// 	let config = await cookiesConfig/*()*/;
-		// 	let processToSetCookies:ChildProcess;
-		// 	processToSetCookies = spawn('ts-node', [config.setterRelativePath/*cookiesConfig().setterRelativePath, 'path='+cookiesConfig().pathToCookies*/, 'path='+config.pathToCookies],{shell: true});
-		// 	let name1 = 'Cookies setting';
-		// 	attachFunc({
-		// 		processObject: processToSetCookies,
-		// 		name: name1,
-		// 		onData: function(data:string) {
-		// 			if ( data.toString().includes('cookies set') ) {
-		// 				console.log('resolving');
-		// 				resolver();
-		// 			}
-		// 			console.log(`Process of ${name1} produced output:\n  ${data}`);
-		// 		}
-		// 	})
-		// })
-
+	// SET COOKIES ON BROWSER
 		tabs.then(() => setCookies(resolver))
 
-	// go to desired page
+	// GO TO DESIRED PAGE
 		let goToPages:Promise<Page[]> = cookiesPromise.then(() => loadPages(arrUrl))
 
-	// save cookies 
+	// SAVE COOKIES 
 		let getCookies:Promise<void> = goToPages.then(() => {setTimeout(() => saveCookies(), 10000)})
 
-	// catcher
+	// CATCHER
 		// .then(res => setTimeout(() => res.browser().disconnect(), 10))
 		// tab1.catch(err => {console.log(err); browser.disconnect()});
 		// goToPages.catch(err => {console.log(err); browser.disconnect()});
 
-	// scroll-reduction function
+	// SCROLL-REDUCTION FUNCTION
 		function scrollReduction(page1:Promise<void>, page2:Page):Promise<void> {
 			return page1.then(() => scroll(page2))
 		}
 
-	// scrolling (puppScroller)
+	// SCROLLING (PUPPSCROLLER)
 		let scrollAll:Promise<void> = goToPages.then((pages2:Page[]) => pages2.reduce(scrollReduction, Promise.resolve()));
 
-	// collect data (DataCollector)
+	// COLLECT DATA (DATACOLLECTOR)
 		let dataCollect = scrollAll.then(() => collectTheData())
 }
 

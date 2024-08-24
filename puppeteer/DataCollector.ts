@@ -1,46 +1,42 @@
-// const pLoader = require('./puppLoader.cjs');
 import {getPu} from './vulcanScrapper/puppLoader';
-// const pEvaluator = require('./puppEvaluator.cjs');
 import {main} from './puppEvaluator';
-// const urlParser = require('url-parse');
 import urlParser from 'url-parse';
-// const pWriter = require('./puppWriterDB.cjs');
 import {main as pWriter} from './puppWriterDB'
 import {Browser, Page} from 'puppeteer'
 
-// temp import
+// TEMP IMPORT
 	import { getBrowserFromParentProcess } from './vulcanScrapper/olxScrapper/index';
 
 let browser:Browser;
 
-function connectToExistingInstance() {
+function connectToExistingInstance():Promise<void> {
 
-	// some values initializations
+	// SOME VALUES INITIALIZATIONS
 		let pageUrl:string;
 
-	// connect the puppeteer to existing browser session or get the browser
+	// CONNECT THE PUPPETEER TO EXISTING BROWSER SESSION OR GET THE BROWSER
 		// let pages:Promise<Page[]> = getPu().then(res => {browser = res; return res.pages()});
 		let pages:Promise<Page[]> = getBrowserFromParentProcess().then((res:Browser) => {browser = res; return res.pages()})
 	
-	// get data
+	// GET DATA
 		let dataGet:Promise<void> = pages.then((res:Page[]) => {
 			pageUrl = res[0].url();
 			return res.map((page:Page) => main(page))
 		})
 
-	// write data to DB
-	  	.then(res => {
+	// WRITE DATA TO DB
+	  	.then((res:Promise<[string[], string[], string[]]>[]) => {
 	  		// browser.disconnect();
-		    res.map(data => 
-		    	data.then(data2 => pWriter(data2[0] as string[], data2[1] as string[], urlParser(pageUrl).host))
+		    res.map((data:Promise<[string[], string[], string[]]>)=> 
+		    	data.then((data2:[string[], string[], string[]]) => pWriter(data2[0] as string[], data2[1] as string[], urlParser(pageUrl).host))
 		    )
 		})
 
-	// error catcher
+	// ERROR CATCHER
 		.catch(err => console.log(err));
 }
 
-function getBrowser() {
+function getBrowser():Browser {
 	return browser;
 }
 

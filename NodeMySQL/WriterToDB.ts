@@ -8,7 +8,7 @@ import getSeller from './DbReader/SellerReader';
 export default function insert(names:string[], prices:string[], seller:string):void {
 
   let query1:string = 'INSERT INTO mojeprodukty '
-  let dateNow = dateToSqlFormat(new Date());
+  let dateNow:string = dateToSqlFormat(new Date());
 
   // GET ARRAY OF COLUMN NAMES FROM DB
     getArrayOfColumnNamesToString()
@@ -17,8 +17,8 @@ export default function insert(names:string[], prices:string[], seller:string):v
     })
 
   // CREATE DB'S QUERY TEXT THEN INSERT
-    .then(res => {
-      let query2 = query1 + res;
+    .then((res:string) => {
+      let query2:string = query1 + res;
 
       // TRANSFORM ARRAY OF QUERIED INPUTS AND INSERT INTO DB
         getSeller().then((seller1:string) => {
