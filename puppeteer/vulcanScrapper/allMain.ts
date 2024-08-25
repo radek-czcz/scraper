@@ -75,32 +75,33 @@ function clickLogin():Promise<void> {
 	// 	);
 	// 	return selector1.click('a.loginButtonDziennikVulcan');
 	// })
-	let handle:Promise<ElementHandle<any>> = page.then((res:Page) => {
+	let handle:Promise<ElementHandle<any>|null> = page.then((res:Page) => {
 		console.log('waiting for selector');
 		let selector1:Promise<ElementHandle<any>|null> = res.waitForSelector(
 			loginButtonSelector,
 			{timeout: 5000}
 		);
 
-		return selector1.then((res:ElementHandle<any>|null) => res ? res : 
-			throw "Selector for click not found"
-		)
+		return selector1;
+
+		// return selector1.then((res:ElementHandle<any>|null) => res ? res : 
+		// 	throw "Selector for click not found"
 	})
 
-	return handle.then((res:ElementHandle<any>) => 
-		res.click('a.loginButtonDziennikVulcan')
+	return handle.then((res:ElementHandle<any>|null) => 
+		res ? res.click(/*'a.loginButtonDziennikVulcan'*/) : throw "selector not found"
 	)
 }
 
-function goToPage(res:Array<void>):Page {
+function goToPage(res:Array<void>):Promise<Page> {
 	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
 }
 
-function logOrFetchData(res):Promise<Promise<void>> {
+function logOrFetchData(res:Page[]):Promise<Promise<void>> {
 	let page1:Page = res[0];
 	let titleOfPAge:Promise<string> = page1.title();
 
-	return titleOfPAge.then(async (res, rej) => {
+	return titleOfPAge.then(async (res:string) => {
 		console.log(res.toLowerCase());
 		switch (res.toLowerCase()) {
 			case 'dziennik vulcan':
@@ -119,7 +120,7 @@ function logOrFetchData(res):Promise<Promise<void>> {
 }
 
 function writeLoginAndPassword() {
-	let resolver;
+	let resolver:Function;
 	let loginPromise = new Promise(res => {resolver = res});
 	let processToSignIn;
 	processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
