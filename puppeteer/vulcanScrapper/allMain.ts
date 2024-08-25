@@ -1,4 +1,4 @@
-import { loadPuppeteer, loadPage } from './puppLoader.js';
+import { loadPuppeteer, loadPage } from '../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
 import { spawn, ChildProcess } from 'child_process';
 import getTime from './RandomTimeInterval.js'
 import attachFunc from './ProcessListenersManager.js'
@@ -65,15 +65,31 @@ function loadBrowserAndPage() {
 	});
 }
 
-function clickLogin():Promise<Promise<void>> {
-	return page.then(async (res:Page) => {
-		console.log('waiting for selector')
-		let selector1:ElementHandle<any>|null = await res/*[0]*/.waitForSelector(
+// function clickLogin():Promise<Promise<void>> {
+function clickLogin():Promise<void> {
+	// return page.then(async (res:Page) => {
+	// 	console.log('waiting for selector')
+	// 	let selector1:ElementHandle<any>|null = await res/*[0]*/.waitForSelector(
+	// 		loginButtonSelector,
+	// 		{timeout: 5000}
+	// 	);
+	// 	return selector1.click('a.loginButtonDziennikVulcan');
+	// })
+	let handle:Promise<ElementHandle<any>> = page.then((res:Page) => {
+		console.log('waiting for selector');
+		let selector1:Promise<ElementHandle<any>|null> = res.waitForSelector(
 			loginButtonSelector,
 			{timeout: 5000}
 		);
-		return selector1.click('a.loginButtonDziennikVulcan');
+
+		return selector1.then((res:ElementHandle<any>|null) => res ? res : 
+			throw "Selector for click not found"
+		)
 	})
+
+	return handle.then((res:ElementHandle<any>) => 
+		res.click('a.loginButtonDziennikVulcan')
+	)
 }
 
 function goToPage(res:Array<void>):Page {

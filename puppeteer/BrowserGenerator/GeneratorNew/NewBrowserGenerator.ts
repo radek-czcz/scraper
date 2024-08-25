@@ -1,4 +1,4 @@
-import {loadPuppeteer} from '../../vulcanScrapper/puppLoader';
+import {loadPuppeteer} from '../PuppeteerBrowserOperations/puppLoader';
 import {Browser} from 'puppeteer'
 
 export default function newBrowser(browserHolder:Browser|undefined):Promise<Browser> {

@@ -1,4 +1,4 @@
-import {getBrowserFromParentProcess} from '../../vulcanScrapper/puppLoader';
+import {getBrowserFromParentProcess} from '../PuppeteerBrowserOperations/puppLoader';
 import {Browser} from 'puppeteer'
 
 export default function getBrowserFromAnotherProcess(browserHolder:Browser|undefined):Promise<Browser> {

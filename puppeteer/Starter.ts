@@ -1,4 +1,4 @@
-import {loadPage, /*loadPuppeteer,*/ loadPages} from './vulcanScrapper/puppLoader';
+import {loadPage, /*loadPuppeteer,*/ loadPages} from './puppLoader';
 import {Browser, Page} from 'puppeteer';
 import cookiesConfig from './ConfigFiles/CookiesConfig';
 import {urlArr, ISitesAndCategories} from './ConfigFiles/categories'

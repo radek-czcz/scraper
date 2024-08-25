@@ -75,7 +75,6 @@ function main(inpPage:Page):Promise<[string[], string[], string[]]> {
          // LOG AND RETURN
             let retVal:[string[], string[], string[]] = [names, pricesPadded, dates];
             return retVal;
-            // return [names, pricesPadded, dates];
       });
 }
 
