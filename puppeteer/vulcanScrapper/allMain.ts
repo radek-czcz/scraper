@@ -51,7 +51,7 @@ function loadBrowserAndPage() {
 	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
 	.catch((err:Error) => {console.log(err); throw err})
 
-	let logging:Promise<Promise<void>> = page.then(logOrFetchData);
+	let logging:Promise<void> = page.then(logOrFetchData);
 
 	let gettingCookies:Promise<void> = logging.then(res => {
 		// if (res === 'continue after login') {
@@ -97,8 +97,9 @@ function goToPage(res:Array<void>):Promise<Page> {
 	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
 }
 
-function logOrFetchData(res:Page[]):Promise<Promise<void>> {
-	let page1:Page = res[0];
+function logOrFetchData(res:Page):Promise<void> {
+	// let page1:Page = res[0];
+	let page1:Page = res
 	let titleOfPAge:Promise<string> = page1.title();
 
 	return titleOfPAge.then(async (res:string) => {
@@ -119,16 +120,16 @@ function logOrFetchData(res:Page[]):Promise<Promise<void>> {
 	})
 }
 
-function writeLoginAndPassword() {
+function writeLoginAndPassword():Promise<void> {
 	let resolver:Function;
-	let loginPromise = new Promise(res => {resolver = res});
+	let loginPromise:Promise<void> = new Promise(res => {resolver = res});
 	let processToSignIn;
 	processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
 	let name1 = 'signing in';
 	attachFunc({
 		processObject: processToSignIn,
 		name: name1,
-		onData: function(data) {
+		onData: function(data:string) {
 			if ( data.toString() === 'singning in was successful' ) {
 				console.log(`Process of ${name1} produced output:\n  ${data}`)
 				resolver('continue after login');
@@ -155,7 +156,7 @@ function fetchData() {
 		attachFunc({
 			processObject: processOfFetchAndWrite,
 			name: name1,
-			onData: function(data) {
+			onData: function(data:string) {
 				if (data === "Error seen in test4:  user must log in again") {
 					clickLogin()
 					.then(writeLoginAndPassword)
