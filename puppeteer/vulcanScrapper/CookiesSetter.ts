@@ -1,8 +1,10 @@
 import { getBrowserFromParentProcess, getPages } from './puppLoader';
 import fs from 'fs';
-import {Browser, Page} from 'puppeteer';
+import {Browser, Page, JSONArray} from 'puppeteer';
 // import process from 'node:process';
 import { argv } from 'node:process';
+import { writeFile, readFile } from 'node:fs/promises';
+
 
 // 1. TYPE IN LOGIN AND PASSWORD
 // 2. CLICK SUBMIT BUTTON
@@ -10,6 +12,29 @@ export function connectToExistingInstance():void {
 
 	getBrowserFromParentProcess().catch((err:Error) => console.log(err))
 	.then(() => {
+
+		function getLocalStorage():Promise<JSONArray> {
+			const localStorageString:Promise<Buffer> = readFile("./local.json");
+			return localStorageString.then((res:Buffer) => JSON.parse(res.toString()));
+		}
+
+		function getSessionStorage():Promise<JSONArray> {
+			const sessStorageString:Promise<Buffer> = readFile("./session.json");
+			return sessStorageString.then((res:Buffer) => JSON.parse(res.toString()));
+		}
+
+		let sessionDataSet = Promise.all([getLocalStorage(), getSessionStorage()]).then((sessionData:[JSONArray, JSONArray]) => getPages().then((tabs:Page[]) => tabs[0].evaluate(
+			(sData) => {
+				console.log(sData);
+				for (const [key, value] of Object.entries(sData[1])) {
+					sessionStorage[key] = value;
+				}
+				for (const [key, value] of Object.entries(sData[0])) {
+					localStorage[key] = value;
+				}
+			}, sessionData))
+		)
+
 		let argsOb:Function =  function():{} {
 			let ob:{[key: string]: string} = {}
 			argv.forEach((inp, index) => {
@@ -44,18 +69,20 @@ export function connectToExistingInstance():void {
 
 		let setC:Promise<void> = pagePromise.then((res:Page[]) => {pages = res})
 
-		let mapAndSet:Promise<void> = Promise.all([setC, cokkieF])
+		let mapAndSet:Promise<void> = Promise.all([setC, cokkieF, sessionDataSet])
 	    .then(() => {
 	    	let ind:number;
 	    	return Promise.all(pages.map((page:Page, idx:number) => 
 	    		{
 	    			ind = idx;
+	    			console.log(cookies)
 	    			let returned = page.setCookie(...cookies);
+	    			returned.then(() => console.log('cookies on page 0 set'), () => console.log('error coo'))
 	    			/*returned.then(() => console.log('cookie on page set'));*/
 	    			return returned
 	    		}
 	    	))
-	    	.then((res:void[]) => console.log(`cookies on all pages set`))
+	    	.then((res:void[]) => {console.log(`cookies on all pages set`)/*; pages[0].cookies().then(res11 => console.log(res11));*/})
 		})
 	    .then(
 	    	(res:void) => {/*console.log('cookies have been set');*/ process.stdout.write('cookies set'); pages[0].browser().disconnect()},

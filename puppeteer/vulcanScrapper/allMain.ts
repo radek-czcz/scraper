@@ -1,9 +1,12 @@
 import { loadPuppeteer, loadPage } from '../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
 import { spawn, ChildProcess } from 'child_process';
 import getTime from './RandomTimeInterval.js'
-import attachFunc from './ProcessListenersManager.js'
+import attachFunc from './ProcessListenersManager'
 import {Browser, Page, ElementHandle} from 'puppeteer'
 import process from 'node:process'
+// import { getShot } from './Captcha/ScreenshotForCaptcha'
+
+import {setCookies, saveCookies as saveCookies2, config} from './config'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -11,7 +14,7 @@ import process from 'node:process'
 
 let browser: Promise<Browser>;
 let page:Promise<Page>;
-const loginButtonSelector:string = 'a.loginButtonDziennikVulcan';
+const loginButtonSelector:string = 'input#Login';
 let processOfFetchAndWrite:typeof process
 
 process.stdin.on('data', data => {
@@ -32,37 +35,39 @@ function loadBrowserAndPage() {
 	let resolver:Function;
 	let cookiesPromise:Promise<void> = new Promise(res => {resolver = res});
 
-	let cookiesSet:Promise<void> = browser.then(() => {
-		let processToSetCookies:ChildProcess;
-		processToSetCookies = spawn('npx', ['babel-node', 'CookiesSetterRunner'],{shell: true});
-		let name1:string = 'Cookies setting';
-		attachFunc({
-			processObject: processToSetCookies,
-			name: name1,
-			onData: function(data:Buffer) {
-				if ( data.toString() === 'cookies set' ) {
-					resolver();
-				}
-				console.log(`Process of ${name1} produced output:\n  ${data}`);
-			}
-		})
-	})
+	// let cookiesSet:Promise<void> = browser.then(() => {
+	// 	let processToSetCookies:ChildProcess;
+	// 	processToSetCookies = spawn('ts-node', ['CookiesSetterRunner'],{shell: true});
+	// 	let name1:string = 'Cookies setting';
+	// 	attachFunc({
+	// 		processObject: processToSetCookies,
+	// 		name: name1,
+	// 		onData: function(data:Buffer) {
+	// 			if ( data.toString() === 'cookies set' ) {
+	// 				resolver();
+	// 			}
+	// 			console.log(`Process of ${name1} produced output:\n  ${data}`);
+	// 		}
+	// 	})
+	// })
 
-	page = Promise.all([cookiesPromise, cookiesSet]).then(goToPage)
-	.catch((err:Error) => {console.log(err); throw err})
+	browser.then(() => loadPage('http://srv59554.seohost.com.pl/'))
+	.then(() => setCookies(config, resolver))
 
-	let logging:Promise<void> = page.then(logOrFetchData);
 
-	let gettingCookies:Promise<void> = logging.then(res => {
-		// if (res === 'continue after login') {
-			saveCookies();
-		// }
-	})
+	page = Promise.all([cookiesPromise, setCookies]).then(goToPage)
+	// .catch((err:Error) => {console.log(err); throw err})
 
-	let fetchingData = logging.then(res => {
-		console.log('from fetching');
-		return fetchData();
-	});
+	// let logging:Promise<void> = page.then(logOrFetchData);
+
+	// let gettingCookies:Promise<void> = logging.then(res => {
+	// 		saveCookies();
+	// })
+
+	// let fetchingData = logging.then(res => {
+	// 	console.log('from fetching');
+	// 	return fetchData();
+	// });
 }
 
 // function clickLogin():Promise<Promise<void>> {
@@ -89,12 +94,12 @@ function clickLogin():Promise<void> {
 	})
 
 	return handle.then((res:ElementHandle<any>|null) => 
-		res ? res.click(/*'a.loginButtonDziennikVulcan'*/) : throw "selector not found"
+		res ? res.click(/*'a.loginButtonDziennikVulcan'*/) : undefined
 	)
 }
 
-function goToPage(res:Array<void>):Promise<Page> {
-	return loadPage('https://uonetplus.vulcan.net.pl/gminawolow');
+function goToPage(res:[void, (additionalParam?: any) => void]):Promise<Page> {
+	return loadPage('https://dziennik-uczen.vulcan.net.pl/gminawolow' /*'https://uonetplus.vulcan.net.pl/gminawolow/LoginEndpoint.aspx'*/);
 }
 
 function logOrFetchData(res:Page):Promise<void> {
@@ -102,9 +107,9 @@ function logOrFetchData(res:Page):Promise<void> {
 	let page1:Page = res
 	let titleOfPAge:Promise<string> = page1.title();
 
-	return titleOfPAge.then(async (res:string) => {
-		console.log(res.toLowerCase());
-		switch (res.toLowerCase()) {
+	return titleOfPAge.then(async (res1:string) => {
+		console.log(res1.toLowerCase());
+		switch (res1.toLowerCase()) {
 			case 'dziennik vulcan':
 				if (await page1.$(loginButtonSelector) !== null) {
 					console.log('opt1');
@@ -115,7 +120,7 @@ function logOrFetchData(res:Page):Promise<void> {
 					return Promise.resolve();
 				}
 				break;
-			case 'logowanie (gminawolow)':
+			case 'logowanie': return writeLoginAndPassword()
 		}
 	})
 }
@@ -124,7 +129,7 @@ function writeLoginAndPassword():Promise<void> {
 	let resolver:Function;
 	let loginPromise:Promise<void> = new Promise(res => {resolver = res});
 	let processToSignIn;
-	processToSignIn = spawn('npx', ['babel-node', 'continuation'], {shell: true})
+	processToSignIn = spawn('ts-node', ['continuation'], {shell: true})
 	let name1 = 'signing in';
 	attachFunc({
 		processObject: processToSignIn,
@@ -160,7 +165,7 @@ function fetchData() {
 				if (data === "Error seen in test4:  user must log in again") {
 					clickLogin()
 					.then(writeLoginAndPassword)
-					.then(processOfFetchAndWrite.stdin.write('browser has already logged again'))
+					.then(() => processOfFetchAndWrite.stdin.write('browser has already logged again'))
 				} else {
 					console.log(`Process of ${name1} produced output:\n  ${data}`)
 				}
@@ -169,3 +174,5 @@ function fetchData() {
 }
 
 loadBrowserAndPage();
+
+export { logOrFetchData }

@@ -1,4 +1,4 @@
-import { getBrowserFromParentProcess, getPage } from './puppLoader.js';
+import { getBrowserFromParentProcess, getPage } from '../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
 import { spawn } from 'child_process';
 import credentials from './VulcanConnectionSettings.js'
 import {Page, Browser, ElementHandle} from 'puppeteer';
@@ -19,18 +19,15 @@ function connectToExistingInstance():void {
 		.then((res:Page) => {
 			page = res;                                                                  
 	        console.log('Writing login');                                             
-	        return page.type('#LoginName', credentials.user, {delay: 100})
+	        return page.type('input#Login', credentials.user, {delay: 100})
+	        .then(() => page.click('button#btNext'))
 		}).then(() => {
 			console.log('Writing password');
-			return page.type('#Password', credentials.password, {delay: 100});
+			return page.type('input#Haslo', credentials.password, {delay: 100})
+			.then(() => page.click('button#btLogOn'))
 		})
 
-		let clickSubmit:Promise<void> = typePassword
-		.then(() => {
-			return page.click('div.center > input[type="submit"]')
-		})
-
-		let waiting:Promise<Array<ElementHandle<any>|null>> = clickSubmit
+		let waiting:Promise<Array<ElementHandle<any>|null>> = typePassword
 		.then(() => {
 			let pr1:Promise<ElementHandle<any>|null> = page.waitForSelector('div.panel.sprawdziany > div.subDiv.pCont > div');
 			let pr2:Promise<ElementHandle<any>|null> = page.waitForSelector('div.panel.plan > div.subDiv.pCont > div');

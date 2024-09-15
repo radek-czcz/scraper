@@ -3,6 +3,7 @@
     "dev": "npx nodemon --exec babel-node backend-all/server.js"
   },
   "dependencies": {
+    "@2captcha/captcha-solver": "^1.2.0",
     "@babel/runtime": "^7.22.10",
     "@hapi/boom": "^10.0.1",
     "@hapi/hapi": "^21.3.2",

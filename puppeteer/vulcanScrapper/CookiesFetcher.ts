@@ -17,7 +17,7 @@ function connectToExistingInstance() {
 		let fetchCookies = pages
 		.then((res:Page[]) => {
 			let arr:Promise<object>[] = [];
-			res.forEach((p:Page) => arr.push(p.cookies()));
+			res.forEach((p:Page) => arr.push(p.cookies('https://uonetplus.vulcan.net.pl/gminawolow', 'https://uonetplus-cdn.vulcan.net.pl', 'https://home.pl')));
 			return Promise.all(arr).then((coo:object[]) => 
 				{	
 					cookies = coo.flat(2)
