@@ -51,11 +51,10 @@ function loadBrowserAndPage() {
 	// 	})
 	// })
 
-	browser.then(() => loadPage('http://srv59554.seohost.com.pl/'))
-	.then(() => setCookies(config, resolver))
+	const navigate:Promise<Page> = browser.then(() => goToPage())
+	const insertCookies:Promise<void> = navigate.then(() => setCookies(config, resolver))
 
-
-	page = Promise.all([cookiesPromise, setCookies]).then(goToPage)
+	const reaload = Promise.all([navigate, insertCookies, cookiesPromise]).then((tabWithCookies:[Page, void, void]) => tabWithCookies[0].reload())
 	// .catch((err:Error) => {console.log(err); throw err})
 
 	// let logging:Promise<void> = page.then(logOrFetchData);
@@ -98,7 +97,7 @@ function clickLogin():Promise<void> {
 	)
 }
 
-function goToPage(res:[void, (additionalParam?: any) => void]):Promise<Page> {
+function goToPage():Promise<Page> {
 	return loadPage('https://dziennik-uczen.vulcan.net.pl/gminawolow' /*'https://uonetplus.vulcan.net.pl/gminawolow/LoginEndpoint.aspx'*/);
 }
 

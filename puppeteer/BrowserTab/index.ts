@@ -6,7 +6,7 @@ import cookiesConfig from '../ConfigFiles/CookiesConfig';
 import attachFunc from '../vulcanScrapper/ProcessListenersManager';
 
 import {tabs} from './TabGenerator'
-import setCookies from './Cookies/CookiesSetter'
+import setCookies from './Cookies/CookiesSetterProcess'
 import saveCookies from './Cookies/CookiesSaver'
 
 export default tabs
