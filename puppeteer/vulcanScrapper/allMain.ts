@@ -1,12 +1,11 @@
-import { loadPuppeteer, loadPage } from '../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
+import { loadPuppeteer, loadPage } from './index';
 import { spawn, ChildProcess } from 'child_process';
-import getTime from './RandomTimeInterval.js'
+import getTime from './RandomTimeInterval'
 import attachFunc from './ProcessListenersManager'
 import {Browser, Page, ElementHandle} from 'puppeteer'
 import process from 'node:process'
-// import { getShot } from './Captcha/ScreenshotForCaptcha'
-
 import {setCookies, saveCookies as saveCookies2, config} from './config'
+// import { getShot } from './Captcha/ScreenshotForCaptcha'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
@@ -27,9 +26,9 @@ process.stdin.on('data', data => {
 })
 
 function loadBrowserAndPage() {
-	const date1:Date = new Date('April 25, 2024 20:17:00');
-	let now:Date = new Date();
-	let waittime:number|typeof NaN = date1.getTime() - now.getTime();
+	// const date1:Date = new Date('April 25, 2024 20:17:00');
+	// let now:Date = new Date();
+	// let waittime:number|typeof NaN = date1.getTime() - now.getTime();
 
 	browser = loadPuppeteer(false);
 	let resolver:Function;
@@ -54,10 +53,10 @@ function loadBrowserAndPage() {
 	const navigate:Promise<Page> = browser.then(() => goToPage())
 	const insertCookies:Promise<void> = navigate.then(() => setCookies(config, resolver))
 
-	const reaload = Promise.all([navigate, insertCookies, cookiesPromise]).then((tabWithCookies:[Page, void, void]) => tabWithCookies[0].reload())
+	const reload = Promise.all([navigate, insertCookies, cookiesPromise]).then((tabWithCookies:[Page, void, void]) => tabWithCookies[0].reload({waitUntil:'networkidle0'}))
 	// .catch((err:Error) => {console.log(err); throw err})
 
-	// let logging:Promise<void> = page.then(logOrFetchData);
+	let logging:Promise<void> = Promise.all([navigate, reload]).then(res => res[0].click('a.extra-button.extra-button-gray[title = "Logowanie zwykłe konto szkolne"]'));
 
 	// let gettingCookies:Promise<void> = logging.then(res => {
 	// 		saveCookies();
@@ -102,14 +101,13 @@ function goToPage():Promise<Page> {
 }
 
 function logOrFetchData(res:Page):Promise<void> {
-	// let page1:Page = res[0];
 	let page1:Page = res
 	let titleOfPAge:Promise<string> = page1.title();
 
 	return titleOfPAge.then(async (res1:string) => {
 		console.log(res1.toLowerCase());
 		switch (res1.toLowerCase()) {
-			case 'dziennik vulcan':
+			case 'uczeń':
 				if (await page1.$(loginButtonSelector) !== null) {
 					console.log('opt1');
 					return clickLogin()

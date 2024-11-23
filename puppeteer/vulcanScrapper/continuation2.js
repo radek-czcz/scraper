@@ -1,4 +1,4 @@
-import { getBrowserFromParentProcess, getPage } from './puppLoader.js';
+import { getBrowserFromParentProcess, getPage } from './index';
 import { main } from './puppWriterDB.js';
 import log from 'why-is-node-running';
 
