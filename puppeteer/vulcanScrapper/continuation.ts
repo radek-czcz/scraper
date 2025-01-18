@@ -25,7 +25,7 @@ function connectToExistingInstance():void {
 	        .then(() => page.click('button#btNext'))
 		})
 
-		typeUser.then(() => {
+		/*typeUser.then(() => {
 			const captchaProcess = spawn('ts-node', ['Captcha/ScreenshotRunner'], {shell: true})
 			let name1 = 'Captcha Processing';
 			attachFunc({
@@ -41,13 +41,15 @@ function connectToExistingInstance():void {
 					}
 				}
 			})
-		})
+		})*/
 
 
 		typeUser.then(() => {
-			console.log('Writing password');
-			return page.type('input#Haslo', credentials.password, {delay: 100})
-			// .then(() => page.click('button#btLogOn'))
+			setTimeout(() => {
+				console.log('Writing password');
+				return page.type('input#Haslo', credentials.password, {delay: 100})
+				.then(() => page.click('button#btLogOn'))
+			}, 10000)
 		})
 
 		/*let waiting:Promise<Array<ElementHandle<any>|null>> = typeUser

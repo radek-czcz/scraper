@@ -34,22 +34,6 @@ function loadBrowserAndPage() {
 	let resolver:Function;
 	let cookiesPromise:Promise<void> = new Promise(res => {resolver = res});
 
-	// let cookiesSet:Promise<void> = browser.then(() => {
-	// 	let processToSetCookies:ChildProcess;
-	// 	processToSetCookies = spawn('ts-node', ['CookiesSetterRunner'],{shell: true});
-	// 	let name1:string = 'Cookies setting';
-	// 	attachFunc({
-	// 		processObject: processToSetCookies,
-	// 		name: name1,
-	// 		onData: function(data:Buffer) {
-	// 			if ( data.toString() === 'cookies set' ) {
-	// 				resolver();
-	// 			}
-	// 			console.log(`Process of ${name1} produced output:\n  ${data}`);
-	// 		}
-	// 	})
-	// })
-
 	const navigate:Promise<Page> = browser.then(() => goToPage())
 	const insertCookies:Promise<void> = navigate.then(() => setCookies(config, resolver))
 
@@ -57,6 +41,16 @@ function loadBrowserAndPage() {
 	// .catch((err:Error) => {console.log(err); throw err})
 
 	let logging:Promise<void> = Promise.all([navigate, reload]).then(res => res[0].click('a.extra-button.extra-button-gray[title = "Logowanie zwykłe konto szkolne"]'));
+
+	logging.then(() => {
+		let prCont:ChildProcess;
+		prCont = spawn('ts-node', ['continuation'], {shell: true})
+		let name1 = 'continue';
+		attachFunc({
+			processObject: prCont,
+			name: name1,
+		})
+	})
 
 	// let gettingCookies:Promise<void> = logging.then(res => {
 	// 		saveCookies();
