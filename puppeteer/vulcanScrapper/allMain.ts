@@ -5,13 +5,15 @@ import attachFunc from './ProcessListenersManager'
 import {Browser, Page, ElementHandle} from 'puppeteer'
 import process from 'node:process'
 import {setCookies, saveCookies as saveCookies2, config} from './config'
+
+import {BrowserSubClass} from './BrowserGenerator/BrowserSubClass'
 // import { getShot } from './Captcha/ScreenshotForCaptcha'
 
 // 1. OPEN BROWSER
 // 2. LOAD WEBPAGE
 // 3. CLICK LOGIN BUTTON
 
-let browser: Promise<Browser>;
+let browser: BrowserSubClass;
 let page:Promise<Page>;
 const loginButtonSelector:string = 'input#Login';
 let processOfFetchAndWrite:typeof process
@@ -30,11 +32,11 @@ function loadBrowserAndPage() {
 	// let now:Date = new Date();
 	// let waittime:number|typeof NaN = date1.getTime() - now.getTime();
 
-	browser = loadPuppeteer(false);
+	browser = new BrowserSubClass();
 	let resolver:Function;
 	let cookiesPromise:Promise<void> = new Promise(res => {resolver = res});
 
-	const navigate:Promise<Page> = browser.then(() => goToPage())
+	const navigate:Promise<Page> = browser.browser().then(() => goToPage())
 	const insertCookies:Promise<void> = navigate.then(() => setCookies(config, resolver))
 
 	const reload = Promise.all([navigate, insertCookies, cookiesPromise]).then((tabWithCookies:[Page, void, void]) => tabWithCookies[0].reload({waitUntil:'networkidle0'}))
