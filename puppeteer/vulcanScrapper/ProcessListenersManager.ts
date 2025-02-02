@@ -10,10 +10,15 @@ export interface SubProcess {
 	onClose?:Function;
 }
 
+// This function enables easy way to provide custom handlers and name for the ChildProcess.
+// To do this, there must be provided an object compatible with SubProcess interface.
+// Name property of this object is utulized in logging functions.
 export default function attachListeners(processObj:SubProcess) {
 
+	// destructure function argument
 	const {processObject, name, onData, onErrData, onError, onClose} = processObj;
-	
+
+	// default handlers. They work, when destructured argument includes no handlers.
 	let onDataCallback:any = function(data:string) {
 		console.log(`Process of ${processObj.name} produced output:\n  ${data}`);
 	}
@@ -27,6 +32,8 @@ export default function attachListeners(processObj:SubProcess) {
 		console.log(`Process of ${processObj.name} has ended with code:${code}`);
 	}
 
+	// function attaching handlers. If destructured argument includes some handlers,
+	// they are going to be attached.
 	let spawnWrapFunction = function(processObj1:SubProcess) {
 		processObject.stdout?.on('data', onData ? onData : onDataCallback);
 		processObject.stderr?.on('data', onErrData ? onErrData : onErrorDataCallback);
@@ -34,5 +41,6 @@ export default function attachListeners(processObj:SubProcess) {
 		processObject.on('close', onClose ? onClose : onCloseCallback)
 	}
 
+	// execute attaching function.
 	spawnWrapFunction(processObj);
 }

@@ -1,4 +1,4 @@
-import {loadPuppeteer} from './PuppeteerBrowserOperations/puppLoader'
+// import {loadPuppeteer} from './PuppeteerBrowserOperations/puppLoader'
 import {Browser, Page} from 'puppeteer'
 import puppeteer from 'puppeteer-extra';
 import net, {Server, Socket} from 'net';
@@ -6,11 +6,11 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 export class BrowserSubClass {
 
-	browserInstance:Promise<Browser>;
+	protected browserInstance:Promise<Browser>;
 
 	protected server:Server|null = null;
 
-	protected launchBrowser(headless:boolean):Promise<Browser> {
+	launchBrowser(headless:boolean = false):Promise<Browser> {
 		let browser:Promise<Browser> = puppeteer.launch({
 			// executablePath:'E:/Users/Kamila i Radek/JavaScript workspace - scraper/node_modules/puppeteer/.local-chromium/105/chrome-win/chrome.exe',
 			headless: headless,
@@ -31,7 +31,7 @@ export class BrowserSubClass {
 		return this.browserInstance.then(br => br.wsEndpoint())
 	};
 
-	public get browser() {
+	public get browser():Promise<Browser> {
 		return this.browserInstance;
 	}
 
