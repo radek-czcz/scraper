@@ -6,6 +6,6 @@ describe('suite should test BrowserSubClass', function() {
 	it('Function launchBrowser() should return puppeteer.Browser instance', async function() {
 		let br2 = new BrowserSubClass();
 		let br = await br2.launchBrowser()
-		expect(br instanceof typeof Browser).toBeTrue();
+		expect(typeof br === 'Browser').toBeTrue();
 	})
 })
