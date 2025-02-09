@@ -1,10 +1,10 @@
-import getBrowser from '../../BrowserGenerator';
+import {ExistingBrowserSubClass} from '../../BrowserGenerator/ExistingBrowserSubClass'
 import { writeFile } from 'node:fs/promises';
 import {Browser, Page} from 'puppeteer';
 import {getArg} from '../../vulcanScrapper/ArgsOperator'
 
 function connectToExistingInstance() {
-	getBrowser(undefined)
+	new ExistingBrowserSubClass().browser
 	.then((brwsr:Browser) => {
 		let cookies:any[];
 		function fetchFunc1():Promise<void> {return writeFile(getArg('cookiesPath')/*'./cookies.json'*/, JSON.stringify(cookies, null, 2))}

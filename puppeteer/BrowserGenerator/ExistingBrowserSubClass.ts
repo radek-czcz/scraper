@@ -3,7 +3,7 @@ import {Browser, Page} from 'puppeteer'
 import net, {Server, Socket} from 'net';
 import puppeteer from 'puppeteer-extra';
 
-class ExistingBrowserSubClass extends BrowserSubClass {
+export class ExistingBrowserSubClass extends BrowserSubClass {
 
 	constructor() {
 		super();
@@ -46,4 +46,4 @@ class ExistingBrowserSubClass extends BrowserSubClass {
 
 }
 
-let brs = new ExistingBrowserSubClass()
+// let brs = new ExistingBrowserSubClass()

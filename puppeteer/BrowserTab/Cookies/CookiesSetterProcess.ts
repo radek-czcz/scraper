@@ -1,5 +1,5 @@
 import {spawn, ChildProcess} from 'node:child_process';
-import allTabs, {cookiesConfig, attachFunc} from '../index';
+import {attachFunc} from '../index';
 
 interface ConfigCookies {
 	setterRelativePath:string;
@@ -7,8 +7,7 @@ interface ConfigCookies {
 	fetcherRelativePath:string
 }
 
-export default function cookiesSet(config:ConfigCookies, additionalParam?:any) {allTabs.then(async () => {
-	// let config = await cookiesConfig;
+export default function cookiesSet(config:ConfigCookies, additionalParam?:any) {
 	let processToSetCookies:ChildProcess;
 	processToSetCookies = spawn('ts-node', [config.setterRelativePath, 'path='+config.pathToCookies], {shell: true});
 	let name1 = 'Cookies setting';
@@ -23,4 +22,4 @@ export default function cookiesSet(config:ConfigCookies, additionalParam?:any) {
 			console.log(`Process of ${name1} produced output:\n  ${data}`);
 		}
 	})
-})}
+}

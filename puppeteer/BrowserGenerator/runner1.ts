@@ -5,7 +5,7 @@ let brs = new BrowserSubClass();
 
 brs.establishNetServer();
 
-new Navigator(brs.browserInstance
+new Navigator(brs.browser
 	.then(browser => browser.pages())
 	.then(pages => pages[0])
 ).goToPage('https://dziennik-uczen.vulcan.net.pl/gminawolow')

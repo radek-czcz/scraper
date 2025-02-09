@@ -1,4 +1,4 @@
-import { getBrowserFromParentProcess, getPages } from '../../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
+import { getPages } from '../../BrowserGenerator/PuppeteerBrowserOperations/puppLoader';
 import fs from 'fs';
 import {Browser, Page, JSONArray} from 'puppeteer';
 // import process from 'node:process';
@@ -58,47 +58,42 @@ function applySessionAndLocalData(data:[JSONArray, JSONArray]) {
 // 1. TYPE IN LOGIN AND PASSWORD
 // 2. CLICK SUBMIT BUTTON
 export function connectToExistingInstance():void {
+	let sessionDataSet = Promise.all([getLocalStorage(), getSessionStorage()])
+	.then(applySessionAndLocalData)
 
-	getBrowserFromParentProcess().catch((err:Error) => console.log(err))
-	.then(() => {
+	let pages:Page[];
 
-		let sessionDataSet = Promise.all([getLocalStorage(), getSessionStorage()])
-		.then(applySessionAndLocalData)
+	function disconnectPupp() {
+		return pages[0].browser().disconnect()
+	}
 
-		let pages:Page[];
+	let cokkieF:Promise<void> = getCookies();
 
-		function disconnectPupp() {
-			return pages[0].browser().disconnect()
-		}
+	let pagePromise:Promise<Page[]> = getPages().then(res => {if (res) return res; else throw 'page not available'})
+	.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
 
-		let cokkieF:Promise<void> = getCookies();
+	let setC:Promise<void> = pagePromise.then((res:Page[]) => {pages = res})
 
-		let pagePromise:Promise<Page[]> = getPages().then(res => {if (res) return res; else throw 'page not available'})
-		.catch((err:Error) => {console.log('getPage() function failed: ', err); throw err});
+	let mapAndSet:Promise<void> = Promise.all([setC, cokkieF, sessionDataSet])
+    .then(() => {
+    	let ind:number;
 
-		let setC:Promise<void> = pagePromise.then((res:Page[]) => {pages = res})
+    	function mappingFunc(page:Page, idx:number) {
+			ind = idx;
+			console.log(cookies);
+			let returned = page.setCookie(...cookies);
+			returned.then(() => console.log('cookies on page 0 set'), () => console.log('error coo'))
+			return returned
+    	}
 
-		let mapAndSet:Promise<void> = Promise.all([setC, cokkieF, sessionDataSet])
-	    .then(() => {
-	    	let ind:number;
-
-	    	function mappingFunc(page:Page, idx:number) {
-				ind = idx;
-				console.log(cookies);
-				let returned = page.setCookie(...cookies);
-				returned.then(() => console.log('cookies on page 0 set'), () => console.log('error coo'))
-				return returned
-	    	}
-
-	    	return Promise.all(pages.map(mappingFunc))
-	    	.then((res:void[]) => {console.log(`cookies on all pages set`)})
-		})
-	    .then(
-	    	(res:void) => {process.stdout.write('cookies set'); return disconnectPupp()},
-	    	(rej:void) => {console.error(rej); return disconnectPupp()}
-	    )
-	    .catch(err => {console.log('cookies could not been set'); disconnectPupp()});
-
-	    return mapAndSet;
+    	return Promise.all(pages.map(mappingFunc))
+    	.then((res:void[]) => {console.log(`cookies on all pages set`)})
 	})
+    .then(
+    	(res:void) => {process.stdout.write('cookies set'); return disconnectPupp()},
+    	(rej:void) => {console.error(rej); return disconnectPupp()}
+    )
+    .catch(err => {console.log('cookies could not been set'); disconnectPupp()});
+
+    return mapAndSet;
 }
