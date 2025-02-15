@@ -9,7 +9,7 @@ export class ExistingBrowserSubClass extends BrowserSubClass {
 		super();
 	}
 	
-	protected launchBrowser(headless:boolean):Promise<Browser> {
+	public launchBrowser(headless:boolean):Promise<Browser> {
   		let endpoint:string;
 
 	  	let connect:Promise<Socket> = new Promise((resFunc, rejFunc) => {
