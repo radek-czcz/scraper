@@ -34,3 +34,23 @@ react/wrapper-tutorial/
 testy/
 testy/
 zadanie/
+
+# temporary
+NodeMySQL/connectionToVulcan-kopia.js     
+Nowy folder/                                               
+priceCharts/src/app/services/app-config.service.spec.ts    
+priceCharts/src/app/services/app-config.service.ts         
+priceCharts/src/app/services/app-config.ts                 
+priceCharts/src/app/services/app.config-r.json             
+priceCharts/src/app/services/app.config.json               
+priceCharts/src/app/services/date-formatter.service.spec.ts
+priceCharts/src/app/services/date-formatter.service.ts     
+priceCharts/src/app/services/date-formatter1.ts            
+priceCharts/src/app/services/date-formatter2.ts            
+priceCharts/src/app/services/get-categories.service.spec.ts
+priceCharts/src/app/services/get-categories.service.ts     
+puppeteer/built/                                           
+puppeteer/puppeteer.7z                                     
+puppeteer/vulcanScrapper/olxScrapper/connectionToCars2.ts  
+puppeteer/vulcanScrapper/test11.js                         
+react/appno1/src/services/                                 

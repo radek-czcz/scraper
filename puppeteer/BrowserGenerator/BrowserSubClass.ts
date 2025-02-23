@@ -45,7 +45,7 @@ export class BrowserSubClass {
 			}
 		}
 
-		function createServerHandler(this:BrowserSubClass, connection:Socket) {
+		let createServerHandler = (connection:Socket) => {
 			console.log('net.server says: client connected');
 
 			connection.on('end', function() {
@@ -59,7 +59,7 @@ export class BrowserSubClass {
 			connection.pipe(connection);
 		}
 
-	    this.server = net.createServer(createServerHandler.bind(this))
+	    this.server = net.createServer(createServerHandler)
 
 		this.server.listen(8088, function() { 
   			console.log('server is listening');
@@ -73,7 +73,3 @@ export class BrowserSubClass {
 	  return Promise.all([pages, going]).then(res => {console.log('page opened'); return res[0][0]})
 	}
 }
-
-// let brs = new BrowserSubClass();
-// brs.establishNetServer();
-// brs.goToPage('https://dziennik-uczen.vulcan.net.pl/gminawolow')
