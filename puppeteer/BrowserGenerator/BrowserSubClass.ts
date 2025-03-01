@@ -61,6 +61,9 @@ export class BrowserSubClass {
 
 	    this.server = net.createServer(createServerHandler)
 
+	    process.on('SIGINT', () => {this.server?.close(); console.log('net.server says: server closed, because prompted'); process.exit()})
+	    process.on('exit', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')})
+
 		this.server.listen(8088, function() { 
   			console.log('server is listening');
 		});

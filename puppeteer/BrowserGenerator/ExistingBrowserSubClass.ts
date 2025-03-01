@@ -5,9 +5,9 @@ import puppeteer from 'puppeteer-extra';
 
 export class ExistingBrowserSubClass extends BrowserSubClass {
 
-	constructor() {
+	/*constructor() {
 		super();
-	}
+	}*/
 	
 	launchBrowser(headless:boolean = false):Promise<Browser> {
   		let endpoint:string;

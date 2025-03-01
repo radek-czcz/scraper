@@ -2,6 +2,7 @@ import { BrowserSubClass } from "../puppeteer/BrowserGenerator/BrowserSubClass";
 import { Browser, Page } from 'puppeteer';
 import "jasmine";
 import net, {Server, Socket} from 'net';
+import CommonBrowsers from './CommonBrowsers.spec';
 
 describe('This suite should test BrowserSubClass\n', function(this:any) {
 
@@ -11,8 +12,13 @@ describe('This suite should test BrowserSubClass\n', function(this:any) {
 	beforeAll(async function(this:any){
 		jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
 		this.url = 'www.google.com'
-		this.br2 = await new BrowserSubClass();
-		this.br = await this.br2.browser
+
+		// this.br2 = await new BrowserSubClass();
+		this.br2 = await CommonBrowsers.bsc();
+
+		// this.br = await this.br2.browser
+		this.br = await CommonBrowsers.browser()
+
 		this.func = this.br2.establishNetServer.bind(this.br2)
 		this.func2 = this.br2.goToPage.bind(this.br2, this.url)
 	}/*, 10000*/)
@@ -44,11 +50,4 @@ describe('This suite should test BrowserSubClass\n', function(this:any) {
 			expect(endpoint).not.toBeFalsy();
 		})
 	})
-
-	/*it('Function goTo should navigate to url', function(this:any) {
-		return this.func2().then((p:Page) => {
-			let funcRef = () => expect(p.url()).toContain(this.url);
-			setTimeout(funcRef, 3000)
-		})
-	})*/
 })
