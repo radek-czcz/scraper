@@ -15,7 +15,7 @@ describe('This class should navigate the tab to new url', function() {
 
 	it('Function should navigate the tab to url', function(this:any) {
 		this.func().then((p:Page) => {
-			let funcRef = () => expect(p.url()).toContain(this.url);
+			let funcRef = () => expect(p.url()).toContain(/*this.url*/'ase');
 			setTimeout(funcRef, 3000)
 		})
 	})

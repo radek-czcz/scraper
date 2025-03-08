@@ -35,6 +35,10 @@ export class BrowserSubClass {
 		return this.browserInstance;
 	}
 
+	private onExit() {
+		this.server?.close()
+	}
+
 	// make .net server to pass the Puppeteer's browser wsEndpoint
 	public establishNetServer() {
 
@@ -64,6 +68,9 @@ export class BrowserSubClass {
 		this.server.listen(8088, function() { 
   			console.log('server is listening');
 		});
+
+
+		process.on('exit', this.onExit)
 	}
 
 	goToPage(url:string):Promise<Page> {
