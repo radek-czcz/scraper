@@ -1,12 +1,14 @@
-import { BrowserSubClass } from "../puppeteer/BrowserGenerator/BrowserSubClass";
 import { ExistingBrowserSubClass } from "../puppeteer/BrowserGenerator/ExistingBrowserSubClass";
 import "jasmine";
+import {pr} from './Before.spec';
 
-xdescribe('This suite should test ExistingBrowserSubClass\n', function() {
-	xit("Function launchBrowser() should return object with properties 'pages' and 'wsEndpoint'", async function(this:any) {
-		this.br = await new BrowserSubClass()
-		this.br2 = await new ExistingBrowserSubClass();
-		this.br3 = await this.br2.launchBrowser()
-		expect('pages' in this.br2 && 'wsEndpoint' in this.br2).toBeTrue();
+describe('This suite should test ExistingBrowserSubClass', function() {
+
+	it("\nFunction launchBrowser() should return object with properties 'pages' and 'wsEndpoint'", async function(this:any) {
+		let br2 = await new ExistingBrowserSubClass();
+		pr.then(async res => {
+			let br = await br2.launchBrowser();
+			return expect('pages' in br && 'wsEndpoint' in br).toBeTrue();
+		})
 	})
 })

@@ -3,33 +3,14 @@ import { Browser, Page } from 'puppeteer';
 import "jasmine";
 import net, {Server, Socket} from 'net';
 import CommonBrowsers from './CommonBrowsers.spec';
+import beforeF from './Before.spec'
 
 describe('This suite should test BrowserSubClass\n', function(this:any) {
 
-	// let br:Browser;
-	// let br2:BrowserSubClass;
-
-	beforeAll(async function(this:any){
-		jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000
-		this.url = 'www.google.com'
-
-		// this.br2 = await new BrowserSubClass();
-		this.br2 = await CommonBrowsers.bsc();
-
-		// this.br = await this.br2.browser
-		this.br = await CommonBrowsers.browser()
-
-		this.func = this.br2.establishNetServer.bind(this.br2)
-		this.func2 = this.br2.goToPage.bind(this.br2, this.url)
-	}/*, 10000*/)
+	beforeAll(beforeF)
 
 	it("Function launchBrowser() should return object with properties 'pages' and 'wsEndpoint'", function(this:any) {
 		expect('pages' in this.br && 'wsEndpoint' in this.br).toBeTrue();
-	})
-
-	it(`Function should make a net communication server on port 8088
-		and respond with sending a puppeteer browser wsEndpoint address`, function(this:any) {
-		expect(this.func/*this.br2.establishNetServer*/).not.toThrow();
 	})
 
 	it('Connection to net.server should get wsEndpoint', function() {

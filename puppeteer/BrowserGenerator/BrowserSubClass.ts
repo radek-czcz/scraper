@@ -1,4 +1,3 @@
-// import {loadPuppeteer} from './PuppeteerBrowserOperations/puppLoader'
 import {Browser, Page} from 'puppeteer'
 import puppeteer from 'puppeteer-extra';
 import net, {Server, Socket} from 'net';
@@ -62,7 +61,8 @@ export class BrowserSubClass {
 	    this.server = net.createServer(createServerHandler)
 
 	    process.on('SIGINT', () => {this.server?.close(); console.log('net.server says: server closed, because prompted'); process.exit()})
-	    process.on('exit', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')})
+	    process.on('exit', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')});
+	    process.on('error', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')})
 
 		this.server.listen(8088, function() { 
   			console.log('server is listening');
