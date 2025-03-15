@@ -3,7 +3,7 @@ import { Navigator } from "../puppeteer/BrowserGenerator/Navigator";
 import { Page } from 'puppeteer';
 import "jasmine";
 
-xdescribe('This class should navigate the tab to new url', function() {
+describe('This class should navigate the tab to new url', function() {
 	beforeAll(async function(this:any){
 		this.url = 'www.google.com'
 		this.br2 = await new BrowserSubClass();
@@ -13,7 +13,7 @@ xdescribe('This class should navigate the tab to new url', function() {
 		this.func = this.nav.goToPage.bind(this.nav, this.url)
 	})
 
-	xit('Function should navigate the tab to url', function(this:any) {
+	it('Function should navigate the tab to url', function(this:any) {
 		this.func().then((p:Page) => {
 			let funcRef = () => expect(p.url()).toContain(this.url);
 			setTimeout(funcRef, 3000)

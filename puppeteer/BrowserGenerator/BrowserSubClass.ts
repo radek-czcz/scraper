@@ -24,6 +24,16 @@ export class BrowserSubClass {
 	constructor() {
 		puppeteer.use(StealthPlugin());
 		this.browserInstance = this.launchBrowser(false);
+
+		process.on('exit', () => this.browserInstance
+			.then((br:Browser) => {br.close(); console.log('browser closed');})
+		)
+		process.on('error', () => this.browserInstance
+			.then((br:Browser) => br.close())
+		)
+		process.on('SIGINT', () => this.browserInstance
+			.then((br:Browser) => {br.close(); console.log('browser closed');})
+		)
 	}
 
 	protected  endpoint():Promise<string> {
@@ -62,7 +72,7 @@ export class BrowserSubClass {
 
 	    process.on('SIGINT', () => {this.server?.close(); console.log('net.server says: server closed, because prompted'); process.exit()})
 	    process.on('exit', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')});
-	    process.on('error', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')})
+	    process.on('error', () => {this.server?.close(); console.log('net.server says: server closed, because of process error')})
 
 		this.server.listen(8088, function() { 
   			console.log('server is listening');
