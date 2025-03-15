@@ -18,15 +18,16 @@ export class CookiesSetter {
 		this.page = page;
 	}
 
-	public setCookies():Promise<(void | JSONArray)[]> {
+	public setCookies():Promise<void> {
 		let ins:Promise<void> = new StorageDataReader(
 			["../ConfigFiles/vulcan/local.json", "../ConfigFiles/vulcan/session.json"]
 		).readStorageData().then(res => new StorageDataInserter(this.page).insertData(res));
 
 		return Promise.all([
 			ins,
-			CookiesReader.getCookies('../ConfigFiles/vulcan/cookies.json')
-		 ]);
+			CookiesReader.getCookies('../ConfigFiles/vulcan/cookies.json'),
+			this.page
+		 ]).then((res:[void, JSONArray, Page]) => res[2].setCookie(...<any>res[1]));
 	}
 }
 
@@ -39,11 +40,11 @@ let tab:Promise<Page> = br
 .then((tabs:Page[]) => tabs[0])
 
 let cs:CookiesSetter = new CookiesSetter(tab)
-Promise.all([cs.setCookies(), tab])
+// Promise.all([cs.setCookies(), tab])
 // .then(res => ebs.browser).then((br:Browser) => br.disconnect());
 
 
-Promise.all([br, tab]).then((res:[Browser, Page]) => cs.setCookies()).then((arr:(void | JSONArray)[]) => br).then((br2:Browser) => br2.disconnect());
+Promise.all([br, tab]).then((res:[Browser, Page]) => cs.setCookies()).then((arr:void) => br).then((br2:Browser) => br2.disconnect());
 
 
 
