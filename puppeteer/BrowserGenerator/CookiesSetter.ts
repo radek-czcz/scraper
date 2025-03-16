@@ -20,21 +20,34 @@ export class CookiesSetter {
 
 	public setCookies():Promise<null | HTTPResponse> {
 
-		let reloadPage = () => {
+		let cookies:Promise<JSONArray> = CookiesReader.getCookies('../ConfigFiles/vulcan/cookies.json');
+
+		let storageDataRead:(Promise<[JSONArray, JSONArray]>) = new StorageDataReader(
+			["../ConfigFiles/vulcan/local.json", "../ConfigFiles/vulcan/session.json"]
+		).readStorageData();
+
+		let storageDataInsert:StorageDataInserter = new StorageDataInserter(this.page);
+
+		let reloadPage:Function = () => {
 			return this.page
 			.then((tab:Page) => tab.reload({waitUntil:'networkidle0'}));
 		}
 
-		let ins:Promise<void> = new StorageDataReader(
-			["../ConfigFiles/vulcan/local.json", "../ConfigFiles/vulcan/session.json"]
-		).readStorageData().then(res => new StorageDataInserter(this.page).insertData(res));
+		let insertStorage:Promise<void> = storageDataRead
+		.then((res:[JSONArray, JSONArray]) => new StorageDataInserter(this.page).insertData(res));
 
-		return Promise.all([
-			ins,
-			CookiesReader.getCookies('../ConfigFiles/vulcan/cookies.json'),
+		let insertCookies = Promise.all([
+			cookies,
 			this.page
-		 ]).then((res:[void, JSONArray, Page]) => res[2].setCookie(...<any>res[1]))
-		.then(() => reloadPage());
+		]).then((res:[JSONArray, Page]) => res[1].setCookie(...<any>res[0]))
+
+		let reload = Promise.all([
+			insertStorage,
+			insertCookies
+		])
+		.then(() => reloadPage())
+
+		return reload
 	}
 }
 
@@ -50,9 +63,3 @@ let cs:CookiesSetter = new CookiesSetter(tab)
 Promise.all([br, tab])
 .then((res:[Browser, Page]) => Promise.all([cs.setCookies(), br]))
 .then((br2:[HTTPResponse | null, Browser]) => br2[1].disconnect());
-
-
-
-
-
-
