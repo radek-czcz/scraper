@@ -3,7 +3,7 @@
 // import { argv } from 'node:process';
 import fs from 'fs';
 import { writeFile, readFile } from 'node:fs/promises';
-import {Browser, Page, JSONArray} from 'puppeteer';
+import {Browser, Page, JSONArray, HTTPResponse} from 'puppeteer';
 import {ExistingBrowserSubClass} from './ExistingBrowserSubClass'
 import StorageDataReader from './Cookies/StorageDataReader'
 import StorageDataInserter from './Cookies/StorageDataInserter'
@@ -18,7 +18,13 @@ export class CookiesSetter {
 		this.page = page;
 	}
 
-	public setCookies():Promise<void> {
+	public setCookies():Promise<null | HTTPResponse> {
+
+		let reloadPage = () => {
+			return this.page
+			.then((tab:Page) => tab.reload({waitUntil:'networkidle0'}));
+		}
+
 		let ins:Promise<void> = new StorageDataReader(
 			["../ConfigFiles/vulcan/local.json", "../ConfigFiles/vulcan/session.json"]
 		).readStorageData().then(res => new StorageDataInserter(this.page).insertData(res));
@@ -27,7 +33,8 @@ export class CookiesSetter {
 			ins,
 			CookiesReader.getCookies('../ConfigFiles/vulcan/cookies.json'),
 			this.page
-		 ]).then((res:[void, JSONArray, Page]) => res[2].setCookie(...<any>res[1]));
+		 ]).then((res:[void, JSONArray, Page]) => res[2].setCookie(...<any>res[1]))
+		.then(() => reloadPage());
 	}
 }
 
@@ -40,11 +47,9 @@ let tab:Promise<Page> = br
 .then((tabs:Page[]) => tabs[0])
 
 let cs:CookiesSetter = new CookiesSetter(tab)
-// Promise.all([cs.setCookies(), tab])
-// .then(res => ebs.browser).then((br:Browser) => br.disconnect());
-
-
-Promise.all([br, tab]).then((res:[Browser, Page]) => cs.setCookies()).then((arr:void) => br).then((br2:Browser) => br2.disconnect());
+Promise.all([br, tab])
+.then((res:[Browser, Page]) => Promise.all([cs.setCookies(), br]))
+.then((br2:[HTTPResponse | null, Browser]) => br2[1].disconnect());
 
 
 
