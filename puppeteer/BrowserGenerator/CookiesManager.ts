@@ -53,7 +53,7 @@ let tab:Promise<Page> = br
 .then((browser:Browser) => browser.pages())
 .then((tabs:Page[]) => tabs[0]);
 
-let cs:CookiesSetter = new CookiesSetter(tab);
+let cs:CookiesManager = new CookiesManager(tab);
 Promise.all([br, tab])
 .then((res:[Browser, Page]) => Promise.all([cs.setCookies('../ConfigFiles/vulcan/'), br]))
 .then((br2:[HTTPResponse | null, Browser]) => br2[1].disconnect());
