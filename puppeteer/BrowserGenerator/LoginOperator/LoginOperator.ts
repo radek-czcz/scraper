@@ -44,8 +44,9 @@ let tab:Promise<Page> = br
 let lo:LoginOperator = new LoginOperator(tab, ['AAABOLQ-002234', '']);
 Promise.all([br, tab])
 .then((res:[Browser, Page]) => Promise.all([lo.writeLogin('input#Login'), br]))
-.then((res:[void, Browser]) => Promise.all([lo.clickNext('button#btNext'), res[1]]))
 // .then((res:[Browser, Page]) => Promise.all([lo.writePassword('input#Haslo'), br]))
-// .then((res:[Browser, Page]) => Promise.all([lo.clickLogin('button#btNext'), br]))
+.then((res:[void, Browser]) => Promise.all([lo.clickNext('button#btNext'), res[1]]))
+// .then((res:[void, Browser]) => Promise.all([lo.clickNext('button#btLogOn'), res[1]]))
+// .then((res:[Browser, Page]) => Promise.all([lo.clickLogin('button#btLogOn'), br]))
 // .then((br2:[void, Browser]) => br2[1].disconnect());
 .then((br2:[void, Browser]) => br2[1].disconnect());
