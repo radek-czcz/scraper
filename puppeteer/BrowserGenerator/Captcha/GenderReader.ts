@@ -10,7 +10,7 @@ export default class GenderReader {
 		this.page = tab
 	}
 
-	async readText():Promise<string> {
+	private async readText():Promise<string> {
 		let page = await this.page;
 		const textElement:ElementHandle|null = await page.$('div.v-captcha-input > label');
 		if (!textElement) {throw "Gender text not found"}
@@ -21,11 +21,11 @@ export default class GenderReader {
 		}
 	}
 
-	async checkIfMaleOrFemale():Promise<string> {
+	async readGender():Promise<string> {
 		const text = await this.readText()
 		switch (true) {
 			case text.includes('męskie'):
-				return	readFile('fNames.csv', { encoding: 'utf8' });
+				return	readFile('mNames.csv', { encoding: 'utf8' });
 			break;
 			case text.includes('żeńskie'):
 				return	readFile('fNames.csv', { encoding: 'utf8' });
@@ -35,19 +35,22 @@ export default class GenderReader {
 	}
 }
 
-let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
-let br:Promise<Browser> = ebs.browser
+// let br:Promise<Browser> = ebs.browser
 
-let tab:Promise<Page> = br
-.then((browser:Browser) => browser.pages())
-.then((tabs:Page[]) => tabs[0]);
+// let tab:Promise<Page> = br
+// .then((browser:Browser) => browser.pages())
+// .then((tabs:Page[]) => tabs[0]);
 
-let cs:GenderReader = new GenderReader(tab);
+// let cs:GenderReader = new GenderReader(tab);
 
-function strRep(inp:string):string {
-	return inp.replaceAll(`"`, '').replaceAll(",", '')
-}
+// function strRep(inp:string):string[] {
+// 	return inp.replaceAll(`"`, '').replaceAll(",", '').split('\n')
+// }
 
-Promise.all([cs.checkIfMaleOrFemale(), br])
-.then((arr:[string, Browser]) => {console.log(strRep(arr[0])); arr[1].disconnect()})
+// Promise.all([cs.readGender(), br])
+// .then((arr:[string, Browser]) => {
+// 	console.log(strRep(arr[0]));
+// 	arr[1].disconnect();
+// })
