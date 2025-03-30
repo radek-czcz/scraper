@@ -41,7 +41,7 @@ let tab:Promise<Page> = br
 .then((browser:Browser) => browser.pages())
 .then((tabs:Page[]) => tabs[0]);
 
-let lo:LoginOperator = new LoginOperator(tab, ['AAABOLQ-002234', '']);
+let lo:LoginOperator = new LoginOperator(tab, ['AAABOLQ-002234', 'HBMCTrojka3']);
 Promise.all([br, tab])
 .then((res:[Browser, Page]) => Promise.all([lo.writeLogin('input#Login'), br]))
 // .then((res:[Browser, Page]) => Promise.all([lo.writePassword('input#Haslo'), br]))

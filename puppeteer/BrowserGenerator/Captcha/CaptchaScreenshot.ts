@@ -30,14 +30,14 @@ export default class CaptchaScreenshot {
 	}
 }
 
-let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
-let br:Promise<Browser> = ebs.browser
+// let br:Promise<Browser> = ebs.browser
 
-let tab:Promise<Page> = br
-.then((browser:Browser) => browser.pages())
-.then((tabs:Page[]) => tabs[0]);
+// let tab:Promise<Page> = br
+// .then((browser:Browser) => browser.pages())
+// .then((tabs:Page[]) => tabs[0]);
 
-let cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
-Promise.all([cs.makeScreenshot(), br])
-.then((arr:[string|Buffer, Browser]) => arr[1].disconnect())
+// let cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
+// Promise.all([cs.makeScreenshot(), br])
+// .then((arr:[string|Buffer, Browser]) => arr[1].disconnect())

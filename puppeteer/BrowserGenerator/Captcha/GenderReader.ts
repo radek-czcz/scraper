@@ -1,17 +1,23 @@
 import { Page, Browser, ElementHandle, JSHandle } from 'puppeteer';
-import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
-import { readFile } from 'node:fs/promises';;
+// import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
+
+export enum Gender {
+	Male,
+	Female
+}
 
 export default class GenderReader {
 
-	page:Promise<Page>;
+	private page:Promise<Page>;
+	private gender_:Gender;
 
-	constructor(tab:Promise<Page>) {
-		this.page = tab
+	constructor(page:Promise<Page>) {
+		this.page = page;
+		this.gender_ = await this.assignGender();
 	}
 
-	private async readText():Promise<string> {
-		let page = await this.page;
+	private async readText(tab:Promise<Page>):Promise<string> {
+		let page = await tab;
 		const textElement:ElementHandle|null = await page.$('div.v-captcha-input > label');
 		if (!textElement) {throw "Gender text not found"}
 		else {
@@ -21,17 +27,21 @@ export default class GenderReader {
 		}
 	}
 
-	async readGender():Promise<string> {
-		const text = await this.readText()
+	private async assignGender():Promise<Gender> {
+		const text = await readText();
 		switch (true) {
 			case text.includes('męskie'):
-				return	readFile('mNames.csv', { encoding: 'utf8' });
+				return Gender.Male;
 			break;
 			case text.includes('żeńskie'):
-				return	readFile('fNames.csv', { encoding: 'utf8' });
+				return Gender.Female;
 			break;
-			default: throw "Word -zenski- or -meski- not found"
+			// default: throw "Word -zenski- or -meski- not found"
 		}
+	}
+
+	public get gender() {
+		return this.gender_;
 	}
 }
 
@@ -49,8 +59,8 @@ export default class GenderReader {
 // 	return inp.replaceAll(`"`, '').replaceAll(",", '').split('\n')
 // }
 
-// Promise.all([cs.readGender(), br])
+// Promise.all([GenderReader.readText(tab), br])
 // .then((arr:[string, Browser]) => {
-// 	console.log(strRep(arr[0]));
+// 	console.log(arr[0]);
 // 	arr[1].disconnect();
 // })

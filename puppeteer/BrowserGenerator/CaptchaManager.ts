@@ -3,6 +3,7 @@ import {Browser, Page} from 'puppeteer';
 import CaptchaScreenshot from './Captcha/CaptchaScreenshot';
 import GenderReader from './Captcha/GenderReader';
 import RequestSender from './Captcha/RequestSender';
+import NamesFileReader from './Captcha/NamesFileReader';
 
 
 
@@ -14,22 +15,31 @@ const tab:Promise<Page> = br
 	.then((tabs:Page[]) => tabs[0]);
 
 const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
-const gr:GenderReader = new GenderReader(tab);
 
 const screenshot = cs.makeScreenshot();
-const gender = gr.readGender();
+const gender = new GenderReader(tab).gender
 
-const rs:RequestSender = new RequestSender(screenshot, gender);
+disconnectBrowser()
 
-function strRep(inp:string):string[] {
-	return inp.replaceAll(`"`, '').replaceAll(",", '').split('\n')
+// .then((res:string) => {console.log(res); return res});
+
+// let fileGender:Promise<string[]> = NamesFileReader.readFile(gender)
+// .then((res:string[]) => console.log(res))
+// .then(() => disconnectBrowser())
+
+function disconnectBrowser() {
+	br.then((res:Browser) => res.disconnect());
 }
 
-rs.solveCaptcha().then((res:string|undefined) => console.log(res))
-.catch(err => {console.log(err); br.then((res:Browser) => res.disconnect())})
+// rs.solveCaptcha().then((res:string|undefined) => {console.log(res); disconnectBrowser()})
+// .catch(err => {console.log(err); disconnectBrowser()})
+
+
 
 // Promise.all([cs.readGender(), br])
 // .then((arr:[string, Browser]) => {
 // 	console.log(strRep(arr[0]));
 // 	arr[1].disconnect();
 // })
+
+Promise.all([screenshot, gender]).then(disconnectBrowser);

@@ -26,7 +26,7 @@ export default class RequestSender {
 		})
 	}
 
-	private sendRequest():Promise<[{}, string | null]> {
+	sendRequest():Promise<[{}, string | null]> {
 		return this.image.then((res:string|Buffer) => {
 			const solver = new Solver(credentials.apiKey);
 			let str:string;
@@ -44,6 +44,6 @@ export default class RequestSender {
 
 	solveCaptcha():Promise<string|undefined> {
 		return sendRequest(this.image, this.gender)
-		.then(this.chooseCorrectWord)
+		// .then(this.chooseCorrectWord)
 	}
 }
