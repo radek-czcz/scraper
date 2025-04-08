@@ -2,6 +2,8 @@ import { Page, Browser, ElementHandle } from 'puppeteer';
 import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
 import screenshotEvalFunction from './ScreenshotMethod2';
 import { createWriteStream } from 'node:fs'
+import '../container';
+import {container} from 'tsyringe';
 
 export default class CaptchaScreenshot {
 
@@ -13,14 +15,17 @@ export default class CaptchaScreenshot {
 	}
 
 	makeScreenshot():ReturnType<typeof screenshotEvalFunction> {
-		const container:Promise<ElementHandle<HTMLImageElement>> = this.page
-		.then((tab:Page) => tab.$('img.v-captcha-image'))
+
+		const captchaImageSelector = container.resolve('captcha-selector');
+
+		const captchaContainer:Promise<ElementHandle<HTMLImageElement>> = this.page
+		.then((tab:Page) => tab.$(captchaImageSelector as string))
 		.then((res:ElementHandle<HTMLImageElement>|null) => {
-			if (!res) throw new Error('selector not found')
+			if (!res) throw new Error('Selector not found')
 			else return res;
 		})
 
-		const sShot = container.then(screenshotEvalFunction)
+		const sShot = captchaContainer.then(screenshotEvalFunction)
 
 		return sShot;
 	}
