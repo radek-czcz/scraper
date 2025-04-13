@@ -1,49 +1,51 @@
-import {Solver} from "@2captcha/captcha-solver"
+import {Solver} from "@2captcha/captcha-solver";
+import {Gender} from './GenderReader'
+import credentials from './Captcha2Credentials'
 
 export default class RequestSender {
 	image:Promise<string|Buffer>;
-	gender:Promise<string | null>;
+	gender:Promise<Gender>;
 
-	constructor(image:Promise<string|Buffer>, gender:Promise<string | null>) {
+	constructor(image:Promise<string|Buffer>, gender:Promise<Gender>) {
 		this.image = image;
 		this.gender = gender;
 	}
 
-	private chooseCorrectWord(solvedCaptcha:[{}, string | null]):string|undefined { 
-		console.log(solvedCaptcha);
-		let words:string[] = (<any>solvedCaptcha[0]).data.split(' ');
-		console.log(words);
+	// private chooseCorrectWord(solvedCaptcha:[{}, string | null]):string|undefined { 
+	// 	console.log(solvedCaptcha);
+	// 	let words:string[] = (<any>solvedCaptcha[0]).data.split(' ');
+	// 	console.log(words);
 
-		let nameGender:string[];
-		if (typeof solvedCaptcha[1] === 'string') {
-			switch (true) {
-				case solvedCaptcha[1].includes('męskie'): nameGender = m_names; break;
-				case solvedCaptcha[1].includes('żeńskie'): nameGender = f_names; break;
-			}
-		}
-		return words.find((elem:string) => {
-			return nameGender.find((name:string) => elem.includes(name.toLowerCase()))
-		})
-	}
+	// 	let nameGender:string[];
+	// 	if (typeof solvedCaptcha[1] === 'string') {
+	// 		switch (true) {
+	// 			case solvedCaptcha[1].includes('męskie'): nameGender = m_names; break;
+	// 			case solvedCaptcha[1].includes('żeńskie'): nameGender = f_names; break;
+	// 		}
+	// 	}
+	// 	return words.find((elem:string) => {
+	// 		return nameGender.find((name:string) => elem.includes(name.toLowerCase()))
+	// 	})
+	// }
 
-	sendRequest():Promise<[{}, string | null]> {
+	sendRequest():Promise<{}> {
 		return this.image.then((res:string|Buffer) => {
 			const solver = new Solver(credentials.apiKey);
 			let str:string;
 			typeof res != 'string' ? str = res.toString() : str = res
-			return Promise.all([solver.imageCaptcha({
+			return solver.imageCaptcha({
 			    body: str,
 			    phrase: 1,
 			    lang: 'pl'
 			    // numeric: 4,
 			    // min_len: 5,
 			    // max_len: 5
-			}), gender])
+			})
 		})
 	}
 
-	solveCaptcha():Promise<string|undefined> {
-		return sendRequest(this.image, this.gender)
-		// .then(this.chooseCorrectWord)
-	}
+	// solveCaptcha():Promise<string|undefined> {
+	// 	return sendRequest(this.image, this.gender)
+	// 	.then(this.chooseCorrectWord)
+	// }
 }

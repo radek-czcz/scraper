@@ -1,7 +1,7 @@
 import {ExistingBrowserSubClass} from './ExistingBrowserSubClass';
 import {Browser, Page} from 'puppeteer';
 import CaptchaScreenshot from './Captcha/CaptchaScreenshot';
-import GenderReader from './Captcha/GenderReader';
+import GenderReader, {Gender} from './Captcha/GenderReader';
 import RequestSender from './Captcha/RequestSender';
 import NamesFileReader from './Captcha/NamesFileReader';
 
@@ -17,9 +17,17 @@ const tab:Promise<Page> = br
 const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
 
 const screenshot = cs.makeScreenshot();
-const gender = new GenderReader(tab).gender
+const genderReader = new GenderReader(tab)
 
-disconnectBrowser()
+const gender:Promise<Gender> = genderReader.gender.then((res:Gender) => {console.log(res); return res})
+
+const names:Promise<void | string[]> = NamesFileReader.readFile(gender)
+.then((res:string[]|void) => console.log(res));
+
+const reqSender:RequestSender = new RequestSender(screenshot, gender);
+const solvedCaptcha:Promise<void> = reqSender.sendRequest()
+.then((res:{}) => console.log(res))
+.catch((err:Error) => {console.log(err); disconnectBrowser()});
 
 // .then((res:string) => {console.log(res); return res});
 

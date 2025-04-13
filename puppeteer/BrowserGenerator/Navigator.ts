@@ -11,7 +11,7 @@ export class Navigator {
 		return this.page.then((page:Page) => {
 		  page.goto(url, {waitUntil: 'networkidle2'})
 		  .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
-		  return this.page
+		  return page;
 		})
 	}
 }

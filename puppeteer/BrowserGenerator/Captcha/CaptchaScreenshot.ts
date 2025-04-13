@@ -1,6 +1,6 @@
 import { Page, Browser, ElementHandle } from 'puppeteer';
 import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
-import screenshotEvalFunction from './ScreenshotMethod2';
+import screenshotEvalFunction from './ScreenshotMethod';
 import { createWriteStream } from 'node:fs'
 import '../container';
 import {container} from 'tsyringe';

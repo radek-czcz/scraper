@@ -5,3 +5,4 @@ import {container} from 'tsyringe'
 
 // captcha image selector
 	container.register<string>('captcha-selector', {useValue:'img.v-captcha-image'});
+	container.register<Function>('func', {useValue: function() {console.log('Hi, it works')}})

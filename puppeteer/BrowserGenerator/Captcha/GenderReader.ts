@@ -9,15 +9,15 @@ export enum Gender {
 export default class GenderReader {
 
 	private page:Promise<Page>;
-	private gender_:Gender;
+	private gender_:Promise<Gender>;
 
 	constructor(page:Promise<Page>) {
 		this.page = page;
-		this.gender_ = await this.assignGender();
+		this.gender_ = this.assignGender();
 	}
 
-	private async readText(tab:Promise<Page>):Promise<string> {
-		let page = await tab;
+	private async readText():Promise<string> {
+		let page = await this.page;
 		const textElement:ElementHandle|null = await page.$('div.v-captcha-input > label');
 		if (!textElement) {throw "Gender text not found"}
 		else {
@@ -28,7 +28,7 @@ export default class GenderReader {
 	}
 
 	private async assignGender():Promise<Gender> {
-		const text = await readText();
+		const text = await this.readText();
 		switch (true) {
 			case text.includes('męskie'):
 				return Gender.Male;
@@ -36,7 +36,7 @@ export default class GenderReader {
 			case text.includes('żeńskie'):
 				return Gender.Female;
 			break;
-			// default: throw "Word -zenski- or -meski- not found"
+			default: throw "Word -zenski- or -meski- not found"
 		}
 	}
 

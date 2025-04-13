@@ -45,15 +45,15 @@ export class CookiesManager {
 	}
 }
 
-let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
-let br:Promise<Browser> = ebs.browser
+// let br:Promise<Browser> = ebs.browser
 
-let tab:Promise<Page> = br
-.then((browser:Browser) => browser.pages())
-.then((tabs:Page[]) => tabs[0]);
+// let tab:Promise<Page> = br
+// .then((browser:Browser) => browser.pages())
+// .then((tabs:Page[]) => tabs[0]);
 
-let cs:CookiesManager = new CookiesManager(tab);
-Promise.all([br, tab])
-.then((res:[Browser, Page]) => Promise.all([cs.setCookies('../ConfigFiles/vulcan/'), br]))
-.then((br2:[HTTPResponse | null, Browser]) => br2[1].disconnect());
+// let cs:CookiesManager = new CookiesManager(tab);
+// Promise.all([br, tab])
+// .then((res:[Browser, Page]) => Promise.all([cs.setCookies('../ConfigFiles/vulcan/'), br]))
+// .then((br2:[HTTPResponse | null, Browser]) => br2[1].disconnect());
