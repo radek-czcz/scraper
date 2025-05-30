@@ -1,86 +1,59 @@
-// import {ExistingBrowserSubClass} from './ExistingBrowserSubClass';
-// import {Navigator} from './Navigator';
-// import {Page} from 'puppeteer';
-// import fetchCookies from '../BrowserTab/Cookies/CookiesFetcher'
-import net, {Server, Socket} from 'net';
-import {BrowserSubClass} from './BrowserSubClass'
+import { Page, Browser, ElementHandle, Frame } from 'puppeteer';
+import {ExistingBrowserSubClass} from './ExistingBrowserSubClass';
+import { CookiesManager } from './CookiesManager'
+import LoginOperator from './LoginOperator/LoginOperator'
 
-// import config from '../ConfigFiles/vulcan/CookiesPaths'
-// import setCookies from '../BrowserTab/Cookies/CookiesSetterProcess'
+let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
-// let brs = new ExistingBrowserSubClass();
+let br:Promise<Browser> = ebs.browser;
 
-// let resolver:Function;
+let tab:Promise<Page> = br
+.then((browser:Browser) => browser.pages())
+.then((tabs:Page[]) => tabs[0]);
 
-// navigate to url
-	// new Navigator(brs.browser
-	// 	.then(browser => browser.pages())
-	// 	.then(pages => pages[0])
-	// ).goToPage('https://www.google.com').then((page:Page) => page.browser().disconnect())
+let lo:LoginOperator = new LoginOperator(tab, ['AAABOLQ-002234', 'HBMCTrojka3']);
+let cs:CookiesManager = new CookiesManager(tab)
 
-// read cookies from files
-	// fetchCookies()
+const wholeFrame:Promise<ElementHandle<HTMLFrameElement>> = tab.then((tab:Page) => tab.waitForSelector('#respect-privacy-frame', {timeout: 5000}))
+.then((el:ElementHandle<HTMLFrameElement> | null) => {if (el) return el; else throw "Selector not found"})
+// .catch(err => {throw 'selector not found'})
 
-// insert cookies (ChildProcess)
-	// let cookiesPromise:Promise<void> = new Promise(res => {resolver = res});
-	// cookiesPromise.then(() => setCookies(config, resolver))
+const contFrame:Promise<Frame | null> = wholeFrame.then((handle:ElementHandle<HTMLFrameElement> | null) => {
+	if (!handle) throw "Frame not found"
+	else console.log('Frame found'); return handle.contentFrame();
+})
 
-	function establishNetServer() {
+const contFrameElem:Promise<ElementHandle<HTMLButtonElement>> = contFrame.then((frame:Frame | null) => {
+	if (!frame) throw new Error("ContentFrame not found")
+	else {console.log('ContentFrame found'); return frame.waitForSelector('#save-default-button', {timeout: 5000})
+		.then((el:ElementHandle<HTMLButtonElement> | null) => {if (el) return el; else throw "Selector not found"})
+		// .catch(() => {throw "Element in ContentFrame not awaited"})
+	}	
+})
 
-		let server:Server ;
+//catch below causes the flow to return at 'finally'. If error is rethrown then flow jumps to next catch
+contFrameElem.catch((err:Error) => console.log('2nd to end catch clause reached:\n', err))
 
-		function dataEventHandler(this:BrowserSubClass, data:any) {
-			if (data.toString() === "close server, please") {
-			  console.log('net.server says: client requested to close server');
-			  this.server?.close(() => console.log('server closed'));
-			}
-		}
+.finally(() => cs.setCookies('../ConfigFiles/vulcan/'))
+.then(async () => {
+	console.log('cookies inserted');
+	let tab2 = await tab; console.log('reloading...');
+	return tab2.reload({waitUntil:'networkidle2'})
+	.then(() => tab2.waitForSelector('a.extra-button.extra-button-gray'));
+})
 
-		let createServerHandler = (connection:Socket) => {
-			console.log('net.server says: client connected');
+.then(() => tab.then((tab1:Page) => {console.log('clicking button');
+	const clickButton = tab1.click('a.extra-button.extra-button-gray'); 
+	return clickButton.then(() => tab1.waitForSelector('#Login', {timeout: 5000}))
+}))
 
-			connection.on('end', function() {
-				console.log('net.server says: client disconnected');
-				// server.close(() => console.log('server closed'));
-			});
+.catch((err:Error) => console.log('Last catch clause reached:\n', err))
 
-			connection.on('data', dataEventHandler);
+// .finally(() => ebs.disconnectBrowser())
 
-			connection.write('radek');
-			connection.pipe(connection);
-		}
 
-	    server = net.createServer(createServerHandler)
-
-		server.listen(8088, function() { 
-  			console.log('server is listening');
-		});
-
-		process.on('SIGINT', () => {server.close(); console.log('server closed'); process.exit()})
-
-		setTimeout(() => server.close(), 15000)
-	}
-
-	function connectTo() {
-  		let endpoint:string;
-
-	  	let connect:Promise<Socket> = new Promise((resFunc, rejFunc) => {
-		    let client:Socket = net.connect({port: 8088}, function() {
-		      console.log('net.child says: connected to server!');  
-		    });
-
-		    client.on('data', function(data) {
-		      console.log('net.child says: data received - ', data.toString());
-		      endpoint = data.toString();
-		      client.end();
-		    });
-		    
-		    client.on('end', function() { 
-		      console.log('net.child says: disconnected from server');
-		    });
-		})
-	}
-
-	establishNetServer();
-	connectTo();
-	// setTimeout(() => connectTo(), 8000)
+.then(() => lo.writeLogin('input#Login'))
+.then(() => lo.clickNext('button#btNext'))
+.then(() => lo.writePassword('input#Haslo'))
+.then(() => lo.clickNext('button#btLogOn'))
+.finally(() => ebs.disconnectBrowser())

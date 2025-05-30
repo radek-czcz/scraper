@@ -44,6 +44,11 @@ export class ExistingBrowserSubClass extends BrowserSubClass {
 		return connectedBrowser;
 	}
 
+	disconnectBrowser():void {
+		console.log('Disconnecting the browser');
+		this.browserInstance.then((res:Browser) => res.disconnect());
+	}
+
 }
 
 // let brs = new ExistingBrowserSubClass()
