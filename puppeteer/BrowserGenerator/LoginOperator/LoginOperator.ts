@@ -1,8 +1,9 @@
-import {Browser, Page, JSONArray, HTTPResponse} from 'puppeteer';
+import {Browser, Page, JSONArray, HTTPResponse, ElementHandle} from 'puppeteer';
 import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass'
 import StorageDataReader from '../Cookies/StorageDataReader'
 import StorageDataInserter from '../Cookies/StorageDataInserter'
 import CookiesReader from '../Cookies/CookiesReader'
+import type { NodeFor } from 'puppeteer-core';
 
 export default class LoginOperator {
 
@@ -16,20 +17,32 @@ export default class LoginOperator {
 
 	async writeLogin(selector:string):Promise<void> {
 		let page = await this.page;
-		page.waitForSelector(selector);
+		this.waitForSelector(selector)
+		.then(() => console.log('(Login input-box)'));
 		return page.type(selector, this.credentials[0], {delay: 100});
 	}
 
 	async writePassword(selector:string):Promise<void> {
 		let page = await this.page
-		page.waitForSelector(selector);
+		this.waitForSelector(selector)
+		.then(() => console.log('(Password input-box)'));
 		return page.type(selector, this.credentials[1], {delay: 100})
 	}
 
 	async clickNext(selector:string):Promise<void> {
 		let page = await this.page;
-		page.waitForSelector(selector);
+		this.waitForSelector(selector)
+		.then(() => console.log('(Next button)'));
 		return page.click(selector);
+	}
+
+	waitForSelector(selector:string):Promise<ElementHandle<NodeFor<string>> | null> {
+		const page = this.page;
+		const waiter = page.then((tab:Page) => tab.waitForSelector(selector, {timeout:5000}));
+		return waiter.then(
+			(el:ElementHandle<NodeFor<string>> | null) => {process.stdout.write('found ' + selector + ' '); return el}/*, 
+			() => {throw new Error('selector ' + selector + ' not found')}*/
+		);
 	}
 }
 

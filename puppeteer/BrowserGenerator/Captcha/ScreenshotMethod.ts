@@ -5,8 +5,8 @@ export default function(captchaContainer:ElementHandle|null):Promise<string|Buff
 		console.log('Captcha element found')
 		return captchaContainer.screenshot({
 			encoding: /*'base64'*/ 'binary',
-			path: 'ca2.jpg',
-			type: 'jpeg',
+			path: 'ca2.png',
+			type: 'png',
 			// quality: 100
 		})
 	}

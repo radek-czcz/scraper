@@ -1,7 +1,9 @@
 import { Page, Browser, ElementHandle, Frame } from 'puppeteer';
 import {ExistingBrowserSubClass} from './ExistingBrowserSubClass';
-import { CookiesManager } from './CookiesManager'
-import LoginOperator from './LoginOperator/LoginOperator'
+import { CookiesManager } from './CookiesManager';
+import LoginOperator from './LoginOperator/LoginOperator';
+import creds from './LoginOperator/Credentials';
+import CaptchaScreenshot from './Captcha/CaptchaScreenshot';
 
 let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
@@ -11,12 +13,11 @@ let tab:Promise<Page> = br
 .then((browser:Browser) => browser.pages())
 .then((tabs:Page[]) => tabs[0]);
 
-let lo:LoginOperator = new LoginOperator(tab, ['AAABOLQ-002234', 'HBMCTrojka3']);
 let cs:CookiesManager = new CookiesManager(tab)
+let lo:LoginOperator = new LoginOperator(tab, creds as [string, string]);
 
 const wholeFrame:Promise<ElementHandle<HTMLFrameElement>> = tab.then((tab:Page) => tab.waitForSelector('#respect-privacy-frame', {timeout: 5000}))
 .then((el:ElementHandle<HTMLFrameElement> | null) => {if (el) return el; else throw "Selector not found"})
-// .catch(err => {throw 'selector not found'})
 
 const contFrame:Promise<Frame | null> = wholeFrame.then((handle:ElementHandle<HTMLFrameElement> | null) => {
 	if (!handle) throw "Frame not found"
@@ -39,21 +40,15 @@ contFrameElem.catch((err:Error) => console.log('2nd to end catch clause reached:
 	console.log('cookies inserted');
 	let tab2 = await tab; console.log('reloading...');
 	return tab2.reload({waitUntil:'networkidle2'})
-	.then(() => tab2.waitForSelector('a.extra-button.extra-button-gray'));
+	.then(() => tab2.waitForSelector('a.extra-button.extra-button-gray', {timeout: 7000}));
 })
-
 .then(() => tab.then((tab1:Page) => {console.log('clicking button');
 	const clickButton = tab1.click('a.extra-button.extra-button-gray'); 
 	return clickButton.then(() => tab1.waitForSelector('#Login', {timeout: 5000}))
 }))
 
-.catch((err:Error) => console.log('Last catch clause reached:\n', err))
-
-// .finally(() => ebs.disconnectBrowser())
-
-
 .then(() => lo.writeLogin('input#Login'))
-.then(() => lo.clickNext('button#btNext'))
-.then(() => lo.writePassword('input#Haslo'))
-.then(() => lo.clickNext('button#btLogOn'))
+// .then(() => lo.clickNext())
+
+.catch((err:Error) => console.log('Last catch clause reached:\n', err))
 .finally(() => ebs.disconnectBrowser())

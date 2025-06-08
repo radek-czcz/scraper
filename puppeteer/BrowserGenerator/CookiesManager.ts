@@ -39,7 +39,7 @@ export class CookiesManager {
 			insertStorage,
 			insertCookies
 		])
-		.then(() => reloadPage());
+		.then(() => {console.log('Cookies inserted and reloading Page'); return reloadPage()});
 
 		return reload;
 	}

@@ -35,7 +35,7 @@ export default class RequestSender {
 			typeof res != 'string' ? str = res.toString() : str = res
 			return solver.imageCaptcha({
 			    body: str,
-			    phrase: 1,
+			    // phrase: 1,
 			    lang: 'pl'
 			    // numeric: 4,
 			    // min_len: 5,
