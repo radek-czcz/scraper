@@ -48,7 +48,7 @@ contFrameElem.catch((err:Error) => console.log('2nd to end catch clause reached:
 }))
 
 .then(() => lo.writeLogin('input#Login'))
-// .then(() => lo.clickNext())
+.then(() => lo.clickNext('button#btNext'))
 
 .catch((err:Error) => console.log('Last catch clause reached:\n', err))
 .finally(() => ebs.disconnectBrowser())

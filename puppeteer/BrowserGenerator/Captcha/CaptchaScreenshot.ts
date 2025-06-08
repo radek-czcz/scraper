@@ -14,18 +14,9 @@ export default class CaptchaScreenshot {
 		this.page = page;
 	}
 
-	makeScreenshot():ReturnType<typeof screenshotEvalFunction> {
+	makeScreenshot():Promise<void> {
 		process.stdout.write('Screenshottng...');
 		const captchaImageSelector = container.resolve('captcha-selector');
-
-		function image(this:CaptchaScreenshot)/*const captchaContainer*/:Promise<ElementHandle<HTMLImageElement>> {
-			return this.page
-			.then((tab:Page) => tab.$(captchaImageSelector as string))
-			.then((res:ElementHandle<HTMLImageElement>|null) => {
-				if (!res) throw new Error('Selector not found')
-				else return res;
-			})
-		}
 
 		function images(this:CaptchaScreenshot):Promise<ElementHandle<HTMLImageElement>[]> {
 			return this.page
@@ -43,18 +34,9 @@ export default class CaptchaScreenshot {
 				// return elem.evaluate(boundedEval)
 				return boundedEval(elem);
 			}
-			return els.forEach(forEachFunction)
+			return Promise.all(els.map(forEachFunction))
+			.then((arr:Promise<Buffer>[]) => Promise.resolve());
 		})
-
-
-
-		// images.call(this).then((els:ElementHandle<HTMLImageElement>[]) => els[0]).then(screenshotEvalFunction.bind(this, 'output1.png'));
-		// return images.call(this).then((els:ElementHandle<HTMLImageElement>[]) => els[1]).then(screenshotEvalFunction.bind(this, 'output2.png'));
-
-		// const sShot = captchaContainer.then(screenshotEvalFunction.bind(this, 'output1.png'));
-		// sShot.then(() => console.log('done'));
-		
-		// return sShot;
 	}
 }
 
