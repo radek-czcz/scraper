@@ -18,8 +18,8 @@ export default class GenderReader {
 
 	private async readText():Promise<string> {
 		let page = await this.page;
-		const textElement:ElementHandle|null = await page.$('div.v-captcha-input > label');
-		if (!textElement) {throw "Gender text not found"}
+		const textElement:ElementHandle|null = await page.$('div#captcha[style]:not([style="display: none;"]) div.v-captcha-input > label');
+		if (!textElement) {throw new Error("Gender text not found")}
 		else {
 			let jsh:JSHandle<unknown> | undefined = await textElement?.getProperty('textContent');
 			let value:unknown =  await jsh?.jsonValue();

@@ -15,14 +15,15 @@ export default class CaptchaScreenshot {
 	}
 
 	makeScreenshot():Promise<void> {
-		process.stdout.write('Screenshottng...');
 		const captchaImageSelector = container.resolve('captcha-selector');
 
 		function images(this:CaptchaScreenshot):Promise<ElementHandle<HTMLImageElement>[]> {
+			this.page.then(() => process.stdout.write('Screenshottng...'));
 			return this.page
 			.then((tab:Page) => tab.$$(captchaImageSelector as string))
 			.then((res:ElementHandle<HTMLImageElement>[]) => {
-				res.forEach((el:ElementHandle<HTMLImageElement>) => {if (!el) throw new Error('Selector not found')});
+				console.log(res.length);
+				if (res.length === 0) {throw new Error('Selector not found')}
 				return res;
 			})
 		}
@@ -31,23 +32,22 @@ export default class CaptchaScreenshot {
 		.then((els:ElementHandle<HTMLImageElement>[]) => {
 			const forEachFunction = (elem:ElementHandle<HTMLImageElement>, ind:number) => {
 				const boundedEval:Function = screenshotEvalFunction.bind(this, 'output' + ind + '.png');
-				// return elem.evaluate(boundedEval)
 				return boundedEval(elem);
 			}
 			return Promise.all(els.map(forEachFunction))
-			.then((arr:Promise<Buffer>[]) => Promise.resolve());
+			.then((arr:Promise<Buffer>[]) => Promise.resolve())
 		})
 	}
 }
 
-let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
-let br:Promise<Browser> = ebs.browser
+// let br:Promise<Browser> = ebs.browser
 
-let tab:Promise<Page> = br
-.then((browser:Browser) => browser.pages())
-.then((tabs:Page[]) => tabs[0]);
+// let tab:Promise<Page> = br
+// .then((browser:Browser) => browser.pages())
+// .then((tabs:Page[]) => tabs[0]);
 
-let cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
-Promise.all([cs.makeScreenshot(), br])
-.finally(() => ebs.disconnectBrowser())
+// let cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
+// Promise.all([cs.makeScreenshot(), br])
+// .finally(() => ebs.disconnectBrowser())

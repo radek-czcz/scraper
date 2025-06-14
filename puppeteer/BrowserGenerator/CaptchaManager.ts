@@ -4,7 +4,7 @@ import CaptchaScreenshot from './Captcha/CaptchaScreenshot';
 import GenderReader, {Gender} from './Captcha/GenderReader';
 import RequestSender from './Captcha/RequestSender';
 import NamesFileReader from './Captcha/NamesFileReader';
-import {readFileSync} from 'fs'
+import {readFile} from 'node:fs/promises'
 
 
 
@@ -18,16 +18,42 @@ const tab:Promise<Page> = br
 const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
 
 const screenshot = cs.makeScreenshot();
+
 const genderReader = new GenderReader(tab)
 
-// const gender:Promise<Gender> = genderReader.gender.then((res:Gender) => {console.log(res); return res})
+const gender:Promise<Gender> = genderReader.gender
 
-const names:Promise<void | string[]> = NamesFileReader.readFile(gender)
-.then((res:string[]|void) => console.log(res));
+const names:Promise<string[]> = NamesFileReader.readFile(gender)
 
-const reqSender:RequestSender = new RequestSender(/*screenshot*/Promise.resolve(readFileSync("./Captcha/output.png", "base64")), gender);
-const solvedCaptcha:Promise<void> = reqSender.sendRequest()
-.then((res:{}) => console.log(res))
-.catch((err:Error) => {console.log(err); ebs.disconnectBrowser()});
+const log = names.then(res => console.log(res));
 
-Promise.all([screenshot, gender]).then(ebs.disconnectBrowser);
+const response:Promise<string> = names.then((/*res:string[]|void*/) => {
+	// console.log(res);
+	
+	const arrayOfRequests:RequestSender[] = [];
+
+	let nth = 0;
+	while ( nth < 2) {
+		 arrayOfRequests.push(new RequestSender(readFile(`./output${nth}.png`, "base64"), gender));
+	}
+
+	function finder(inp:{data:string}) {
+		if (inp) {}
+	}
+
+	function reduceCallb(acc:RequestSender, cur:RequestSender):Promise<string> {
+		return acc.sendRequest()
+		.then(
+			(res:{data:string}) => res.data
+		)
+	}
+
+	const reduced:Promise<string> = arrayOfRequests.reduce(reduceCallb, arrayOfRequests.shift())
+
+})
+
+.then((res:string) => {console.log('result print', res); return res})
+
+Promise.all([screenshot, response, gender, names]).catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
+
+.finally(() => ebs.disconnectBrowser());

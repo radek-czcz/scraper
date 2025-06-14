@@ -28,7 +28,7 @@ export default class RequestSender {
 	// 	})
 	// }
 
-	sendRequest():Promise<{}> {
+	sendRequest():Promise<{data:string}> {
 		return this.image.then((res:string|Buffer) => {
 			const solver = new Solver(credentials.apiKey);
 			let str:string;
