@@ -6,8 +6,6 @@ import RequestSender from './Captcha/RequestSender';
 import NamesFileReader from './Captcha/NamesFileReader';
 import {readFile} from 'node:fs/promises'
 
-
-
 const ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 const br:Promise<Browser> = ebs.browser
 
@@ -17,7 +15,7 @@ const tab:Promise<Page> = br
 
 const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
 
-const screenshot = cs.makeScreenshot();
+// const screenshot = cs.makeScreenshot();
 
 const genderReader = new GenderReader(tab)
 
@@ -35,25 +33,46 @@ const response:Promise<string> = names.then((/*res:string[]|void*/) => {
 	let nth = 0;
 	while ( nth < 2) {
 		 arrayOfRequests.push(new RequestSender(readFile(`./output${nth}.png`, "base64"), gender));
+		 nth++
 	}
 
-	function finder(inp:{data:string}) {
-		if (inp) {}
+	function shiftedValue():RequestSender {
+		let returnValue:RequestSender|undefined = arrayOfRequests.shift();
+		if (returnValue) return returnValue
+		else throw new Error('array empty')
 	}
 
-	function reduceCallb(acc:RequestSender, cur:RequestSender):Promise<string> {
-		return acc.sendRequest()
+	function finder(inp:{data:string}):Promise<string> {
+
+		function check(elem:string):boolean {
+			return inp.data.toLowerCase().includes(elem.toLowerCase())
+		}
+
+		function truthyResult(namesGendered:string[]) {
+			const result:string|undefined = namesGendered.find(check)
+			if (result) return inp.data
+			else throw new Error('Name not found in list')
+		}
+
+		return names.then(truthyResult)
+	}
+
+	function reduceCallback(acc:Promise<string>, cur:RequestSender):Promise<string> {
+		return acc
 		.then(
-			(res:{data:string}) => res.data
+			(res:string) => res,
+			() => cur.sendRequest().then((res:{data:string}) => {console.log('2nd: ', res.data);return finder(res)}),
 		)
 	}
 
-	const reduced:Promise<string> = arrayOfRequests.reduce(reduceCallb, arrayOfRequests.shift())
+	const reduced:Promise<string> = arrayOfRequests.reduce<Promise<string>>(reduceCallback, shiftedValue().sendRequest().then((res:{data:string}) => {console.log('1st: ', res.data);return finder(res)}))
+
+	return reduced;
 
 })
 
 .then((res:string) => {console.log('result print', res); return res})
 
-Promise.all([screenshot, response, gender, names]).catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
+Promise.all([/*screenshot,*/ response, gender, names]).catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
 
 .finally(() => ebs.disconnectBrowser());
