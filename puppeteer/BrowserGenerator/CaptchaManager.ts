@@ -6,6 +6,18 @@ import RequestSender from './Captcha/RequestSender';
 import NamesFileReader from './Captcha/NamesFileReader';
 import {readFile} from 'node:fs/promises'
 
+export class CaptchaManager {
+
+	private tab:Promise<Page>;
+
+	constructor(tab:Promise<Page>) {
+		this.tab = tab;
+	}
+
+	
+
+}
+
 const ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 const br:Promise<Browser> = ebs.browser
 
@@ -15,7 +27,7 @@ const tab:Promise<Page> = br
 
 const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
 
-// const screenshot = cs.makeScreenshot();
+const screenshot = cs.makeScreenshot();
 
 const genderReader = new GenderReader(tab)
 
@@ -73,6 +85,6 @@ const response:Promise<string> = names.then((/*res:string[]|void*/) => {
 
 .then((res:string) => {console.log('result print', res); return res})
 
-Promise.all([/*screenshot,*/ response, gender, names]).catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
+Promise.all([screenshot, response, gender, names]).catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
 
 .finally(() => ebs.disconnectBrowser());
