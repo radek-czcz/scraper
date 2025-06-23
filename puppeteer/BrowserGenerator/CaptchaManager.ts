@@ -34,7 +34,13 @@ export class CaptchaManager {
 		return names;
 	}
 
-	/*private*/ receiveAndProcessResponse():Promise<string|void> {
+	/*private*/ receiveAndProcessResponse():void/*Promise<string|void>*/ {
+
+		const screens:Promise<void> = this.takeScreenshot();
+
+		const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
+
+		const names:Promise<string[]> = screens.then(() => this.readNamesFile());
 			
 		const arrayOfRequests:RequestSender[] = [];
 
@@ -91,7 +97,9 @@ export class CaptchaManager {
 
 		log.catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/});
 
-		return log;
+		// log.finally(() => ebs.disconnectBrowser());
+
+		Promise.any([screens2, log]).then((res:string|void) => console.log('last log: ',res))
 	}
 }
 
@@ -103,16 +111,17 @@ const tab:Promise<Page> = br
 	.then((tabs:Page[]) => tabs[0]);
 
 const cm = new CaptchaManager(tab);
-const screens:Promise<void> = cm.takeScreenshot();
+cm.receiveAndProcessResponse();
+// const screens:Promise<void> = cm.takeScreenshot();
 
-const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
+// const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
 // const gender:Promise<Gender> = screens.then(() => cm.readGender());
-const names:Promise<string[]> = screens.then(() => cm.readNamesFile());
+// const names:Promise<string[]> = screens.then(() => cm.readNamesFile());
 // const response:Promise<string> = screens.then((v:void) => cm.receiveAndProcessResponse());
-const writeAndCatch:Promise<string|void> = screens.then(() => cm.receiveAndProcessResponse());
-writeAndCatch.finally(() => ebs.disconnectBrowser())
+// const writeAndCatch:Promise<string|void> = screens.then(() => cm.receiveAndProcessResponse());
+// writeAndCatch.finally(() => ebs.disconnectBrowser())
 
-Promise.any([screens2, writeAndCatch]).then((res:string|void) => console.log('last log: ',res))
+// Promise.any([screens2, writeAndCatch]).then((res:string|void) => console.log('last log: ',res))
 
 
 // const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
