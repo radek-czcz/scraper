@@ -34,7 +34,7 @@ export class CaptchaManager {
 		return names;
 	}
 
-	/*private*/ receiveAndProcessResponse():Promise<string> {
+	/*private*/ receiveAndProcessResponse():Promise<string|void> {
 			
 		const arrayOfRequests:RequestSender[] = [];
 
@@ -73,14 +73,6 @@ export class CaptchaManager {
 			)
 		}
 
-		const firstFromRequests:Promise<string> = shiftedValue().sendRequest().then((res:{data:string}) => {console.log('1st: ', res.data);return finder(res)})
-
-		const reduced:Promise<string> = arrayOfRequests.reduce<Promise<string>>(reduceCallback, firstFromRequests)
-
-		return reduced;
-	}
-
-	/*private*/ writeCaptchaAndCatch():Promise<string|void> {
 		const writeCaptcha = async (res:string) => {
 			console.log('result print', res);
 			let page = await this.tab;
@@ -91,11 +83,16 @@ export class CaptchaManager {
 			return waitForWriting;
 		}
 
-		const log:Promise<string|void> = this.receiveAndProcessResponse().then(writeCaptcha)
-		log.catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/})
+		const firstFromRequests:Promise<string> = shiftedValue().sendRequest().then((res:{data:string}) => {console.log('1st: ', res.data);return finder(res)})
+
+		const reduced:Promise<string> = arrayOfRequests.reduce<Promise<string>>(reduceCallback, firstFromRequests)
+
+		const log:Promise<string|void> = reduced.then(writeCaptcha);
+
+		log.catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/});
+
 		return log;
 	}
-
 }
 
 const ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
@@ -112,7 +109,7 @@ const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err
 // const gender:Promise<Gender> = screens.then(() => cm.readGender());
 const names:Promise<string[]> = screens.then(() => cm.readNamesFile());
 // const response:Promise<string> = screens.then((v:void) => cm.receiveAndProcessResponse());
-const writeAndCatch:Promise<string|void> = screens.then(() => cm.writeCaptchaAndCatch());
+const writeAndCatch:Promise<string|void> = screens.then(() => cm.receiveAndProcessResponse());
 writeAndCatch.finally(() => ebs.disconnectBrowser())
 
 Promise.any([screens2, writeAndCatch]).then((res:string|void) => console.log('last log: ',res))
