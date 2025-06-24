@@ -6,7 +6,7 @@ import RequestSender from './Captcha/RequestSender';
 import NamesFileReader from './Captcha/NamesFileReader';
 import {readFile} from 'node:fs/promises'
 
-export class CaptchaManager {
+export default class CaptchaManager {
 
 	private tab:Promise<Page>;
 
@@ -15,7 +15,7 @@ export class CaptchaManager {
 	}
 
 	/*private*/ takeScreenshot():Promise<void> {
-		const cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
+		const cs:CaptchaScreenshot = new CaptchaScreenshot(this.tab);
 		return cs.makeScreenshot();
 	}
 
@@ -25,7 +25,7 @@ export class CaptchaManager {
 	}*/
 
 	/*private*/ readGender():Promise<Gender> {
-		const genderReader = new GenderReader(tab);
+		const genderReader = new GenderReader(this.tab);
 		return genderReader.gender
 	}
 
@@ -34,85 +34,96 @@ export class CaptchaManager {
 		return names;
 	}
 
-	/*private*/ receiveAndProcessResponse():void/*Promise<string|void>*/ {
+	/*private*/ receiveAndProcessResponse():/*void*/Promise<string|void> {
 
 		const screens:Promise<void> = this.takeScreenshot();
 
-		const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
+		return screens.then(() => {
 
-		const names:Promise<string[]> = screens.then(() => this.readNamesFile());
-			
-		const arrayOfRequests:RequestSender[] = [];
+			const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
 
-		let nth = 0;
-		while ( nth < 2) {
-			 arrayOfRequests.push(new RequestSender(readFile(`./output${nth}.png`, "base64"), this.readGender()));
-			 nth++
-		}
+			const names:Promise<string[]> = screens.then(() => this.readNamesFile());
+				
+			const arrayOfRequests:RequestSender[] = [];
 
-		function shiftedValue():RequestSender {
-			let returnValue:RequestSender|undefined = arrayOfRequests.shift();
-			if (returnValue) return returnValue
-			else throw new Error('array empty')
-		}
-
-		function finder(inp:{data:string}):Promise<string> {
-
-			function findFunction(elem:string):boolean {
-				return inp.data.toLowerCase().includes(elem.toLowerCase())
+			let nth = 0;
+			while ( nth < 2) {
+				 arrayOfRequests.push(new RequestSender(readFile(`./output${nth}.png`, "base64"), this.readGender()));
+				 nth++
 			}
 
-			function truthyResult(namesGendered:string[]) {
-				const result:string|undefined = namesGendered.find(findFunction)
-				if (result) return inp.data
-				else throw new Error('Name not found in list')
+			function shiftedValue():RequestSender {
+				let returnValue:RequestSender|undefined = arrayOfRequests.shift();
+				if (returnValue) return returnValue
+				else throw new Error('array empty')
 			}
 
-			return names.then(truthyResult);
-		}
+			function finder(inp:{data:string}):Promise<string> {
 
-		function reduceCallback(acc:Promise<string>, cur:RequestSender):Promise<string> {
-			return acc
-			.then(
-				(res:string) => res,
-				() => cur.sendRequest().then((res:{data:string}) => {console.log('2nd: ', res.data);return finder(res)}),
-			)
-		}
+				function findFunction(elem:string):boolean {
+					return inp.data.toLowerCase().includes(elem.toLowerCase())
+				}
 
-		const writeCaptcha = async (res:string) => {
-			console.log('result print', res);
-			let page = await this.tab;
-			const selector = '#captchaUser'
-			page.waitForSelector(selector)
-			.then(() => console.log('(Login input-box)'));
-			const waitForWriting:void = await page.type(selector, res, {delay: 100})
-			return waitForWriting;
-		}
+				function truthyResult(namesGendered:string[]) {
+					const result:string|undefined = namesGendered.find(findFunction)
+					if (result) return inp.data
+					else throw new Error('Name not found in list')
+				}
 
-		const firstFromRequests:Promise<string> = shiftedValue().sendRequest().then((res:{data:string}) => {console.log('1st: ', res.data);return finder(res)})
+				return names.then(truthyResult);
+			}
 
-		const reduced:Promise<string> = arrayOfRequests.reduce<Promise<string>>(reduceCallback, firstFromRequests)
+			function reduceCallback(acc:Promise<string>, cur:RequestSender):Promise<string> {
+				return acc
+				.then(
+					(res:string) => res,
+					() => cur.sendRequest().then((res:{data:string}) => {console.log('2nd: ', res.data);return finder(res)}),
+				)
+			}
 
-		const log:Promise<string|void> = reduced.then(writeCaptcha);
+			const writeCaptcha = async (res:string):Promise<string> => {
+				console.log('result print', res);
+				let page = await this.tab;
+				const selector = '#captchaUser'
+				page.waitForSelector(selector)
+				.then(() => console.log('(Login input-box)'));
+				const waitForWriting:void = await page.type(selector, res, {delay: 100})
+				return res;
+			}
 
-		log.catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/});
+			const firstFromRequests:Promise<string> = shiftedValue().sendRequest().then((res:{data:string}) => {console.log('1st: ', res.data);return finder(res)})
 
-		// log.finally(() => ebs.disconnectBrowser());
+			const reduced:Promise<string> = arrayOfRequests.reduce<Promise<string>>(reduceCallback, firstFromRequests)
 
-		Promise.any([screens2, log]).then((res:string|void) => console.log('last log: ',res))
+			const log:Promise<string> = reduced.then(writeCaptcha);
+
+			log.catch((err:Error) => {console.log('catch: ',err)/*; ebs.disconnectBrowser()*/});
+
+			// log.finally(() => ebs.disconnectBrowser());
+
+			Promise.any([screens2, log]).then((res:string|void) => console.log('last log: ',res))
+
+			return log;
+		})
 	}
 }
 
-const ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
-const br:Promise<Browser> = ebs.browser
+// const ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// const br:Promise<Browser> = ebs.browser
 
-const tab:Promise<Page> = br
-	.then((browser:Browser) => browser.pages())
-	.then((tabs:Page[]) => tabs[0]);
+// const tab:Promise<Page> = br
+// 	.then((browser:Browser) => browser.pages())
+// 	.then((tabs:Page[]) => tabs[0]);
 
-const cm = new CaptchaManager(tab);
-cm.receiveAndProcessResponse()
-setTimeout(ebs.disconnectBrowser, 2000)
+// const cm = new CaptchaManager(tab);
+// const final:Promise<string|void> = cm.receiveAndProcessResponse();
+// final.then(() => ebs.disconnectBrowser())
+
+
+
+
+
+
 // const screens:Promise<void> = cm.takeScreenshot();
 
 // const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})

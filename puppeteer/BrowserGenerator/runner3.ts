@@ -2,7 +2,7 @@ import { Page, Browser, ElementHandle, Frame } from 'puppeteer';
 import {ExistingBrowserSubClass} from './ExistingBrowserSubClass';
 import LoginOperator from './LoginOperator/LoginOperator';
 import creds from './LoginOperator/Credentials';
-import CaptchaScreenshot from './Captcha/CaptchaScreenshot';
+import CaptchaManager from './CaptchaManager'
 
 let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
 
@@ -13,11 +13,13 @@ let tab:Promise<Page> = br
 .then((tabs:Page[]) => tabs[0]);
 
 let lo:LoginOperator = new LoginOperator(tab, creds as [string, string]);
-const capScr:CaptchaScreenshot = new CaptchaScreenshot(tab);
+const capMan:CaptchaManager = new CaptchaManager(tab);
 
-lo.writePassword('input#Haslo1')
-// lo.writePassword('input#Haslo')
-/*.then(() => */ /*capScr.makeScreenshot()*/ /*)*/
-// .then(() => lo.clickNext('button#btLogOn'))
-// .catch((err:Error) => console.log(err)) 
+function passwordCallback() {
+	return lo.writePassword('input#Haslo');
+}
+
+capMan.receiveAndProcessResponse()
+.then(passwordCallback, passwordCallback)
+.then(() => lo.clickNext('button#btLogOn'))
 .finally(() => ebs.disconnectBrowser())
