@@ -111,7 +111,8 @@ const tab:Promise<Page> = br
 	.then((tabs:Page[]) => tabs[0]);
 
 const cm = new CaptchaManager(tab);
-cm.receiveAndProcessResponse();
+cm.receiveAndProcessResponse()
+setTimeout(ebs.disconnectBrowser, 2000)
 // const screens:Promise<void> = cm.takeScreenshot();
 
 // const screens2:Promise<void> = screens.then((inp:void) => Promise.reject(), (err:Error) => {if (err.message === 'Selector not found') {console.log('No need to write captcha'); return Promise.resolve()}})
