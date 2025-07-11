@@ -2,19 +2,15 @@ import {BrowserSubClass} from './BrowserSubClass';
 import {Navigator} from './Navigator';
 import { CookiesManager } from './CookiesManager'
 import { Page, Frame, ElementHandle } from 'puppeteer'
-import './container';
-import {container} from 'tsyringe';
 
 let brs = new BrowserSubClass();
 
 brs.establishNetServer();
 
-const url:string = container.resolve('url')
-
 const tab = new Navigator(brs.browser
 	.then(browser => browser.pages())
 	.then(pages => pages[0])
-).goToPage(url)
+).goToPage('https://dziennik-uczen.vulcan.net.pl/gminawolow')
 
 // let cs:CookiesManager = new CookiesManager(tab);
 

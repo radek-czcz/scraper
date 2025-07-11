@@ -15,11 +15,11 @@ let childProcessWriteDataToDB;
 // urls fo olx pages
 	let arrUrl:string[] = [];
 	// avensis
-		// arrUrl.push('https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
+		arrUrl.push('https://www.olx.pl/motoryzacja/samochody/toyota/q-avensis/?search%5Border%5D=created_at:desc&search%5Bfilter_float_year:from%5D=2006&search%5Bfilter_float_year:to%5D=2008&search%5Bfilter_float_enginesize:to%5D=1900&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_petrol%5D%5B1%5D=lpg&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
 	// insignia		
-		// arrUrl.push('https://www.olx.pl/motoryzacja/samochody/opel/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
+		arrUrl.push('https://www.olx.pl/motoryzacja/samochody/opel/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:to%5D=30000&search%5Bfilter_enum_model%5D%5B0%5D=insignia&search%5Bfilter_enum_petrol%5D%5B0%5D=petrol&search%5Bfilter_enum_car_body%5D%5B0%5D=estate-car&search%5Bfilter_float_milage:to%5D=200000');
 	// media expert
-		arrUrl.push('https://www.mediaexpert.pl/agd/lodowki-i-zamrazarki/chlodziarki/whirlpool.electrolux/cena_1200.0?sort=price_asc&limit=50');
+		// arrUrl.push('https://www.mediaexpert.pl/agd/lodowki-i-zamrazarki/chlodziarki/whirlpool.electrolux/cena_1200.0?sort=price_asc&limit=50');
 
 // reaction to ctrl+c
 	process.on('SIGINT', function() {
