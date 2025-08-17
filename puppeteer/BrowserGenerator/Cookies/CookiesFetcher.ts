@@ -1,36 +1,45 @@
 import { Page, Browser } from 'puppeteer'
 import { writeFile } from 'node:fs/promises';
 import { ExistingBrowserSubClass } from '../ExistingBrowserSubClass'
+import {singleton, inject} from 'tsyringe';
 
+@singleton()
 export default class CookiesFetcher {
-	page:Promise<Page>
 
-	constructor(page:Promise<Page>) {
-		this.page = page
-	}
+	constructor(
+		private page:Promise<Page>,
+		@inject('cookies-path') protected cookiesPath:string,
+		@inject('cookies-urls') protected cookiesUrls:string[],
+	) {}
 
 	private writeToFile(cookies:object) {
 		return writeFile(
-			'cookies.json',
-			/*'./cookies.json'*/
+			this.cookiesPath,
 			JSON.stringify(cookies, null, 2))
+		.then(() => console.log(`Cookies fetched and saved to file ${this.cookiesPath}`))
 	}
 
 	async fetchCookies():Promise<void> {
+		// let cookiesUrls:string[] = [];
 		let cookies:object;
-		let page:Page = await this.page
-		cookies = await page.cookies(
-			'https://uonetplus.vulcan.net.pl/gminawolow', 
-			'https://uonetplus-cdn.vulcan.net.pl', 
-			'https://home.pl'
-		)/*.then((res:object) => res.flat(2))*/
-		return this.writeToFile(cookies)
+		let page:Page = await this.page;
+		cookies = await page.cookies(...this.cookiesUrls);
+		return this.writeToFile(cookies);
 	}
 }
 
-let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
-let tab:Promise<Page> = ebs.browser.then((br:Browser) => br.pages())
-.then((tabs:Page[]) => tabs[0])
+// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
+// let tab:Promise<Page> = ebs.browser.then((br:Browser) => br.pages())
+// .then((tabs:Page[]) => tabs[0])
 
-new CookiesFetcher(tab).fetchCookies()
+// new CookiesFetcher(
+// 	tab,
+// 	'../../ConfigFiles/vulcan/cookies4.json',
+// 	[
+// 		'https://uonetplus.vulcan.net.pl/gminawolow', 
+// 		'https://uonetplus-cdn.vulcan.net.pl', 
+// 		'https://home.pl'
+// 	]
+// ).fetchCookies()
+// .then(() => ebs.disconnectBrowser())
 
