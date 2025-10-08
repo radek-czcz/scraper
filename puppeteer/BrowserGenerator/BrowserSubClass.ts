@@ -1,8 +1,11 @@
+import "reflect-metadata";
 import {Browser, Page} from 'puppeteer'
 import puppeteer from 'puppeteer-extra';
 import net, {Server, Socket} from 'net';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+import {injectable, inject} from 'tsyringe';
 
+@injectable()
 export class BrowserSubClass {
 
 	protected browserInstance:Promise<Browser>;
@@ -21,9 +24,12 @@ export class BrowserSubClass {
 		return browser
 	}
 
-	constructor() {
+	constructor(
+		@inject('port') protected port:number,
+		@inject('headless') private headless:boolean
+	) {
 		puppeteer.use(StealthPlugin());
-		this.browserInstance = this.launchBrowser(false);
+		this.browserInstance = this.launchBrowser(this.headless);
 
 		process.on('exit', () => this.browserInstance
 			.then((br:Browser) => {br.close(); console.log('browser closed');})
@@ -42,6 +48,12 @@ export class BrowserSubClass {
 
 	public get browser():Promise<Browser> {
 		return this.browserInstance;
+	}
+
+	get tab0():Promise<Page> {
+		return this.browserInstance
+		.then((browser:Browser) => browser.pages())
+		.then(pages => pages[0]);
 	}
 
 	// make .net server to pass the Puppeteer's browser wsEndpoint
@@ -74,15 +86,8 @@ export class BrowserSubClass {
 	    process.on('exit', () => {this.server?.close(); console.log('net.server says: server closed, because of process exit')});
 	    process.on('error', () => {this.server?.close(); console.log('net.server says: server closed, because of process error')})
 
-		this.server.listen(8088, function() { 
+		this.server.listen(this.port, function() { 
   			console.log('server is listening');
 		});
-	}
-
-	goToPage(url:string):Promise<Page> {
-	  let pages:Promise<Page[]> = this.browserInstance.then(br => br.pages());
-	  let going = pages.then((res) => res[0].goto(url, {waitUntil: 'networkidle2'}))
-	  .catch(err => console.log(`browser could not navigate to the page address\n${err}`));
-	  return Promise.all([pages, going]).then(res => {console.log('page opened'); return res[0][0]})
 	}
 }
