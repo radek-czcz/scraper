@@ -1,53 +1,37 @@
-import { Page, Browser, ElementHandle } from 'puppeteer';
-import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
-import screenshotEvalFunction from './ScreenshotMethod2';
-import { createWriteStream } from 'node:fs'
-import '../container';
-import {container} from 'tsyringe';
+import { Page, ElementHandle } from 'puppeteer';
+import {autoInjectable, inject} from 'tsyringe';
+import {IScreenshotMethod} from './IScreenshotMethod';
 
-export default class CaptchaScreenshot {
+@autoInjectable()
+export class CaptchaScreenshot {
 
-	page:Promise<Page>;
+	constructor(
+		private _page:Promise<Page>,
+		@inject('captcha-selector') private _selector:string,
+		// @inject('captcha-path') private _path:string,
+		@inject('screenshot-function') private screenshotEvalFunction:IScreenshotMethod<Buffer>
+	) {}
 
-
-	constructor(page:Promise<Page>) {
-		this.page = page;
+	private images():Promise<ElementHandle<HTMLImageElement>[]> {
+		this._page.then(() => process.stdout.write('Screenshottng...'));
+		return this._page
+		.then((tab:Page) => tab.$$(this._selector as string))
+		.then((res:ElementHandle<HTMLImageElement>[]) => {
+			if (res.length === 0) {throw new Error('Selector not found')}
+			return res;
+		})
 	}
 
-	makeScreenshot():Promise<void> {
-		const captchaImageSelector = container.resolve('captcha-selector');
-
-		function images(this:CaptchaScreenshot):Promise<ElementHandle<HTMLImageElement>[]> {
-			this.page.then(() => process.stdout.write('Screenshottng...'));
-			return this.page
-			.then((tab:Page) => tab.$$(captchaImageSelector as string))
-			.then((res:ElementHandle<HTMLImageElement>[]) => {
-				console.log(res.length);
-				if (res.length === 0) {throw new Error('Selector not found')}
-				return res;
-			})
-		}
-
-		return images.call(this)
+	makeScreenshot():Promise<Buffer[]> {
+		return this.images()
 		.then((els:ElementHandle<HTMLImageElement>[]) => {
 			const forEachFunction = (elem:ElementHandle<HTMLImageElement>, ind:number) => {
-				const boundedEval:Function = screenshotEvalFunction.bind(this, 'output' + ind + '.png');
-				return boundedEval(elem);
+				// const boundedEval:Function = this.screenshotEvalFunction.bind(this, this._path + 'output' + ind + '.png');
+				// return boundedEval(elem);
+				const boundedEval:Function = this.screenshotEvalFunction.makeScreenshot.bind(this);
+				return boundedEval();
 			}
 			return Promise.all(els.map(forEachFunction))
-			.then((arr:Promise<Buffer>[]) => Promise.resolve())
 		})
 	}
 }
-
-// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
-
-// let br:Promise<Browser> = ebs.browser
-
-// let tab:Promise<Page> = br
-// .then((browser:Browser) => browser.pages())
-// .then((tabs:Page[]) => tabs[0]);
-
-// let cs:CaptchaScreenshot = new CaptchaScreenshot(tab);
-// Promise.all([cs.makeScreenshot(), br])
-// .finally(() => ebs.disconnectBrowser())
