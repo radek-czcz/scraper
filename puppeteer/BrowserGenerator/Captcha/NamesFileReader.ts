@@ -1,17 +1,28 @@
 import { readFile } from 'node:fs/promises';
 import {Gender} from './GenderReader';
-import stringFunction from './NamesFileProcessFunction'
+import stringFunction from './NamesFileProcessFunction';
+import {autoInjectable, inject} from 'tsyringe';
+import GenderReader from './GenderReader';
 
-export default class NamesFileReader {
-	static 	async readFile(genderInp:Promise<Gender>):Promise<ReturnType<typeof stringFunction>> {
-		const gender = await genderInp;
+
+@autoInjectable()
+export class NamesFileReader {
+
+	constructor(
+		private _genReader:GenderReader
+	) {/*console.log(this)*/}
+
+	async readFile():Promise<ReturnType<typeof stringFunction>> {
+		const gender:Gender = await this._genReader.gender;
+		// console.log('NamesFileReader', this);
+		// console.log(Gender[gender]);
 		switch (true) {
 			case gender===Gender.Male:
-				return	readFile('./Captcha/mNames.csv', { encoding: 'utf8' })
+				return	readFile('../BrowserGenerator/Captcha/mNames.csv', { encoding: 'utf8' })
 				.then((res:string) => stringFunction(res));
 			break;
 			case gender===Gender.Female:
-				return	readFile('./Captcha/fNames.csv', { encoding: 'utf8' })
+				return	readFile('../BrowserGenerator/Captcha/fNames.csv', { encoding: 'utf8' })
 				.then((res:string) => stringFunction(res));
 			break;
 			default: throw "Word -zenski- or -meski- not found"
