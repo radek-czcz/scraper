@@ -1,23 +1,30 @@
 import { ElementHandle } from 'puppeteer'
 import { writeFile } from 'node:fs/promises';
+import {autoInjectable, inject} from 'tsyringe';
+import {IScreenshotMethod} from './IScreenshotMethod';
+import {Buffer as Buf} from 'node:buffer'
 
 // reads base64 string from src of HTMLImageElement
-export default function(
-	path:string,
-	captchaImageContainer:ElementHandle<HTMLImageElement>
-):Promise<Buffer> {
+@autoInjectable()
+export class ScreenshotMethod2/*<Buf>*/ implements IScreenshotMethod<Buf>/*<T>*/{
 
-	function writeBuffer(res:string):Buffer {
-		// if (res) {
-			const buf:Buffer = Buffer.from(res.replace('data:image/png;base64,', ''), 'base64');
-			writeFile(path, buf)
-			.then(() => {
-				console.log('Buffer has been written to file successfully');
-			})
-		// }
-			return buf;
+	constructor(
+		private path:string,
+		private captchaImageContainer:ElementHandle<HTMLImageElement>
+	){/*console.log(Buffer);console.log(Buf);console.log(Buffer === Buf)*/}
+
+	writeBuffer(res:string):Buf {
+		const buf/*:Buf */= Buf.from(res.replace('data:image/png;base64,', ''), 'base64');
+		console.log(buf);
+		writeFile(this.path, buf)
+		.then(() => {
+			console.log('Buffer has been written to file successfully');
+		})
+		return buf;
 	}
 
-	return captchaImageContainer.evaluate((el:HTMLImageElement) => el.src)
-	.then(writeBuffer)
+	makeScreenshot():Promise<Buf> {
+		return this.captchaImageContainer.evaluate((el:HTMLImageElement) => el.src)
+		.then(() => this.writeBuffer(this.path))
+	}
 }
