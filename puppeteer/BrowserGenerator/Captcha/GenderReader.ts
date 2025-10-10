@@ -1,22 +1,20 @@
 import { Page, Browser, ElementHandle, JSHandle } from 'puppeteer';
-// import {ExistingBrowserSubClass} from '../ExistingBrowserSubClass';
+import {autoInjectable} from 'tsyringe';
+
 
 export enum Gender {
 	Male,
 	Female
 }
 
+@autoInjectable()
 export default class GenderReader {
 
-	private page:Promise<Page>;
-	private gender_:Promise<Gender>;
+	constructor(
+		protected page:Promise<Page>,
+	) {	}
 
-	constructor(page:Promise<Page>) {
-		this.page = page;
-		this.gender_ = this.assignGender();
-	}
-
-	private async readText():Promise<string> {
+	protected async readText():Promise<string> {
 		let page = await this.page;
 		const textElement:ElementHandle|null = await page.$('div#captcha[style]:not([style="display: none;"]) div.v-captcha-input > label');
 		if (!textElement) {throw new Error("Gender text not found")}
@@ -27,7 +25,7 @@ export default class GenderReader {
 		}
 	}
 
-	private async assignGender():Promise<Gender> {
+	protected async assignGender():Promise<Gender> {
 		const text = await this.readText();
 		switch (true) {
 			case text.includes('męskie'):
@@ -41,26 +39,6 @@ export default class GenderReader {
 	}
 
 	public get gender() {
-		return this.gender_;
+		return this.assignGender();
 	}
 }
-
-// let ebs:ExistingBrowserSubClass = new ExistingBrowserSubClass();
-
-// let br:Promise<Browser> = ebs.browser
-
-// let tab:Promise<Page> = br
-// .then((browser:Browser) => browser.pages())
-// .then((tabs:Page[]) => tabs[0]);
-
-// let cs:GenderReader = new GenderReader(tab);
-
-// function strRep(inp:string):string[] {
-// 	return inp.replaceAll(`"`, '').replaceAll(",", '').split('\n')
-// }
-
-// Promise.all([GenderReader.readText(tab), br])
-// .then((arr:[string, Browser]) => {
-// 	console.log(arr[0]);
-// 	arr[1].disconnect();
-// })

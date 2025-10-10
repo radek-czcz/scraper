@@ -1,15 +1,14 @@
 import {Solver} from "@2captcha/captcha-solver";
-import {Gender} from './GenderReader'
-import credentials from './Captcha2Credentials'
+import {Gender} from './GenderReader';
+import credentials from './Captcha2Credentials';
+import {autoInjectable, inject} from 'tsyringe';
 
+@autoInjectable()
 export default class RequestSender {
-	image:Promise<string|Buffer>;
-	gender:Promise<Gender>;
 
-	constructor(image:Promise<string|Buffer>, gender:Promise<Gender>) {
-		this.image = image;
-		this.gender = gender;
-	}
+	constructor(
+		@inject('captcha-image') private image:Promise<string|Buffer>, 
+		private gender:Promise<Gender>) { }
 
 	// private chooseCorrectWord(solvedCaptcha:[{}, string | null]):string|undefined { 
 	// 	console.log(solvedCaptcha);
