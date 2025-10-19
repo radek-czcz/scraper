@@ -1,47 +1,61 @@
 import {Browser, Page, JSONArray, HTTPResponse} from 'puppeteer';
-import {ExistingBrowserSubClass} from './ExistingBrowserSubClass'
 import StorageDataReader from './Cookies/StorageDataReader'
 import StorageDataInserter from './Cookies/StorageDataInserter'
-import CookiesReader from './Cookies/CookiesReader'
+import CookiesReader from './Cookies/CookiesReader';
+import {injectable, container, singleton, inject} from 'tsyringe'
 
+@singleton()
 export class CookiesManager {
 
-	private page:Promise<Page>;
+	// protected _page:Promise<Page> = container.resolve(Promise<Page>);
 
-	constructor(page:Promise<Page>) {
-		this.page = page;
+	constructor(
+		protected _page:Promise<Page>,
+		@inject('cookies-path') protected cookiesPath:string
+	) {}
+
+	protected readCookiesFromFile(path:string):Promise<JSONArray> {
+		return CookiesReader.getCookies(path/*path+'cookies.json'*/)
 	}
 
-	public setCookies(path:string):Promise<null | HTTPResponse> {
+	public setCookies():Promise<null | HTTPResponse> {
 
-		let cookies:Promise<JSONArray> = CookiesReader.getCookies(path+'cookies.json');
+		const cookies = this.readCookiesFromFile(this.cookiesPath)
 
-		let storageDataRead:(Promise<[JSONArray, JSONArray]>) = new StorageDataReader(
-			[path+'local.json', path+'session.json']
-		).readStorageData();
-
-		let storageDataInsert:StorageDataInserter = new StorageDataInserter(this.page);
-
-		let reloadPage:Function = () => {
-			return this.page
-			.then((tab:Page) => tab.reload({waitUntil:'networkidle0'}));
-		}
-
-		let insertStorage:Promise<void> = storageDataRead
-		.then((res:[JSONArray, JSONArray]) => new StorageDataInserter(this.page).insertData(res));
+		const insertStorage = this.insertStorageData();
 
 		let insertCookies = Promise.all([
 			cookies,
-			this.page
+			this._page
 		]).then((res:[JSONArray, Page]) => res[1].setCookie(...<any>res[0]));
-
 		let reload = Promise.all([
 			insertStorage,
 			insertCookies
 		])
-		.then(() => {console.log('Cookies inserted and reloading Page'); return reloadPage()});
+		.then(() => {console.log('Cookies inserted and reloading Page'); return this.reloadPage()});
 
 		return reload;
+	}
+
+	protected readStorageData(path:string):Promise<[JSONArray, JSONArray]> {
+		return new StorageDataReader(
+			[path+'local.json', path+'session.json']
+		).readStorageData();
+	}
+
+	public insertStorageData():Promise<void> {
+		return this.readStorageData('../ConfigFiles/vulcan/')
+		.then((res:[JSONArray, JSONArray]) => new StorageDataInserter(this._page).insertData(res));	
+	}
+
+	protected checkedReload(promiseConditions:Promise<any>[]) {
+		let reload = Promise.all(promiseConditions)
+		.then(() => {console.log('Cookies inserted and reloading Page'); return this.reloadPage()});
+	}
+
+	protected reloadPage():Promise<HTTPResponse | null> {
+		return this._page
+		.then((tab:Page) => tab.reload({waitUntil:'networkidle0'}));
 	}
 }
 

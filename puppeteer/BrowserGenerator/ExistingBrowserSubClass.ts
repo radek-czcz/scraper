@@ -2,8 +2,9 @@ import {BrowserSubClass} from './BrowserSubClass'
 import {Browser, Page} from 'puppeteer'
 import net, {Server, Socket} from 'net';
 import puppeteer from 'puppeteer-extra';
+import {IDisconnectable} from './Interfaces/IDisconnectable'
 
-export class ExistingBrowserSubClass extends BrowserSubClass {
+export class ExistingBrowserSubClass extends BrowserSubClass implements IDisconnectable {
 
 	/*constructor() {
 		super();

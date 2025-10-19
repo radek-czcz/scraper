@@ -1,4 +1,4 @@
-import { Page, Browser, ElementHandle, JSHandle } from 'puppeteer';
+import { Page, ElementHandle, JSHandle } from 'puppeteer';
 import {autoInjectable} from 'tsyringe';
 
 
