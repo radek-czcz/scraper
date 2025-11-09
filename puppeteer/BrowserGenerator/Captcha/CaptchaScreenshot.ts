@@ -31,6 +31,7 @@ export class CaptchaScreenshot {
 				// return boundedEval(elem);
 				// console.log('elem: ', elem);
 				container.register('captcha-elHandle', {useValue:elem})
+				container.register<string>('captcha-path', {useValue:`../BrowserGenerator/Captcha/output${ind}.png`});
 				let screenshotEvalFunction:IScreenshotMethod<Buffer> = container.resolve('screenshot-function');
 				// console.log('screenshotEvalFunction: ', screenshotEvalFunction);
 				// const boundedEval:Function = screenshotEvalFunction.makeScreenshot;

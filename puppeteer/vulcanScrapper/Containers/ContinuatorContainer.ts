@@ -45,7 +45,6 @@ container.register('selector-inputbox', {useValue:'input#Login'});
 container.register('credentials', {useValue:creds});
 
 container.register<string>('captcha-selector', {useValue:'img.v-captcha-image'});
-container.register<string>('captcha-path', {useValue:'../BrowserGenerator/Captcha/output1.png'});
 container.register('screenshot-function', {useClass:ScreenshotMethod2});
 container.register<GenderReader>(GenderReader, {useClass:GenderReader2});
 container.register(RequestSender, {useClass:RequestSender});
