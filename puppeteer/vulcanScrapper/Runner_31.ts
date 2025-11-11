@@ -56,11 +56,23 @@ function sendRequest():Promise<{data:string}> {
 	return container.resolve(RequestSender).sendRequest()
 }
 
-function consumeRequest(response:{data:string}):void {
-	return console.log(response.data)
+const namesArray:Promise<string[]> = readNamesFromFile();
+
+function consumeRequest(response:{data:string}):Promise<boolean> {
+	// return console.log(response.data)
+	return namesArray
+	.then((namesArray:string[]) => {
+		namesArray.forEach((name:string) => {
+			if (response.data.includes(name.toLowerCase()))
+				{console.log('name '+name+' found in array')
+				return true}
+			else return false
+		})
+		console.log('name '+response.data+' not found in array');
+		return Promise.reject();
+	})
 }
 
-const namesArray:Promise<string[]> = readNamesFromFile();
 
 const screens = makeScreenshots();
 
@@ -68,11 +80,18 @@ function loopOverScreens() {
 	return screens.then((screens:Buffer[]) => screens.reduce((acc:Promise<boolean>, cur:Buffer) => {
 		// if (acc) {return acc.then(consumeRequest)}
 		// registerScreenshot(cur);
-		// sendRequest()
+		// return sendRequest()
 		// .then(consumeRequest)
 
-		return acc.then((boo:boolean) => boo);
-	}, Promise.resolve(false)))
+		return acc.then(
+			(boo:boolean) => boo, 
+			() => {console.log('sec branch'); 		
+				registerScreenshot(cur);
+				return sendRequest()
+				.then(consumeRequest)
+			}
+		);
+	}, Promise.reject()))
 }
 
 
@@ -85,7 +104,7 @@ function loopOverScreens() {
 // 		if ('patryk90002'.includes(name.toLowerCase()))
 // 			{console.log(name)}
 // 	}) 
-// })*/
+// })
 
 loopOverScreens()
 /*sendRequest*/.then(() => continuator.existing.disconnectBrowser())
