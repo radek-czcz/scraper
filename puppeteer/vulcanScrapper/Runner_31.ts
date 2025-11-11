@@ -33,20 +33,33 @@ const continuator:ContinuatorHere<Page> = container.resolve(Continuator) as Cont
 
 const pageContinuator:Promise<Page> = continuator.resume()
 
-const registerScreenshot = pageContinuator
-.then(() => {
-	const screens:Promise<Buffer[]> = continuator.cs.makeScreenshot();
-	return screens
-	.then((buf:Buffer[]) => container.register('captcha-image', {useValue:Promise.resolve(buf[0])}))
-})
+function makeScreenshots():Promise<Buffer[]> {
+	return pageContinuator.then(() => continuator.cs.makeScreenshot());
+}
 
-const namesArray:Promise<string[]> = continuator.namesFileReader.readFile()
+function registerScreenshot(buf:Buffer[]) {
+	return container.register('captcha-image', {useValue:Promise.resolve(buf[0])})
+}
 
-const sendRequest = registerScreenshot.then(() => {
-	const requestSender = container.resolve(RequestSender);
-	return requestSender.sendRequest()
-	.then((response:{data:string}) => console.log(response.data))
-})
+function readNamesFromFile():Promise<string[]> {
+	return continuator.namesFileReader.readFile();
+}
+
+function sendRequest():Promise<{data:string}> {
+	return container.resolve(RequestSender).sendRequest()
+}
+
+function consumeRequest(response:{data:string}):void {
+	return console.log(response.data)
+}
+
+const namesArray:Promise<string[]> = readNamesFromFile();
+
+makeScreenshots()
+.then(registerScreenshot)
+.then(sendRequest)
+.then(consumeRequest)
+
 
 // namesArray
 // .then((namesArray:string[]) => {
@@ -54,6 +67,6 @@ const sendRequest = registerScreenshot.then(() => {
 // 		if ('patryk90002'.includes(name.toLowerCase()))
 // 			{console.log(name)}
 // 	}) 
-// })
+// })*/
 
-sendRequest.then(() => continuator.existing.disconnectBrowser())
+/*sendRequest*/.then(() => continuator.existing.disconnectBrowser())
