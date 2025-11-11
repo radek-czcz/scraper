@@ -37,9 +37,16 @@ function makeScreenshots():Promise<Buffer[]> {
 	return pageContinuator.then(() => continuator.cs.makeScreenshot());
 }
 
-function registerScreenshot(buf:Buffer[]) {
-	return container.register('captcha-image', {useValue:Promise.resolve(buf[0])})
+function registerScreenshot(buf:Buffer) {
+	return container.register('captcha-image', {useValue:Promise.resolve(buf)})
 }
+
+// function registerScreenshotToBind(num:string, buf:Buffer[]) {
+// 	console.log(num);
+// 	return container.register('captcha-image', {useValue:Promise.resolve(buf[0])});
+// }
+
+// let registerScreenshot = registerScreenshotToBind.bind(this, '2');
 
 function readNamesFromFile():Promise<string[]> {
 	return continuator.namesFileReader.readFile();
@@ -55,10 +62,21 @@ function consumeRequest(response:{data:string}):void {
 
 const namesArray:Promise<string[]> = readNamesFromFile();
 
-makeScreenshots()
-.then(registerScreenshot)
-.then(sendRequest)
-.then(consumeRequest)
+const screens = makeScreenshots();
+
+function loopOverScreens() {
+	return screens.then((screens:Buffer[]) => screens.reduce((acc:Promise<boolean>, cur:Buffer) => {
+		// if (acc) {return acc.then(consumeRequest)}
+		// registerScreenshot(cur);
+		// sendRequest()
+		// .then(consumeRequest)
+
+		return acc.then((boo:boolean) => boo);
+	}, Promise.resolve(false)))
+}
+
+
+
 
 
 // namesArray
@@ -69,4 +87,5 @@ makeScreenshots()
 // 	}) 
 // })*/
 
+loopOverScreens()
 /*sendRequest*/.then(() => continuator.existing.disconnectBrowser())
