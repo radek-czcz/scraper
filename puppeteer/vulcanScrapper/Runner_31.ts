@@ -69,7 +69,7 @@ function consumeRequest(response:{data:string}):Promise<boolean> {
 			else return false
 		})
 		console.log('name '+response.data+' not found in array');
-		return Promise.reject();
+		return false;
 	})
 }
 
@@ -84,14 +84,15 @@ function loopOverScreens() {
 		// .then(consumeRequest)
 
 		return acc.then(
-			(boo:boolean) => boo, 
-			() => {console.log('sec branch'); 		
-				registerScreenshot(cur);
-				return sendRequest()
-				.then(consumeRequest)
+			(b:boolean) => {console.log('normal branch');
+				if (!b) {
+					registerScreenshot(cur);
+					return sendRequest()
+					.then(consumeRequest)
+				} else return false
 			}
 		);
-	}, Promise.reject()))
+	}, Promise.resolve(false)))
 }
 
 
