@@ -8,24 +8,7 @@ export default class RequestSender {
 
 	constructor(
 		@inject('captcha-image') private image:Promise<string|Buffer>, 
-		private gender:Promise<Gender>) { }
-
-	// private chooseCorrectWord(solvedCaptcha:[{}, string | null]):string|undefined { 
-	// 	console.log(solvedCaptcha);
-	// 	let words:string[] = (<any>solvedCaptcha[0]).data.split(' ');
-	// 	console.log(words);
-
-	// 	let nameGender:string[];
-	// 	if (typeof solvedCaptcha[1] === 'string') {
-	// 		switch (true) {
-	// 			case solvedCaptcha[1].includes('męskie'): nameGender = m_names; break;
-	// 			case solvedCaptcha[1].includes('żeńskie'): nameGender = f_names; break;
-	// 		}
-	// 	}
-	// 	return words.find((elem:string) => {
-	// 		return nameGender.find((name:string) => elem.includes(name.toLowerCase()))
-	// 	})
-	// }
+	) { }
 
 	sendRequest():Promise<{data:string}> {
 		return this.image.then((res:string|Buffer) => {
@@ -42,9 +25,4 @@ export default class RequestSender {
 			})
 		})
 	}
-
-	// solveCaptcha():Promise<string|undefined> {
-	// 	return sendRequest(this.image, this.gender)
-	// 	.then(this.chooseCorrectWord)
-	// }
 }

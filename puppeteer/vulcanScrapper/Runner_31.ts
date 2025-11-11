@@ -6,33 +6,54 @@ import {Page} from 'puppeteer';
 import {ExistingBrowserSubClass} from '../BrowserGenerator/ExistingBrowserSubClass';
 import GenderReader, {Gender} from '../BrowserGenerator/Captcha/GenderReader';
 import {Continuator} from './Continuator';
-import {CaptchaScreenshot} from '../BrowserGenerator/Captcha/CaptchaScreenshot'
+import {CaptchaScreenshot} from '../BrowserGenerator/Captcha/CaptchaScreenshot';
+import RequestSender from '../BrowserGenerator/Captcha/RequestSender';
+import {NamesFileReader} from '../BrowserGenerator/Captcha/NamesFileReader';
 
-// @injectable()
 @autoInjectable()
 class ContinuatorHere<T> extends Continuator<T> {
 	constructor(
 		private registrator:Registrator,
 		protected _existing:ExistingBrowserSubClass,
-		private _genderReader:GenderReader,
-		private _cs:CaptchaScreenshot
+		private _cs:CaptchaScreenshot,
+		private _namesFileReader:NamesFileReader
 	) {super(_existing)}
 
-	get genderReader() {
-		return this._genderReader;
-	}
 	get cs() {
 		return this._cs;
+	}
+
+	get namesFileReader() {
+		return this._namesFileReader;
 	}
 }
 
 container.register(Continuator, {useClass:ContinuatorHere}, {lifecycle: Lifecycle.Singleton}) 
 const continuator:ContinuatorHere<Page> = container.resolve(Continuator) as ContinuatorHere<Page>;
 
-continuator.resume()
-.then(() => continuator.genderReader.gender)
-.then((gender:Gender) => console.log(gender))
+const pageContinuator:Promise<Page> = continuator.resume()
 
-.then(() => continuator.cs.makeScreenshot())
+const registerScreenshot = pageContinuator
+.then(() => {
+	const screens:Promise<Buffer[]> = continuator.cs.makeScreenshot();
+	return screens
+	.then((buf:Buffer[]) => container.register('captcha-image', {useValue:Promise.resolve(buf[0])}))
+})
 
-.then(() => continuator.existing.disconnectBrowser())
+const namesArray:Promise<string[]> = continuator.namesFileReader.readFile()
+
+const sendRequest = registerScreenshot.then(() => {
+	const requestSender = container.resolve(RequestSender);
+	return requestSender.sendRequest()
+	.then((response:{data:string}) => console.log(response.data))
+})
+
+// namesArray
+// .then((namesArray:string[]) => {
+// 	namesArray.forEach((name:string) => {
+// 		if ('patryk90002'.includes(name.toLowerCase()))
+// 			{console.log(name)}
+// 	}) 
+// })
+
+sendRequest.then(() => continuator.existing.disconnectBrowser())
