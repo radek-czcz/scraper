@@ -61,14 +61,16 @@ const namesArray:Promise<string[]> = readNamesFromFile();
 function consumeRequest(response:{data:string}):Promise<boolean> {
 	// return console.log(response.data)
 	return namesArray
-	.then((namesArray:string[]) => {
-		namesArray.forEach((name:string) => {
+	.then((namesArrayDepromisyfied:string[]) => {
+		namesArrayDepromisyfied.forEach((name:string) => {
 			if (response.data.includes(name.toLowerCase()))
-				{console.log('name '+name+' found in array')
-				return true}
-			else return false
+				{
+					console.log(`name ${name} found in array`);
+					return true;
+				}
+			// else return false
 		})
-		console.log('name '+response.data+' not found in array');
+		console.log(`name ${response.data} not found in array`);
 		return false;
 	})
 }
@@ -76,18 +78,22 @@ function consumeRequest(response:{data:string}):Promise<boolean> {
 
 const screens = makeScreenshots();
 
-function loopOverScreens() {
-	return screens.then((screens:Buffer[]) => screens.reduce((acc:Promise<boolean>, cur:Buffer) => {
+function loopOverScreens():Promise<string> {
+	let captcha:Promise<string>;
+	return screens
+	.then((screens:Buffer[]) => screens.reduce((acc:Promise<boolean>, cur:Buffer) => {
 		// if (acc) {return acc.then(consumeRequest)}
 		// registerScreenshot(cur);
 		// return sendRequest()
 		// .then(consumeRequest)
 
 		return acc.then(
-			(b:boolean) => {console.log('normal branch');
+			(b:boolean) => {
+				console.log('normal branch');
 				if (!b) {
 					registerScreenshot(cur);
-					return sendRequest()
+					captcha = sendRequest();
+					return captcha
 					.then(consumeRequest)
 				} else return false
 			}
@@ -108,4 +114,5 @@ function loopOverScreens() {
 // })
 
 loopOverScreens()
+.then((password:string) => console.log(password))
 /*sendRequest*/.then(() => continuator.existing.disconnectBrowser())
